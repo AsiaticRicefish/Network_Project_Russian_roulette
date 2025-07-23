@@ -2,15 +2,20 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Player : MonoBehaviour
+public class GamePlayer : MonoBehaviour
 {
-    private PlayerData _data;
+    [SerializeField] private PlayerData _data;
     public string Nickname => _data.nickname;
     public string PlayerId => _data.playerId;
-    public string FirebaseUid => _data.firebaseUid;
     public int MaxHp => _data.maxHp;
     public int CurrentHp => _data.currentHp;
     public bool IsAlive => _data.isAlive;
+
+
+    private void Start()
+    {
+        //Debug.Log($"{Nickname},{PlayerId}");
+    }
 
     public void Initialize(PlayerData data)
     {
