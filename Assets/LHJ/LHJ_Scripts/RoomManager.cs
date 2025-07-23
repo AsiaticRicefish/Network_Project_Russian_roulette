@@ -74,17 +74,17 @@ public class RoomManager : MonoBehaviour
     }
     public void LeaveRoom()
     {
-        if (hostInstance == null)
-            return;
+        if (hostInstance != null)
+        {
+            Destroy(hostInstance);
+            hostInstance = null;
+        }
 
-        Destroy(hostInstance);
-        hostInstance = null;
-
-        if (clientInstance == null)
-            return;
-
-        Destroy(clientInstance);
-        clientInstance = null;
+        if (clientInstance != null)
+        {
+            Destroy(clientInstance);
+            clientInstance = null;
+        }
 
         PhotonNetwork.LeaveRoom(); // 방 나가기
     }
