@@ -3,7 +3,7 @@ using Managers;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace LDH.LDH_Scripts.UI
+namespace GameUI
 {
     public class UI_VolumeSetting : MonoBehaviour
     {
