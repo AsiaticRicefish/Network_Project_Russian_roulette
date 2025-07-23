@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using DesignPattern;
+using Sound;
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.Events;
@@ -14,6 +15,11 @@ namespace Managers
         private AudioMixerGroup[] _audioMixerGroups;
 
         private AudioSource[] audioSources = new AudioSource[(int)Define_LDH.Sound.MaxCount];
+
+        private SfxClipTable _sfxClipTable;
+        [SerializeField] private string _sfxClipTablePath = "Sounds/SfxClipData";
+        
+        
         //private Dictionary<string, AudioClip> sfxAudioClips = new();   // 캐싱 사용 x
         
         public float BgmVolume { get; private set; }
@@ -64,8 +70,11 @@ namespace Managers
             
             //bgm 연속 재생 설정
             audioSources[(int)Define_LDH.Sound.Bgm].loop = true;
-
-
+            
+            
+            //리소스 로드
+            _sfxClipTable = Resources.Load<SfxClipTable>(_sfxClipTablePath);
+            _sfxClipTable.Init();
 
         }
 
@@ -173,6 +182,22 @@ namespace Managers
             {
                 Debug.LogWarning($"[{GetType()}] 잘못된 sound type입니다.");
             }
+        }
+
+        
+        public void PlaySfxByKey(string sfxKey)
+        {
+            var audioClip = _sfxClipTable.GetAudioClip(sfxKey);
+            
+            if (audioClip == null)
+            {
+                Debug.LogWarning($"{GetType()} sfx clip table에서 audio clip을 찾을 수 없습니다.");
+                return;
+            }
+            
+            AudioSource audioSource = audioSources[(int)Define_LDH.Sound.Sfx];
+            
+            audioSource.PlayOneShot(audioClip);
         }
 
         #endregion
