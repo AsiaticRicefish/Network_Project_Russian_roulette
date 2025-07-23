@@ -16,8 +16,8 @@ namespace Managers
         private AudioSource[] audioSources = new AudioSource[(int)Define_LDH.Sound.MaxCount];
         //private Dictionary<string, AudioClip> sfxAudioClips = new();   // 캐싱 사용 x
         
-        public float bgmVolume { get; private set; }
-        public float sfxVolume { get; private set; }
+        public float BgmVolume { get; private set; }
+        public float SfxVolume { get; private set; }
 
         public const string BgmVolumeKey = "BGMVolume"; //playerprefs, audio mixer parameter로 사용
         public const string SfxVolumeKey = "SFXVolume"; //playerprefs, audio mixer parameter로 사용
@@ -33,7 +33,7 @@ namespace Managers
             //audio mixer setting
             if (audioMixer == null)
             {
-                audioMixer = Resources.Load<AudioMixer>("Sounds/MasterAudioMoxer");
+                audioMixer = Resources.Load<AudioMixer>("Sounds/MasterAudioMixer");
                 _audioMixerGroups = audioMixer.FindMatchingGroups("Master");
                 
                 
@@ -42,10 +42,12 @@ namespace Managers
             }
             
             
-            //SFX, BGM 재생하는 object 생성.....??
+            //SFX, BGM audio source 생성 및 output audio mixer group 지정
             GameObject soundRoot = new GameObject("@Sound");
-            //soundRoot.transform.SetParent(Manager.manager.transform);
-
+            // soundRoot.transform.SetParent(Manager.manager.transform);  //dont destroy 처리
+            DontDestroyOnLoad(soundRoot);
+            
+            
             string[] soundTypeNames = System.Enum.GetNames((typeof(Define_LDH.Sound)));
             
             for(int i=0; i<soundTypeNames.Length - 1 ; i++)
@@ -84,8 +86,11 @@ namespace Managers
         {
             foreach (AudioSource audioSource in audioSources)
             {
-                audioSource.clip = null;
-                audioSource.Stop();
+                if (audioSource != null)
+                {
+                    audioSource.clip = null;
+                    audioSource.Stop();
+                }
             }
             //sfxAudioClips.Clear();
         }
@@ -100,20 +105,27 @@ namespace Managers
         //0~1 사이의 값을 믹서 값에 맞게 변환 -> 오디오 믹서에 반영 -> 0~1 사이의 값을 로컬에 저장
         public void SetBgmVolume(float value)
         {
-            bgmVolume = Mathf.Clamp(value, 0.0001f, 1f);
+            //볼륨 clamp
+            BgmVolume = Mathf.Clamp(value, 0.0001f, 1f);
+            
+            // 값 전환
             float bgmMixerValue = ValueChange(value);
+            
+            //오디오 믹서 설정
             audioMixer.SetFloat(BgmVolumeKey, bgmMixerValue);
-            PlayerPrefs.SetFloat(BgmVolumeKey, bgmMixerValue);
+            
+            //로컬 저장
+            PlayerPrefs.SetFloat(BgmVolumeKey, BgmVolume);  //mixer 값이 아닌 0~1 사이의 값 저장
         }
         
         //sfx 볼륨 설정
         //0~1 사이의 값을 믹서 값에 맞게 변환 -> 오디오 믹서에 반영 -> 0~1 사이의 값을 로컬에 저장
         public void SetSfxVolume(float value)
         {
-            sfxVolume = Mathf.Clamp(value, 0.0001f, 1f);
+            SfxVolume = Mathf.Clamp(value, 0.0001f, 1f);
             float sfxMixerValue = ValueChange(value);
             audioMixer.SetFloat(SfxVolumeKey, sfxMixerValue);
-            PlayerPrefs.SetFloat(SfxVolumeKey, sfxMixerValue);
+            PlayerPrefs.SetFloat(SfxVolumeKey, SfxVolume);
         }
 
         private float ValueChange(float value)
