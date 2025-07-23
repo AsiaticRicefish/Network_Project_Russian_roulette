@@ -5,61 +5,51 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
     private PlayerData _data;
-
-    public string _playerId;
-    public string _firebaseUid;
-    public int _maxHp;
-    public int _currentHp;
-    public bool _isAlive;
-    //public List<ItemData> _itemslot;
-
-    public string PlayerId { get { return _playerId; } }
-    public int MaxHp { get { return _maxHp; } }
-    public int CurrentHp { get { return _currentHp; } }
-    public bool IsAlive { get { return _isAlive; } }
+    public string Nickname => _data.nickname;
+    public string PlayerId => _data.playerId;
+    public string FirebaseUid => _data.firebaseUid;
+    public int MaxHp => _data.maxHp;
+    public int CurrentHp => _data.currentHp;
+    public bool IsAlive => _data.isAlive;
 
     public void Initialize(PlayerData data)
     {
         _data = data;
-        _playerId = _data.playerId;
-        _firebaseUid = _data.firebaseUid;
-        _maxHp = _data.maxHp;
-        _currentHp = _data.currentHp;
-        _isAlive = _data.isAlive;
     }
 
-    //Ãß°¡ÀûÀÎ ³×Æ®¿öÅ© µ¿±âÈ­ ÀÛ¾÷ÀÌ ÇÊ¿ä
-
     /// <summary>
-    /// ¶ó¿îµå ÃÊ±âÈ­ ÇÒ ¶§ °¢ÀÚ ÇÃ·¹ÀÌ¾îÀÇ MaxHp°¡ ´Þ¶óÁ®¾ß ÇÑ´Ù
+    /// Player MaxHp Setting ë©”ì„œë“œ
     /// </summary>
-    /// <param name="newhp"> maxhp·Î º¯°æµÉ °ª </param>
-    public void SetMaxHp(int newhp)
+    /// <param name="newHp"> ì„¤ì • ì‹œí‚¬ MaxHpê°’ </param>
+    public void SetMaxHp(int newHp)
     {
-        if (newhp < 0)
+        if (newHp < 0)
         {
-            Debug.LogError("0º¸´Ù ÀÛÀº °ªÀ¸·Î ÇÃ·¹ÀÌ¾îÀÇ MaxHp¸¦ ¼ÂÆÃ ÇÒ ¼ö ¾ø½À´Ï´Ù");
+            Debug.LogError("0ë³´ë‹¤ ìž‘ì€ ê°’ìœ¼ë¡œ MaxHp ì„¤ì • ë¶ˆê°€");
             return;
         }
-
-        _maxHp = newhp;
+        _data.maxHp = newHp;
     }
 
     /// <summary>
-    /// Hp °ü·Ã ¾ÆÀÌÅÛ »ç¿ë ¹× ÃÑ ¸Â¾ÒÀ» ¶§ »ç¿ë µÉ ÇÔ¼ö
+    /// Player hp ê´€ë ¨ ë©”ì„œë“œ
     /// </summary>
-    /// <param name="amount"> hp º¯µ¿ ¼ýÀÚ </param>
-    public void IncreaseHp(int amount) 
+    /// <param name="amount"></param>
+    public void IncreaseHp(int amount)
     {
-        _currentHp = Mathf.Min(_currentHp + amount, _maxHp);
+        _data.currentHp = Mathf.Min(_data.currentHp + amount, _data.maxHp);
     }
-    public void DecreaseHp(int amount) 
+
+    public void DecreaseHp(int amount)
     {
-        _currentHp = Mathf.Max(_currentHp - amount, 0);
-        if(_currentHp <= 0)
-        {
-            _isAlive = false;
-        }
+        _data.currentHp = Mathf.Max(_data.currentHp - amount, 0);
+        if (_data.currentHp <= 0)
+            _data.isAlive = false;
     }
-    
+
+    //Playerì—ì„œ PlayerDataë¥¼ ë„˜ê²¨ì£¼ëŠ” ë©”ì„œë“œ
+    public PlayerData ToPlayerData()
+    {
+        return _data;
+    }
 }

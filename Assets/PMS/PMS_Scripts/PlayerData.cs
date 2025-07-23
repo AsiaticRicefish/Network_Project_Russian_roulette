@@ -4,6 +4,7 @@ using System.Collections.Generic;
 [System.Serializable]
 public class PlayerData
 {
+    public string nickname;     // ê²Œì„ ë‚´ ë‹‰ë„¤ì„
     public string playerId;
     public string firebaseUid;
     public int winCount;
@@ -11,28 +12,40 @@ public class PlayerData
     public int maxHp;
     public int currentHp;
     public bool isAlive;
+    public PlayerData(string nickname, string id, string uid, int winCount, int loseCount)
+    {
+        this.nickname = nickname;
+        playerId = id;
+        firebaseUid = uid;
+        this.winCount = winCount;
+        this.loseCount = loseCount;
+        this.maxHp = 3;
+        this.currentHp = maxHp;
+        this.isAlive = true;
+    }
 
-    private PlayerData(string id, string uid, int winCount = 0, int loseCount = 0, int maxHp = 3)
+    /*public PlayerData(string id, string uid, int winCount, int loseCount, int maxHp,int currentHp,bool isAlive)
     {
         playerId = id;
         firebaseUid = uid;
         this.winCount = winCount;
         this.loseCount = loseCount;
         this.maxHp = maxHp;
-        this.currentHp = maxHp;
-        this.isAlive = true;
-    }
+        this.currentHp = currentHp;
+        this.isAlive = isAlive;
+    }*/
 
     /// <summary>
-    /// Firebase¿¡¼­ ºÒ·¯¿Â µ¥ÀÌÅÍ¸¦ ¹ÙÅÁÀ¸·Î PlayerData »ı¼º
+    /// Firebaseì—ì„œ ë¶ˆëŸ¬ì˜¨ ë°ì´í„°ë¥¼ ë°”íƒ•ìœ¼ë¡œ PlayerData ìƒì„±
     /// </summary>
-    /// <param name="playerId"> ÇÃ·¹ÀÌ¾îID </param>
+    /// <param name="nickname"> í”Œë ˆì´ì–´ ì´ë¦„ </param>
+    /// <param name="playerId"> í”Œë ˆì´ì–´ID </param>
     /// <param name="firebaseUid"> FirebaseUid </param>
-    /// <param name="winCount"> Firebase¿¡ ÀúÀåµÈ winCount °ª </param>
-    /// <param name="loseCount"> Firebase¿¡ ÀúÀåµÈ loseCount °ª </param>
+    /// <param name="winCount"> Firebaseì— ì €ì¥ëœ winCount ê°’ </param>
+    /// <param name="loseCount"> Firebaseì— ì €ì¥ëœ loseCount ê°’ </param>
     /// <returns></returns>
-    public static PlayerData CreatePlayerDataFromFirebase(string playerId, string firebaseUid, int winCount, int loseCount)
+    public static PlayerData CreatePlayerDataFromFirebase(string nickname,string playerId, string firebaseUid, int winCount, int loseCount)
     {
-        return new PlayerData(playerId, firebaseUid, winCount, loseCount);
+        return new PlayerData(nickname, playerId, firebaseUid, winCount, loseCount);
     }
 }
