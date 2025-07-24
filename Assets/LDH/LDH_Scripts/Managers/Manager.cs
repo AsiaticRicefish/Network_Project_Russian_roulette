@@ -41,7 +41,7 @@ namespace Managers
         public static TestManager Test => TestManager.Instance;
 
         public static SoundManager Sound => SoundManager.Instance;      // 사운드
-        
+        public static UIManager UI => UIManager.Instance;               //  UI
         
         
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
