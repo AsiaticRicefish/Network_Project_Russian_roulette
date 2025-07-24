@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Managers;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class SfxPlayTest : MonoBehaviour
@@ -25,5 +26,10 @@ public class SfxPlayTest : MonoBehaviour
     void Update()
     {
         
+    }
+
+    public void MoveScene(string sceneName)
+    {
+        SceneManager.LoadScene(sceneName);
     }
 }
