@@ -11,7 +11,7 @@ namespace Sound
     public class SfxClipTable : ScriptableObject
     {
         /// <summary>
-        /// 키(key)에 대응하는 AudioClip을 저장하는 구조체
+        /// 키(key)에 대응하는 AudioClip을 저장하는 클래스
         /// </summary>
         [System.Serializable]
         public class SfxEntry
