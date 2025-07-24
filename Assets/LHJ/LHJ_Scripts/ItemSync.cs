@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ItmeSync : MonoBehaviourPun
+public class ItemSync : MonoBehaviourPun
 {
     [SerializeField] private List<ItemData> itemDataList;  // 아이템 데이터 리스트
     private string myId; // 임시 플레이어 식별 ID

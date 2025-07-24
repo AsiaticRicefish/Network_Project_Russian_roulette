@@ -252,7 +252,7 @@ GameObject:
   - component: {fileID: 1067473396}
   - component: {fileID: 1067473398}
   m_Layer: 0
-  m_Name: NetworkSync
+  m_Name: ItemSync
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
