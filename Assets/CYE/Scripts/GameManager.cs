@@ -3,52 +3,109 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using DesignPattern;
+using UnityEngine.Events;
+using System;
+using Managers;
 
+/// <summary>
+/// 게임 플레이의 흐름을 관리하는 클래스.
+/// </summary>
 public class GameManager : Singleton<GameManager>
 {
-    // private List<Player> _players
-    // private LinkedList<int> _순번리스트
-    // 
+    // 참가자 순서 리스트 
+    // => 다만 플레이어의 목록 자체는 PlayerManager에서 관리하므로 해당 값 또한 PlayerManager에서 관리해야할수도 있음
+    private LinkedList<int> _turnOrder = new();
+    private LinkedListNode<int> _currentTurnIndex;
+    private int _currentRound;
+    public int CurrentRound { get { return _currentRound; } private set { _currentRound = value; } }
+    private int _totalRound;
+    public int TotalRound { get { return _totalRound; } private set { _totalRound = value; } }
+
+    // 각 게임 상태로 전환될때 실행되는 event 변수 
+    // => 각 상태 전환시 필요한 동작을 개별적으로 
+    public event Action OnGameStart;
+    public event Action OnGameEnd;
+    public event Action OnRoundStart;
+    public event Action OnRoundEnd;
+    public event Action OnTurnStart;
+    public event Action OnTurnEnd;
+    public event Action<bool> OnPaused;
+
     private void Awake() => SingletonInit();
 
-    private void StartGame()
+    public void StartGame()
     {
-        // SceneManager.LoadScene("게임 Scene")
-        // StartRound()
+        GameInit();
+
+        OnGameStart?.Invoke();
+
+        StartRound();
     }
-    private void EndGame()
+    public void EndGame()
     {
+        OnGameEnd?.Invoke();
         // 각 플레이어의 승패를 통해 결과 저장
-        // SceneManager.LoadScene("결과창 Scene")
     }
 
-    private void StartRound()
+    public void StartRound()
     {
-        // 해당 라운드에 사용할 랜덤 순번 지정
-        // StartTurn()
-    }
-    private void EndRound()
-    {
+        RoundInit();
 
+        OnRoundStart?.Invoke();
+
+        StartTurn();
+    }
+    public void EndRound()
+    {
+        OnRoundEnd?.Invoke();
+
+        if (_currentRound >= _totalRound)
+        {
+            EndGame();
+            return;
+        }
+
+        StartRound();
     }
 
-    private void StartTurn()
+    public void StartTurn()
     {
-        // 해당 턴의 플레이어 상태 = 활성
-        // 해당하지 않는 플레이어 상태 = 비활성
+        TurnInit();
+
+        OnTurnStart?.Invoke();
     }
-    private void EndTurn()
+    public void EndTurn()
     {
-        // 해당 턴의 플레이어 상태 = 비활성
-        // 
+        OnTurnEnd?.Invoke();
+        
+        // TO DO: 해당 조건을 확인할 주체를 고려해야함
         // if(플레이어들의 체력 == 0)
         //  EndRound()
         //  return
-        // 
-        // 순번 변경
-        // StartRound()
+
+        _currentTurnIndex = _currentTurnIndex.Next;
+        StartTurn();
     }
 
-    
+    public void PauseGame(bool changeState)
+    {
+        OnPaused?.Invoke(changeState);
+    }
 
+    private void GameInit()
+    {
+        _currentRound = 0;
+    }
+    private void RoundInit()
+    {
+        _currentRound++;
+        _currentTurnIndex = _turnOrder.First;
+    }
+    private void TurnInit()
+    {
+        if (Manager.Gun.Magazine.Count == 0)
+        { 
+            Manager.Gun.Reload();
+        }
+    }
 }

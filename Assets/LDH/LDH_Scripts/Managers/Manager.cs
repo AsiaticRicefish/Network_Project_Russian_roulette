@@ -41,7 +41,12 @@ namespace Managers
         public static TestManager Test => TestManager.Instance;
 
         public static SoundManager Sound => SoundManager.Instance;      // 사운드
+      
         public static UIManager UI => UIManager.Instance;               //  UI
+
+        public static GunManager Gun => GunManager.Instance;            // 총 매니저
+
+        public static GameManager Game => GameManager.Instance;         // 게임 매니저
         
         
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
