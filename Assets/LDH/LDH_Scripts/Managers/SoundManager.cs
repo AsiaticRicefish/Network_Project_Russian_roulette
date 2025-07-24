@@ -108,7 +108,7 @@ namespace Managers
         /// </summary>
         private void LoadSavedVolumes()
         {
-            Debug.Log($"[{GetType()}] 저장된 사운드 볼륨 데이터를 가져옵니다.");
+            Debug.Log($"[{GetType().Name}] 저장된 사운드 볼륨 데이터를 가져옵니다.");
             SetBgmVolume((PlayerPrefs.HasKey(BgmVolumeKey)) ? PlayerPrefs.GetFloat(BgmVolumeKey) : 0.5f);
             SetSfxVolume((PlayerPrefs.HasKey(SfxVolumeKey)) ? PlayerPrefs.GetFloat(SfxVolumeKey) : 0.5f);
         }
