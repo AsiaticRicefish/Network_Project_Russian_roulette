@@ -3,13 +3,16 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun; // ActorNumber를 사용하기 위해 추가
+using Photon.Realtime;
 
 namespace PMS_Test
 {
     public class PlayerManager : Singleton<PlayerManager>
     {
-        private List<GamePlayer> _players;
-        public List<GamePlayer> Players => _players;
+        //리스트가 아닌 Dictionary로 관리 Key - FirebaseUID, Player GamePlayer  
+        private Dictionary<string, GamePlayer> _players;
+
+        public Dictionary<string, GamePlayer> GetAllPlayers() => _players;
 
         //리스트에서 플레이어를 지우거나 추가를 할 때 자동 동기화 될 수 있도록 하는방법? 
         //public List<Player> Players { get { return _players} set { } };
@@ -17,14 +20,33 @@ namespace PMS_Test
         private void Awake()
         {
             SingletonInit();
-            _players = new List<GamePlayer>(); // _players 리스트 초기화
+            if (PhotonNetwork.IsMasterClient)
+            {
+                Init();
+            }
         }
 
-        public void AddPlayer(GamePlayer player)
+        private void Init()
         {
-            if (!_players.Contains(player))
+            _players = new Dictionary<string, GamePlayer>();
+        }
+
+        //플레이어 UID로 관리 되는 딕셔너리에 등록
+        public void RegisterGamePlayer(Player photonPlayer)
+        {
+            string uid = photonPlayer.CustomProperties["uid"]?.ToString() ?? "unknown";
+            string nickname = photonPlayer.NickName;
+
+            GamePlayer gamePlayer = new GamePlayer();
+            gamePlayer.Initialize(uid, nickname);
+            RegisterPlayer(gamePlayer);
+        }
+
+        public void RegisterPlayer(GamePlayer player)
+        {
+            if (!_players.ContainsKey(player.PlayerId))
             {
-                _players.Add(player);
+                _players.Add(player.PlayerId, player);
                 Debug.Log($"Player added! Player FirebaseUID Number : {player.PlayerId}. Current players: {_players.Count}");
             }
             else
@@ -35,9 +57,9 @@ namespace PMS_Test
 
         public void RemovePlayer(GamePlayer player)
         {
-            if (_players.Contains(player))
+            if (_players.ContainsKey(player.PlayerId))
             {
-                _players.Remove(player);
+                _players.Remove(player.PlayerId);
             }
             else
             {
@@ -51,7 +73,7 @@ namespace PMS_Test
             GamePlayer player = FindPlayerByUID(uid);
             if (player != null)
             {
-                _players.Remove(player);
+                _players.Remove(player.PlayerId);
                 return true;
             }
             else
@@ -63,21 +85,18 @@ namespace PMS_Test
 
         public GamePlayer FindPlayerByUID(string uid)
         {
-            return _players.Find(p => p.PlayerId == uid);
-        }
-
-        // 플레이어 고유값인 ActorNumber로 리스트에서 플레이어 찾기
-        public GamePlayer FindPlayerByActorNumber(int actorNumber)
-        {
-            // _players 리스트의 각 GamePlayer에 연결된 PhotonView의 owner.ActorNumber를 비교
-            return _players.Find(p => p.GetComponent<PhotonView>().Owner.ActorNumber == actorNumber);
+            if (_players.TryGetValue(uid, out GamePlayer player))
+            {
+                return player;
+            }
+            return null;
         }
 
         public void PlayerListPrint()
         {
             foreach (var player in _players)
             {
-                Debug.Log(player.Nickname);
+                Debug.Log(player.Value.Nickname);
             }
         }
     }

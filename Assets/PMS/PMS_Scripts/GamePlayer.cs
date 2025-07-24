@@ -36,19 +36,16 @@ public class GamePlayer : MonoBehaviour
         _data.currentHp = _data.maxHp;
         _data.isAlive = true;
         AssignedSpawnPointIndex = initialSpawnPointIndex; // 스폰 지점 인덱스 저장
-
-        Debug.Log($"Initialized GamePlayer: {Nickname}, HP: {CurrentHp} at spawn index {AssignedSpawnPointIndex}");
-        // UIManager 등을 통해 플레이어 UI 업데이트 로직 호출 가능
-    }
-
-    private void Start()
-    {
-        //Debug.Log($"{Nickname},{PlayerId}");
     }
 
     public void Initialize(PlayerData data)
     {
         _data = data;
+    }
+    public void Initialize(string nickname,string uid)
+    {
+        _data.nickname = nickname;
+        _data.playerId = uid;
     }
 
     /// <summary>

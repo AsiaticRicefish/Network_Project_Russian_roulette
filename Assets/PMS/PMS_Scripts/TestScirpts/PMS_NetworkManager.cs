@@ -27,11 +27,17 @@ namespace PMS_Test
         {
             Debug.Log("입장완료");
             PhotonNetwork.LocalPlayer.NickName = $"Player_{Random.Range(1, 1000).ToString("0000")}";
-            
+
             //SpawnManager.Instance.InitializeAvailableSpawnPoints();
             //InstantiateLocalPlayerCharacter();
 
-            if(PhotonNetwork.IsMasterClient)
+            //마스터 클라이언트만 스폰 위치 초기화 실행
+            if (PhotonNetwork.IsMasterClient)
+            {
+                SpawnManager.Instance.InitializeAvailableSpawnPoints();
+                //StartCoroutine(SpawnAllPlayersWhenReady());
+            }
+            /*if(PhotonNetwork.IsMasterClient)
             {
                 SpawnManager.Instance.InitializeAvailableSpawnPoints();
                 StartCoroutine(HeyWait());
@@ -39,7 +45,7 @@ namespace PMS_Test
             else
             {
                 StartCoroutine(HeyWait());
-            }
+            }*/
         }
 
         private IEnumerator HeyWait()
@@ -81,14 +87,14 @@ namespace PMS_Test
                     if (newPlayer != null)
                     {
                         // PlayerData 초기화 (Firebase에서 불러온 데이터를 RPC로 전달하는 부분)
-                        PlayerData dummyData = new PlayerData(PhotonNetwork.LocalPlayer.NickName, PhotonNetwork.LocalPlayer.UserId, 0, 0);
+                        PlayerData dummyData = new PlayerData(PhotonNetwork.LocalPlayer.NickName, PhotonNetwork.LocalPlayer.UserId,0,0);          //Firebase에서 uid,wincount,losecount를 들고와야함
 
                         // GamePlayer의 RPC_InitializePlayer 메서드를 모든 클라이언트에서 호출하여 플레이어 데이터 및 스폰 인덱스 동기화
                         newPlayer.GetComponent<PhotonView>().RPC("RPC_InitializePlayer", RpcTarget.AllBuffered,
                             dummyData.nickname, dummyData.playerId, dummyData.winCount, dummyData.loseCount, spawnIndex);
 
                         // 플레이어를 PlayerManager에 추가 (플레이어 관리)
-                        PMS_Test.PlayerManager.Instance.AddPlayer(newPlayer); // Namespace PMS_Test 가정
+                        PMS_Test.PlayerManager.Instance.RegisterPlayer(newPlayer); // Namespace PMS_Test 가정
                         Debug.Log($"로컬 플레이어 컨트롤러({playerobj.name})를 성공적으로 생성하고 PlayerManager에 추가했습니다!");
                     }
                     else
@@ -132,10 +138,10 @@ namespace PMS_Test
         // 새로운 플레이어가 방에 입장했을 때 (모든 클라이언트에서 호출)
         public override void OnPlayerEnteredRoom(Photon.Realtime.Player newPlayer)
         {
-            base.OnPlayerEnteredRoom(newPlayer);
-            Debug.Log($"{newPlayer.NickName} 님이 방에 입장했습니다.");
-            // 마스터 클라이언트는 이 콜백에서 새로운 플레이어의 캐릭터를 Instantiate 할 수 있습니다.
-            // (InstantiateLocalPlayerCharacter() 로직을 플레이어 입장 시에도 재활용하여.)
+            if (PhotonNetwork.IsMasterClient)
+            {
+                //SpawnPlayerForClient(newPlayer);
+            }
         }
 
         // 플레이어가 방을 나갔을 때 (모든 클라이언트에서 호출)
@@ -150,7 +156,7 @@ namespace PMS_Test
                 // 나간 유저의 정보가 필요하다.
                 // 방을 나간 플레이어가 사용하던 스폰 지점을 찾아 반환하는 로직 구현 필요.
                 // GamePlayer에서 스폰 인덱스를 저장해두었으므로, PlayerManager에서 해당 플레이어를 찾아 인덱스를 얻습니다.
-                GamePlayer exitedPlayer = PMS_Test.PlayerManager.Instance.FindPlayerByActorNumber(otherPlayer.ActorNumber); // PlayerManager에 FindPlayerByActorNumber 추가 가정
+                /*GamePlayer exitedPlayer = PMS_Test.PlayerManager.Instance.FindPlayerByActorNumber(otherPlayer.ActorNumber); // PlayerManager에 FindPlayerByActorNumber 추가 가정
                 if (exitedPlayer != null && exitedPlayer.AssignedSpawnPointIndex != -1)
                 {
                     SpawnManager.Instance.ReturnSpawnPoint(exitedPlayer.AssignedSpawnPointIndex);
@@ -159,7 +165,7 @@ namespace PMS_Test
                 else
                 {
                     Debug.LogWarning($"마스터 클라이언트: 나간 플레이어 {otherPlayer.NickName}의 스폰 지점을 찾거나 반환할 수 없습니다.");
-                }
+                }*/
             }
         }
     }
