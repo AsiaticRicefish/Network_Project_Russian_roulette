@@ -9,7 +9,7 @@ public class SpawnManager : MonoBehaviour
     public static SpawnManager Instance;
 
     //룸에서 사용되는 룸 프로퍼티 접두사
-    public const string SP_KEY_PREFIX = "SP_";
+    public const string SP_KEY_PREFIX = "SP_";      //S
 
     [SerializeField] private Transform[] _allSpawnPoints;
 
@@ -39,6 +39,7 @@ public class SpawnManager : MonoBehaviour
             Debug.Log($"SpawnManager : {_allSpawnPoints.Length}개의 스폰포인트를 찾았습니다.");
         }
     }
+
 
     //마스터 클라이언트(방장)만 룸을 초기화 해야함 일단 
 
@@ -79,16 +80,11 @@ public class SpawnManager : MonoBehaviour
     /// <returns>선택된 스폰 지점 Transform과 _allSpawnPoints 배열에서의 인덱스. 없으면 (null, -1)</returns>
     public (Transform spawnPoint, int index) GetAndClaimRandomSpawnPoint()
     {
-        if (!PhotonNetwork.IsMasterClient) // 마스터 클라이언트가 아니면 오류 로그 출력
+        if(!PhotonNetwork.IsMasterClient) // 마스터 클라이언트가 아니면 오류 로그 출력
         {
             Debug.LogError("마스터 클라이언트만 룸 프로퍼티에 대한 부분을 설정할 수 있음.");
             return (null, -1);
         }
-
-        int a = 1;
-        string keye = SP_KEY_PREFIX + a.ToString();
-        Debug.Log(PhotonNetwork.CurrentRoom.CustomProperties[keye].ToString());
-
         List<int> availableIndices = new List<int>();
         // 모든 스폰 지점을 순회하며 룸 프로퍼티에서 사용 가능 상태(값이 true)인 스폰 지점의 인덱스를 수집
         for (int i = 0; i < _allSpawnPoints.Length; i++) 

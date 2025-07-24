@@ -26,7 +26,24 @@ namespace PMS_Test
         {
             Debug.Log("입장완료");
             PhotonNetwork.LocalPlayer.NickName = $"Player_{Random.Range(1, 1000).ToString("0000")}";
-            SpawnManager.Instance.InitializeAvailableSpawnPoints();
+            
+            //SpawnManager.Instance.InitializeAvailableSpawnPoints();
+            //InstantiateLocalPlayerCharacter();
+
+            if(PhotonNetwork.IsMasterClient)
+            {
+                SpawnManager.Instance.InitializeAvailableSpawnPoints();
+                StartCoroutine(HeyWait());
+            }
+            else
+            {
+                StartCoroutine(HeyWait());
+            }
+        }
+
+        private IEnumerator HeyWait()
+        {
+            yield return new WaitForSeconds(0.5f);
             InstantiateLocalPlayerCharacter();
         }
 
@@ -57,7 +74,7 @@ namespace PMS_Test
                 {
                     // PhotonNetwork.Instantiate를 사용하여 플레이어 캐릭터/컨트롤러 프리팹을 네트워크 상에 생성
                     // 프리팹 경로 및 이름 확인 (예: Assets/Resources/Prefabs/PlayerController)
-                    GameObject playerGO = PhotonNetwork.Instantiate(Path.Combine("Prefabs", "PlayerController"), spawnPoint.position, spawnPoint.rotation);
+                    GameObject playerGO = PhotonNetwork.Instantiate(Path.Combine("Prefabs", "PlayerConrtoller"), spawnPoint.position, spawnPoint.rotation);
 
                     // GamePlayer 컴포넌트를 가져와 초기화 RPC 호출
                     GamePlayer newPlayer = playerGO.GetComponent<GamePlayer>();
