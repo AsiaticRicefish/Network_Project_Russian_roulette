@@ -27,6 +27,7 @@
 
 # Visual Studio cache directory
 .vs/
+.vscode/
 
 # Gradle cache directory
 .gradle/
@@ -76,12 +77,12 @@ crashlytics-build.properties
 
 
 
-
-
 # Mac file setting
 .DS_Store
 
 # Rider
 .idea/
 
-/Assets/Imports
+# External Import Asset
+/Assets/[Ii]mport
+/Assets/[Ii]mports
