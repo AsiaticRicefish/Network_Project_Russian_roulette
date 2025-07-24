@@ -12,16 +12,17 @@ using DG.Tweening;
 
 public class ItemBoxManager : Singleton<ItemBoxManager>
 {
-    [Header("보상 아이템 설정")]
+    [Header("TurnEnd NewItem")]
     [SerializeField] private List<ItemData> newItems; // 등장 가능한 아이템 목록
     [SerializeField] private int newItemCount;
 
-    [Header("상자 오브젝트")]
-    [SerializeField] private Transform containerTransform;  // 서랍식으로 열릴 부분
+    [Header("ItemBox Object")]
     [SerializeField] private GameObject itemBoxPrefabs;     // 상자 전체 오브젝트
     [SerializeField] private Renderer[] boxRenderers;       // 머티리얼 투명도 조절용
+    [SerializeField] private Transform lidTransform;        // 상자 뚜껑 (CommonMediumLid)
+    [SerializeField] private Vector3 openRotation = new Vector3(-120f, 0f, 0f); // 뚜껑 열리는 각도
 
-    [Header("슬롯 연결")]
+    [Header("Connect Slot")]
     [SerializeField] private DeskUI deskUI;
 
     private bool isOpened = false;
@@ -31,14 +32,29 @@ public class ItemBoxManager : Singleton<ItemBoxManager>
     {
         SingletonInit();
 
-        // 각 Renderer의 머티리얼 인스턴스화
+        InitMaterials();
+
+        CloseBoxImmediately(); // 시작 시 닫힌 상태로 초기화
+    }
+
+    private void InitMaterials()
+    {
         boxMaterials = new Material[boxRenderers.Length];
         for (int i = 0; i < boxRenderers.Length; i++)
         {
             boxMaterials[i] = boxRenderers[i].material;
-        }
 
-        CloseBoxImmediately(); // 시작 시 닫힌 상태로 초기화
+            // 내부는 뒤쪽에 렌더링되도록 설정
+            if (boxMaterials[i].name.ToLower().Contains("container"))
+                boxMaterials[i].renderQueue = 3100;
+            else
+                boxMaterials[i].renderQueue = 3000;
+
+            // 초기 알파값 0
+            var color = boxMaterials[i].color;
+            color.a = 0f;
+            boxMaterials[i].color = color;
+        }
     }
 
     /// <summary>
@@ -58,9 +74,20 @@ public class ItemBoxManager : Singleton<ItemBoxManager>
     {
         for (int i = 0; i < boxMaterials.Length; i++)
         {
-            float delay = i * 0.1f;
-            boxMaterials[i].DOFade(1f, 0.5f).SetDelay(delay);
+            float delay = i * 0.3f;
+            boxMaterials[i].DOFade(1f, 1.2f)
+                          .SetDelay(delay)
+                          .SetEase(Ease.OutQuad);
         }
+    }
+
+    /// <summary>
+    /// 상자를 닫힌 상태로 초기화
+    /// </summary>
+    private void CloseBoxImmediately()
+    {
+        lidTransform.localRotation = Quaternion.identity; // 뚜껑 닫기
+        itemBoxPrefabs.SetActive(true);
     }
 
     private void SetBoxAlpha(float alpha)
@@ -82,25 +109,16 @@ public class ItemBoxManager : Singleton<ItemBoxManager>
         if (isOpened) return;
         isOpened = true;
 
-        // 서랍식 애니메이션
-        containerTransform.DOLocalMoveZ(-0.03f, 0).SetEase(Ease.OutBack);
-
-        // 아이템 지급
-        var rewards = PickRandomRewards();
-        AutoPlaceToSlots(rewards);
-
-        // 잠시 후 상자 숨기기
-        StartCoroutine(HideBoxAfterDelay());
+        lidTransform.DOLocalRotate(openRotation, 0.7f)
+                 .SetEase(Ease.OutBack)
+                 .OnComplete(() =>
+                 {
+                     var rewards = PickRandomRewards();
+                     AutoPlaceToSlots(rewards);
+                     StartCoroutine(HideBoxAfterDelay());
+                 });
     }
 
-    /// <summary>
-    /// 상자를 닫힌 위치로 되돌림
-    /// </summary>
-    private void CloseBoxImmediately()
-    {
-        containerTransform.localPosition = Vector3.zero;
-        itemBoxPrefabs.SetActive(true);
-    }
 
     /// <summary>
     /// 아이템을 랜덤하게 선택
