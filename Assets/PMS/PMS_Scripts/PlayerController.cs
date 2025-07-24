@@ -28,6 +28,7 @@ public class PlayerController : MonoBehaviour
             //자기 카메라가 아니면 다 비활성화 처리
             //추후 게임이 종료되도 관전 모드를 만들게 되면 다른 유저의 시야를 봐야 할 수도 있기 때문에
             GetComponentInChildren<Camera>().gameObject.SetActive(false);
+            Destroy(_rb);
         }
     }
 
@@ -37,6 +38,7 @@ public class PlayerController : MonoBehaviour
 
         PlayerLook();
         PlayerMove();
+        PlayerJump();
     }
 
     private void PlayerLook()
@@ -49,7 +51,6 @@ public class PlayerController : MonoBehaviour
         _cameraHolder.transform.localEulerAngles = Vector3.left * verticalLookRotation;
     }
 
-
     //테스트 코드
     private void PlayerMove()
     {
@@ -58,5 +59,15 @@ public class PlayerController : MonoBehaviour
 
         Vector3 move = transform.right * horizontal + transform.forward * vertical;
         transform.Translate(move * moveSpeed * Time.deltaTime, Space.World);
+    }
+
+    //테스트 코드
+    private void PlayerJump()
+    {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            Debug.Log("Hi");
+            _rb.AddForce(transform.up * 5.0f, ForceMode.Impulse);
+        }
     }
 }
