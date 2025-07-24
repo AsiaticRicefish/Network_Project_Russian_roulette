@@ -37,10 +37,30 @@ public class PlayerController : MonoBehaviour
         if (!_pv.IsMine) return;
 
         PlayerLook();
-        PlayerMove();
-        PlayerJump();
+
+
+        //TODO - 이후 GameManager에서 턴이 시작되면 만약 해당 턴이 내가 가질 턴이면 아이템 사용 이나 Gun사용 활성화 처리가 필요
+        //bool 값으로 전달 받으면 좋을 것 같다.
+
+        /*if (GameManager.Instance.StartTurn())
+        {
+            photonView.RPC(nameof(Shoot), RpcTarget.All);
+        }*/
+
+        //PlayerMove();
+        //PlayerJump();
     }
 
+    [PunRPC]
+    private void Shoot()
+    {
+        // 총알 종류에 따라 효과 적용
+        Debug.Log("총 발사!");
+
+        //GunManager.Instance.Fire(Player player);
+    }
+
+    //시점 변경 테스트코드
     private void PlayerLook()
     {
         transform.Rotate(Vector3.up * Input.GetAxisRaw("Mouse X") * _mouseSensitivity);
@@ -51,7 +71,7 @@ public class PlayerController : MonoBehaviour
         _cameraHolder.transform.localEulerAngles = Vector3.left * verticalLookRotation;
     }
 
-    //테스트 코드
+    //이동 테스트 코드
     private void PlayerMove()
     {
         float horizontal = Input.GetAxis("Horizontal");
@@ -61,7 +81,7 @@ public class PlayerController : MonoBehaviour
         transform.Translate(move * moveSpeed * Time.deltaTime, Space.World);
     }
 
-    //테스트 코드
+    //rb 점프 테스트 코드
     private void PlayerJump()
     {
         if (Input.GetKeyDown(KeyCode.Space))
