@@ -7,11 +7,14 @@ namespace LTH
     [CreateAssetMenu(fileName = "NewItemData", menuName = "LTH/ItemData")]
     public class ItemData : ScriptableObject
     {
-        public ItemType itemType;   // ¾ÆÀÌÅÛ À¯Çü
-        public string displayName;  // UI µî¿¡ Ç¥½ÃÇÒ ÀÌ¸§
-        public string description;  // ¾ÆÀÌÅÛ ¼³¸í
-        public Sprite icon;         // ¾ÆÀÌÄÜ ÀÌ¹ÌÁö
-        public bool isUsed;         // ¾ÆÀÌÅÛ »ç¿ë ¿©ºÎ
+        public ItemType itemType;   // ì•„ì´í…œ ìœ í˜•
+        public string displayName;  // UI ë“±ì— í‘œì‹œí•  ì´ë¦„
+        public string description;  // ì•„ì´í…œ ì„¤ëª…
+        public Sprite icon;         // ì•„ì´ì½˜ ì´ë¯¸ì§€
+        public bool isUsed;         // ì•„ì´í…œ ì‚¬ìš© ì—¬ë¶€
+
+        [Header("Prefab")]
+        public GameObject itemPrefab; // ì•„ì´í…œ í”„ë¦¬íŒ¹
 
         public ItemData(ItemType type, string name, string desc, bool used = false)
         {

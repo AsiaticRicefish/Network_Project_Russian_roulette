@@ -1,48 +1,41 @@
+using LTH; // ì„ì‹œ Playerm ItemData ì •ì˜ìš© ë„¤ì„ìŠ¤í˜ì´ìŠ¤
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
 using TMPro;
-using LTH; // ÀÓ½Ã Playerm ItemData Á¤ÀÇ¿ë ³×ÀÓ½ºÆäÀÌ½º
+using UnityEngine;
+
 
 /// <summary>
-///  UI »ó¿¡¼­ ¾ÆÀÌÅÛ 1°³¸¦ Ç¥ÇöÇÏ´Â ½½·Ô (ÇÑ ½½·Ô ¸¶´Ù ÇÏ³ª¾¿¸¸ ¹èÄ¡µÇµµ·Ï)
+///  UI ìƒì—ì„œ ì•„ì´í…œ 1ê°œë¥¼ í‘œí˜„í•˜ëŠ” ìŠ¬ë¡¯ (í•œ ìŠ¬ë¡¯ ë§ˆë‹¤ í•˜ë‚˜ì”©ë§Œ ë°°ì¹˜ë˜ë„ë¡)
 /// </summary>
-
 public class ItemSlot : MonoBehaviour
 {
     [Header("UI")]
-    [SerializeField] private Image itemIconImage; // ¾ÆÀÌÅÛ ¾ÆÀÌÄÜ
-    [SerializeField] private TMP_Text itemNameText; // ¾ÆÀÌÅÛ ÀÌ¸§
-    [SerializeField] private Button useButton; // ½½·Ô Å¬¸¯ ¹öÆ° (°¨Áö)
+    [SerializeField] private Transform anchorPoint; // ì•„ì´í…œì´ ë†“ì¼ ìœ„ì¹˜
 
-    private ItemData itemData;
+    private GameObject currentItem;
 
-    public void Init(ItemData data) // ½½·Ô ÃÊ±âÈ­ (µ¥ÀÌÅÍ ¼¼ÆÃ)
+    /// <summary>
+    /// ì•„ì´í…œ í”„ë¦¬íŒ¹ì„ ìŠ¬ë¡¯ ìœ„ì— ë°°ì¹˜
+    /// </summary>
+    public void PlaceItem(GameObject itemPrefab)
     {
-        itemData = data; // ScriptableObject ±â¹İÀÇ ItemData¸¦ ¹Ş¾Æ ½½·ÔÀ» ÃÊ±âÈ­
+        Clear();
 
-        if (itemData == null)  return;
-
-        itemNameText.text = itemData.displayName;
-        itemIconImage.sprite = itemData.icon;
-
-        // ¹öÆ° Å¬¸¯ ÀÌº¥Æ® ¼³Á¤
-        useButton.onClick.RemoveAllListeners();
-        useButton.onClick.AddListener(OnClick);
-    }
-
-    public void OnClick()
-    {
-        // TdDo : ¾ÆÀÌÅÛ »ç¿ë Ã³¸® (ItemManager)
-        // PhotonView¿Í ¿¬µ¿ÇØ ´Ù¸¥ Å¬¶óÀÌ¾ğÆ®¿Í ¾ÆÀÌÅÛ »ç¿ë µ¿±âÈ­ Ã³¸® ¿¹Á¤
+        if (itemPrefab != null)
+        {
+            currentItem = Instantiate(itemPrefab, anchorPoint.position, anchorPoint.rotation, anchorPoint);
+        }
     }
 
     public void Clear()
     {
-        itemData = null;
-        itemNameText.text = "";
-        itemIconImage.sprite = null;
-        useButton.onClick.RemoveAllListeners();
+        if (currentItem != null)
+        {
+            Destroy(currentItem);
+            currentItem = null;
+        }
     }
+
+    public bool IsEmpty() => currentItem == null;
 }

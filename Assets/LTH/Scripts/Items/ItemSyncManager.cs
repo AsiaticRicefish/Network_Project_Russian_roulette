@@ -2,7 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DesignPattern;
-using LTH; // 임시 Playerm ItemData 정의용 네임스페이스
+
+using LTH;
+using UnityEditor.Rendering; // 임시 Playerm ItemData 정의용 네임스페이스
+
+
 // using Photon.Pun;
 // using Photon.Realtime;
 // using ExitGames.Client.Photon;
@@ -29,8 +33,11 @@ public class ItemSyncManager : Singleton<ItemSyncManager>
         // ToDo: 실제 게임 로직에 맞는 아이템 생성 로직으로 교체 필요
         var generatedItems = new List<ItemData>
         {
-            new ItemData(LTH.ItemType.Cigarette, "담배", "플레이어 체력 1 회복합니다."),
-            new ItemData(LTH.ItemType.Cellphone, "휴대폰", "장전된 탄환에 대한 미래 예지가 가능합니다.")
+
+            new ItemData(ItemType.Cigarette, "담배", "플레이어 체력 1 회복합니다."),
+            new ItemData(ItemType.Cuffs, "수갑", "상대 플레이어 턴 1회 건너뜁니다"),
+            new ItemData(ItemType.MagnifyingGlass, "돋보기", "실탄인지 공포탄인지 구분합니다."),
+            new ItemData(ItemType.Saw, "톱", "총 2배로 데미지 증가합니다.")
         };
 
         // 로컬에 생성된 아이템을 저장
