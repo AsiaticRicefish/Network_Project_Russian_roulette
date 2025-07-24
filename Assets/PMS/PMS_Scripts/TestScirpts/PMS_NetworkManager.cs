@@ -5,6 +5,11 @@ using Photon.Pun;
 using Photon.Realtime;
 using System.IO;
 
+
+/*
+ * 테스트용 제거 예정
+ */
+
 namespace PMS_Test
 {
     public class PMS_NetworkManager : MonoBehaviourPunCallbacks
@@ -27,7 +32,6 @@ namespace PMS_Test
         private void SpawnPlayer()
         {
             PlayerData playerData = new PlayerData(PhotonNetwork.LocalPlayer.NickName, "abc" + Random.Range(1, 1000).ToString("0000"), 0, 0);
-            PhotonNetwork.Instantiate(Path.Combine("Prefabs", "PlayerConrtoller"), SpawnManager.Instance.GetRandomAvailableSpawnPoint().position, Quaternion.identity);
         }
     }
 }
