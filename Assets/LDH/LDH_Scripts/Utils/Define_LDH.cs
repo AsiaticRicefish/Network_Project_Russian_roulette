@@ -11,6 +11,14 @@ namespace Utils
             Sfx,
             MaxCount,
         }
+        
+        public enum UIEvent
+        {
+            Click,
+            PointEnter,
+            PointExit,
+            Drag,
+        }
 
     }
 }
