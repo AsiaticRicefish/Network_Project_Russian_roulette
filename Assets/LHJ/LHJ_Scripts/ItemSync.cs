@@ -15,23 +15,28 @@ public class ItmeSync : MonoBehaviourPun
         // MasterClient면 플레이어1 아니면 player2(Test)
         myId = PhotonNetwork.IsMasterClient ? "player1" : "player2";
 
-        // 아이템 리스트 본인 ID에 등록
-        var myItems = new List<ItemData>(itemDataList);
-        TestCopyItemSync.Instance.OnSyncReceived(myId, myItems);
-        Debug.Log($"[{myId}] 아이템 생성 완료");
+        // 아이템 리스트 전체 클라이언트에 동기화
+        photonView.RPC("InitPlayerItems", RpcTarget.AllBuffered, myId);
     }
 
     void Update()
     { 
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
-            photonView.RPC("RPC_UseItem", RpcTarget.AllViaServer, myId, "담배");
+            photonView.RPC("UseItem", RpcTarget.AllViaServer, myId, "담배");
         }
 
         if (Input.GetKeyDown(KeyCode.Alpha2))
         {
-            photonView.RPC("RPC_UseItem", RpcTarget.AllViaServer, myId, "휴대폰");
+            photonView.RPC("UseItem", RpcTarget.AllViaServer, myId, "휴대폰");
         }
+    }
+    [PunRPC]
+    private void InitPlayerItems(string playerId)
+    {
+        var myItems = new List<ItemData>(itemDataList);
+        TestCopyItemSync.Instance.OnSyncReceived(playerId, myItems);
+        Debug.Log($"[{playerId}] 아이템 생성 및 동기화 완료");
     }
 
     // 모든 클라이언트에서 호출
