@@ -21,7 +21,7 @@ public class PlayerManager : MonoBehaviour
         }
     }
 
-    void CreateController()
+    private void CreateController()
     {
         //Instantiate player controller
         PhotonNetwork.Instantiate(Path.Combine("Prefabs", "PlayerConrtoller"), SpawnManager.Instance.GetRandomAvailableSpawnPoint().position, Quaternion.identity);
