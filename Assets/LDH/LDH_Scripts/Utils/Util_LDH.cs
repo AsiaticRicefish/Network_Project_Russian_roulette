@@ -35,7 +35,27 @@ namespace Utils
         }
 
         #endregion
-        
+
+
+        #region Resource
+
+        public static T Instantiate<T>(string prefabPath, Transform parent = null) where T : UnityEngine.Object
+        {
+            T prefab = Resources.Load<T>(prefabPath);
+            if (prefabPath == null)
+            {
+                Debug.Log($"[Util_LDH] 프리팹을 가져올 수 없습니다. : {prefabPath}");
+                return null;
+            }
+            
+            T go = Object.Instantiate(prefab, parent);
+            go.name = prefab.name;
+
+            return go;
+        }
+
+
+        #endregion
     }
     
 }
