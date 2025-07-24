@@ -9,138 +9,151 @@ using Utils;
 
 namespace Managers
 {
+    /// <summary>
+    /// 전체 게임에서 사운드를 제어하는 싱글톤 매니저.
+    /// BGM 및 SFX 재생, 볼륨 조절(볼륨 데이터 로컬 저장) 등의 기능을 제공한다.
+    /// </summary>
     public class SoundManager : Singleton<SoundManager>
     {
-        public AudioMixer audioMixer;
-        private AudioMixerGroup[] _audioMixerGroups;
+        [Header("AudioMixer / AudioMizerGroups")] 
+        public AudioMixer audioMixer;                        // 전체 오디오 믹서를 관리하는 AudioMixer
+        private AudioMixerGroup[] _audioMixerGroups;        // Master 오디오 믹서 하위의 AudioMixerGroup, 사운드 타입별로 분리(순서대로 BGM, SFX 사운드)
 
-        private AudioSource[] audioSources = new AudioSource[(int)Define_LDH.Sound.MaxCount];
-
-        private SfxClipTable _sfxClipTable;
-        [SerializeField] private string _sfxClipTablePath = "Sounds/SfxClipData";
+        [Header("AudioSources")]
+        private AudioSource[] _audioSources = new AudioSource[(int)Define_LDH.Sound.MaxCount];      // 사운드 타입별 AudioSource 배열
         
+        [Header("SFX Mapping Table")]
+        private SfxClipTable _sfxClipTable;                 // SFX 키와 AudioClip을 매핑한 테이블 (ScriptableObject)
+        [SerializeField] private string _sfxClipTablePath = "Sounds/SfxClipData";        // SfxClipTable을 불러올 리소스 경로
         
         //private Dictionary<string, AudioClip> sfxAudioClips = new();   // 캐싱 사용 x
         
-        public float BgmVolume { get; private set; }
-        public float SfxVolume { get; private set; }
-
-        public const string BgmVolumeKey = "BGMVolume"; //playerprefs, audio mixer parameter로 사용
-        public const string SfxVolumeKey = "SFXVolume"; //playerprefs, audio mixer parameter로 사용
+        [Header("Volume Control")]
+        public const string BgmVolumeKey = "BGMVolume";         // PlayerPrefs에 저장될 BGM 볼륨 키 및 AudioMixer 파라미터 이름
+        public const string SfxVolumeKey = "SFXVolume";         // PlayerPrefs에 저장될 SFX 볼륨 키 및 AudioMixer 파라미터 이름
+        [field: SerializeField] public float BgmVolume { get; private set; }     // 현재 설정된 BGM 볼륨 (0~1)
+        [field: SerializeField] public float SfxVolume { get; private set; }             // 현재 설정된 SFX 볼륨 (0~1)
         
         private void Awake() => Init();
 
+        
+        /// <summary>
+        /// SoundManager 초기화.
+        ///  - 싱글톤 설정
+        /// - AudioMixer 및 AudioSource 구성
+        /// - SFX 테이블 로드
+        /// - 볼륨 설정 초기화
+        /// </summary>
         private void Init()
         {
             SingletonInit();
-            
             Clear();
+            InitializeMixer();
+            InitializeAudioSources();
+            LoadSfxClipTable();
+            LoadSavedVolumes();
             
-            //audio mixer setting
-            if (audioMixer == null)
-            {
-                audioMixer = Resources.Load<AudioMixer>("Sounds/MasterAudioMixer");
-                _audioMixerGroups = audioMixer.FindMatchingGroups("Master");
-                
-                
-                //로컬에 있는 정보를 읽어와서 bgm, sfx 볼륨 설정하기
-                InitVolume();
-            }
-            
-            
-            //SFX, BGM audio source 생성 및 output audio mixer group 지정
-            GameObject soundRoot = new GameObject("@Sound");
-            // soundRoot.transform.SetParent(Manager.manager.transform);  //dont destroy 처리
-            DontDestroyOnLoad(soundRoot);
-            
-            
-            string[] soundTypeNames = System.Enum.GetNames((typeof(Define_LDH.Sound)));
-            
-            for(int i=0; i<soundTypeNames.Length - 1 ; i++)
-            {
-                AudioSource audioSource = new GameObject(soundTypeNames[i]).AddComponent<AudioSource>();
-                audioSource.outputAudioMixerGroup = _audioMixerGroups[i+1]; //오디오 소스의 output을 할당
-                
-                audioSources[i] = audioSource;
-                audioSource.transform.SetParent(soundRoot.transform);
-            }
-            
-            Debug.Log($"{GetType()} @Sound 생성 및 Bgm, Sfx audio source 생성");
-            
-            
-            //bgm 연속 재생 설정
-            audioSources[(int)Define_LDH.Sound.Bgm].loop = true;
-            
-            
-            //리소스 로드
-            _sfxClipTable = Resources.Load<SfxClipTable>(_sfxClipTablePath);
-            _sfxClipTable.Init();
-
         }
 
         #region Initialize
+        
+        /// <summary>
+        /// MasterAudioMixer를 리소스에서 불러오고, 하위 그룹들을 배열로 저장
+        /// </summary>
+        private void InitializeMixer()
+        {
+            if (audioMixer == null)
+                audioMixer = Resources.Load<AudioMixer>("Sounds/MasterAudioMixer");
+
+            _audioMixerGroups = audioMixer.FindMatchingGroups("Master");
+        }
+        
+        /// <summary>
+        /// 사운드 타입(BGM, SFX 등)별 AudioSource를 생성하고 Mixer 그룹에 연결.
+        /// 생성한 AudioSource는 @Sound 오브젝트(루트 오브젝트) 아래에 배치
+        /// 루트 오브젝트는 DontDestroy 처리하여 씬 전환 시에도 유지
+        /// </summary>
+        private void InitializeAudioSources()
+        {
+            //SFX, BGM audio source 생성 및 output audio mixer group 지정
+            GameObject soundRoot = new GameObject("@Sound");
+            DontDestroyOnLoad(soundRoot);
+
+            string[] soundTypeNames = System.Enum.GetNames(typeof(Define_LDH.Sound));
+
+            for (int i = 0; i < soundTypeNames.Length - 1; i++)
+            {
+                AudioSource source = new GameObject(soundTypeNames[i]).AddComponent<AudioSource>();
+                source.outputAudioMixerGroup = _audioMixerGroups[i + 1];  // +1: Master 제외
+                source.transform.SetParent(soundRoot.transform);
+                _audioSources[i] = source;
+            }
+
+            _audioSources[(int)Define_LDH.Sound.Bgm].loop = true;
+
+            Debug.Log($"[{GetType().Name}] @Sound 생성 및 Bgm, Sfx audio source 생성과 초기화");
+        }
+        
+        /// <summary>
+        /// SfxClipTable을 리소스 경로에서 로드하고 내부 Dictionary로 초기화
+        /// </summary>
+        private void LoadSfxClipTable()
+        {
+            _sfxClipTable = Resources.Load<SfxClipTable>(_sfxClipTablePath);
+            _sfxClipTable.Init();
+        }
 
         /// <summary>
-        /// 로컬에 저장된 볼륨 값에 대한 데이터를 가져오고, 있으면 그 값으로, 없으면 전체 데이터로 초기화
+        /// PlayerPrefs에 저장된 BGM, SFX 볼륨 값을 가져와 설정. 없을 경우 기본값 0.5f를 사용
         /// </summary>
-        private void InitVolume()
+        private void LoadSavedVolumes()
         {
             Debug.Log($"[{GetType()}] 저장된 사운드 볼륨 데이터를 가져옵니다.");
             SetBgmVolume((PlayerPrefs.HasKey(BgmVolumeKey)) ? PlayerPrefs.GetFloat(BgmVolumeKey) : 0.5f);
             SetSfxVolume((PlayerPrefs.HasKey(SfxVolumeKey)) ? PlayerPrefs.GetFloat(SfxVolumeKey) : 0.5f);
         }
         
-        //모든 오디오 소스의 클립을 빼고 플레이 중단, sfxAudioClip cashing 초기화
-        public void Clear()
-        {
-            foreach (AudioSource audioSource in audioSources)
-            {
-                if (audioSource != null)
-                {
-                    audioSource.clip = null;
-                    audioSource.Stop();
-                }
-            }
-            //sfxAudioClips.Clear();
-        }
-
         #endregion
 
 
-        #region Volume Setting
+        #region Volume Control
         
 
-        //bgm 볼륨 설정
-        //0~1 사이의 값을 믹서 값에 맞게 변환 -> 오디오 믹서에 반영 -> 0~1 사이의 값을 로컬에 저장
+        /// <summary>
+        /// BGM 볼륨을 0~1 범위로 설정하고 AudioMixer에 반영하며 로컬에 저장
+        /// </summary>
         public void SetBgmVolume(float value)
         {
             //볼륨 clamp
-            BgmVolume = Mathf.Clamp(value, 0.0001f, 1f);
-            
-            // 값 전환
-            float bgmMixerValue = ValueChange(value);
+            BgmVolume = ClampVolume(value);
             
             //오디오 믹서 설정
-            audioMixer.SetFloat(BgmVolumeKey, bgmMixerValue);
+            audioMixer.SetFloat(BgmVolumeKey, ToDecibel(BgmVolume));
             
             //로컬 저장
             PlayerPrefs.SetFloat(BgmVolumeKey, BgmVolume);  //mixer 값이 아닌 0~1 사이의 값 저장
         }
         
-        //sfx 볼륨 설정
-        //0~1 사이의 값을 믹서 값에 맞게 변환 -> 오디오 믹서에 반영 -> 0~1 사이의 값을 로컬에 저장
+        /// <summary>
+        /// SFX 볼륨을 0~1 범위로 설정하고 AudioMixer에 반영하며 로컬에 저장
+        /// </summary>
         public void SetSfxVolume(float value)
         {
-            SfxVolume = Mathf.Clamp(value, 0.0001f, 1f);
-            float sfxMixerValue = ValueChange(value);
-            audioMixer.SetFloat(SfxVolumeKey, sfxMixerValue);
+            SfxVolume = ClampVolume(value);
+            audioMixer.SetFloat(SfxVolumeKey, ToDecibel(SfxVolume));
             PlayerPrefs.SetFloat(SfxVolumeKey, SfxVolume);
         }
+        
+        /// <summary>
+        /// 볼륨 입력값을 0.0001 ~ 1.0 범위로 클램핑
+        /// </summary>
+        private float ClampVolume(float value) => Mathf.Clamp(value, 0.0001f, 1f);
 
-        private float ValueChange(float value)
-        {
-            return Mathf.Log10(Mathf.Clamp(value, 0.0001f, 1f)) * 20f;
-        }
+        /// <summary>
+        /// 0~1 범위의 값을 데시벨(-80~0) 값으로 변환
+        /// </summary>
+        private float ToDecibel(float value) => Mathf.Log10(value) * 20f;
+
 
 
         #endregion
@@ -148,28 +161,28 @@ namespace Managers
 
         #region Audio Play / Audio Clip
         
-        //매개변수로 전닮받은 오디오 클립을 재생
-        //bgm은 루프로 계속 재생 하며, sfx는 중첩 가능하도록 play one shot으로 재생한다.
+        /// <summary>
+        /// 지정된 AudioClip을 재생.
+        /// BGM은 루프 재생, 동일 클립 중복 방지.
+        /// SFX는 PlayOneShot으로 중첩 재생 가능.
+        /// </summary>
         public void Play(AudioClip audioClip, Define_LDH.Sound soundType = Define_LDH.Sound.Sfx)
         {
             if (audioClip == null)
             {
-                Debug.LogWarning($"{GetType()} audio clip이 없습니다. 재생할 수 없습니다.");
+                Debug.LogWarning($"[{GetType().Name}] 재생할 오디오 클립이 없습니다.");
                 return;
             }
             
-            AudioSource audioSource = audioSources[(int)soundType];
+            AudioSource audioSource = _audioSources[(int)soundType];
 
             if (soundType == Define_LDH.Sound.Bgm)
             {
-                if (audioSource.isPlaying)
-                {
-                    // 같은 audio clip을 재생하는 경우는 무시
-                    if (audioSource.clip == audioClip) return;
-                    audioSource.Stop();
-                }
+                // 같은 audio clip을 재생하는 경우는 무시
+                if (audioSource.clip == audioClip) return;
                 
                 // audioclip 교체
+                audioSource.Stop();
                 audioSource.clip = audioClip;
                 audioSource.Play();
             }
@@ -180,29 +193,48 @@ namespace Managers
 
             else
             {
-                Debug.LogWarning($"[{GetType()}] 잘못된 sound type입니다.");
+                Debug.LogWarning($"[{GetType().Name}] 알 수 없는 사운드 타입입니다: {soundType}");
             }
         }
 
-        
+        /// <summary>
+        /// 키 값으로 SFX 테이블에서 오디오 클립을 조회해 재생
+        /// </summary>
         public void PlaySfxByKey(string sfxKey)
         {
             var audioClip = _sfxClipTable.GetAudioClip(sfxKey);
             
             if (audioClip == null)
             {
-                Debug.LogWarning($"{GetType()} sfx clip table에서 audio clip을 찾을 수 없습니다.");
+                Debug.LogWarning($"[{GetType().Name}] 키 '{sfxKey}' 에 해당하는 SFX가 없습니다.");
                 return;
             }
             
-            AudioSource audioSource = audioSources[(int)Define_LDH.Sound.Sfx];
-            
+            AudioSource audioSource = _audioSources[(int)Define_LDH.Sound.Sfx];
             audioSource.PlayOneShot(audioClip);
         }
 
         #endregion
 
 
+        #region Utility
+
+        /// <summary>
+        /// 모든 오디오 소스를 정지시키고 클립을 제거
+        /// </summary>
+        public void Clear()
+        {
+            foreach (var source in _audioSources)
+            {
+                if (source != null)
+                {
+                    source.Stop();
+                    source.clip = null;
+                }
+            }
+        }
+
+        #endregion
 
     }
 }
