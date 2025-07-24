@@ -1,33 +1,32 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using LTH; // ÀÓ½Ã Playerm ItemData Á¤ÀÇ¿ë ³×ÀÓ½ºÆäÀÌ½º
+using LTH; // ì„ì‹œ Playerm ItemData ì •ì˜ìš© ë„¤ì„ìŠ¤í˜ì´ìŠ¤
 
 /// <summary>
-/// Æ¯Á¤ ÇÃ·¹ÀÌ¾îÀÇ ¾ÆÀÌÅÛ ½½·Ô(Ã¥»ó)À» UI·Î Ç¥ÇöÇÏ´Â Å¬·¡½º
+/// íŠ¹ì • í”Œë ˆì´ì–´ì˜ ì•„ì´í…œ ìŠ¬ë¡¯(ì±…ìƒ)ì„ UIë¡œ í‘œí˜„í•˜ëŠ” í´ë˜ìŠ¤
 /// </summary>
 
 public class DeskUI : MonoBehaviour
 {
-    [SerializeField] private List<ItemSlot> itemSlots; // ¾ÆÀÌÅÛ ½½·Ô ¸®½ºÆ®
+    [SerializeField] private List<ItemSlot> itemSlots; // ì•„ì´í…œ ìŠ¬ë¡¯ ë¦¬ìŠ¤íŠ¸
 
-    public void Setup(List<ItemData> dataList) // ¾ÆÀÌÅÛ UI ÃÊ±â ¼¼ÆÃ
+    /// <summary>
+    /// ëª¨ë“  ìŠ¬ë¡¯ ì´ˆê¸°í™” (ì•„ì´í…œ ì œê±°)
+    /// </summary>
+    public void ClearAllSlots()
     {
-        for (int i = 0; i < itemSlots.Count; i++) // ½½·Ô °³¼ö¸¸Å­ ¹İº¹
+        foreach (var slot in itemSlots)
         {
-            if (i < dataList.Count) // dataList¿¡ ÇØ´çÇÏ´Â ¾ÆÀÌÅÛÀÌ ÀÖÀ¸¸é ¡æ Init() È£Ãâ
-            {
-                itemSlots[i].gameObject.SetActive(true);
-                itemSlots[i].Init(dataList[i]);
-            }
-            else
-            {
-                itemSlots[i].Clear(); // dataList¿¡ ¾ÆÀÌÅÛÀÌ ¾øÀ¸¸é ¡æ Clear() È£Ãâ
-            }
+            if (slot != null) slot.Clear();
         }
     }
 
-    // ToDo: Dotween ¾Ö´Ï¸ŞÀÌ¼Ç, ¿¬Ãâ È¿°ú Ãß°¡ ¿¹Á¤
-    public void Show() => gameObject.SetActive(true);
-    public void Hide() => gameObject.SetActive(false);
+    /// <summary>
+    /// ë¹„ì–´ ìˆëŠ” ìŠ¬ë¡¯ë§Œ ë¦¬ìŠ¤íŠ¸ë¡œ ë°˜í™˜
+    /// </summary>
+    public List<ItemSlot> GetEmptySlots()
+    {
+        return itemSlots.FindAll(slot => slot != null && slot.IsEmpty());
+    }
 }
