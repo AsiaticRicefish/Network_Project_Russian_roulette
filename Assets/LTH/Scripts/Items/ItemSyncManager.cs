@@ -2,18 +2,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DesignPattern;
-using LTH; // ÀÓ½Ã Playerm ItemData Á¤ÀÇ¿ë ³×ÀÓ½ºÆäÀÌ½º
+using LTH; // ì„ì‹œ Playerm ItemData ì •ì˜ìš© ë„¤ì„ìŠ¤í˜ì´ìŠ¤
 // using Photon.Pun;
 // using Photon.Realtime;
 // using ExitGames.Client.Photon;
 
 /// <summary>
-/// ¾ÆÀÌÅÛ µ¿±âÈ­ °ü¸® Å¬·¡½º
+/// ì•„ì´í…œ ë™ê¸°í™” ê´€ë¦¬ í´ë˜ìŠ¤
 /// </summary>
 
 public class ItemSyncManager : Singleton<ItemSyncManager>
 {
-    // °¢ ÇÃ·¹ÀÌ¾îº° µ¿±âÈ­µÈ ¾ÆÀÌÅÛ ¸ñ·Ï ÀúÀå
+    // ê° í”Œë ˆì´ì–´ë³„ ë™ê¸°í™”ëœ ì•„ì´í…œ ëª©ë¡ ì €ì¥
     private Dictionary<Player, List<ItemData>> syncedItems = new();
 
     private void Awake()
@@ -22,45 +22,45 @@ public class ItemSyncManager : Singleton<ItemSyncManager>
     }
 
     /// <summary>
-    /// ¾ÆÀÌÅÛÀ» »ı¼ºÇÏ°í ³×Æ®¿öÅ©·Î Àü¼ÛÇÏ´Â ¿ªÇÒ  (·ÎÄÃ¿¡¼­ »ı¼ºÇÏ°í ³×Æ®¿öÅ© Àü¼Û ¿¹Á¤)
+    /// ì•„ì´í…œì„ ìƒì„±í•˜ê³  ë„¤íŠ¸ì›Œí¬ë¡œ ì „ì†¡í•˜ëŠ” ì—­í•   (ë¡œì»¬ì—ì„œ ìƒì„±í•˜ê³  ë„¤íŠ¸ì›Œí¬ ì „ì†¡ ì˜ˆì •)
     /// </summary>
     public void GenerateAndSync(Player player)
     {
-        // ToDo: ½ÇÁ¦ °ÔÀÓ ·ÎÁ÷¿¡ ¸Â´Â ¾ÆÀÌÅÛ »ı¼º ·ÎÁ÷À¸·Î ±³Ã¼ ÇÊ¿ä
+        // ToDo: ì‹¤ì œ ê²Œì„ ë¡œì§ì— ë§ëŠ” ì•„ì´í…œ ìƒì„± ë¡œì§ìœ¼ë¡œ êµì²´ í•„ìš”
         var generatedItems = new List<ItemData>
         {
-            new ItemData(ItemType.Cigarette, "´ã¹è", "ÇÃ·¹ÀÌ¾î Ã¼·Â 1 È¸º¹ÇÕ´Ï´Ù."),
-            new ItemData(ItemType.Cellphone, "ÈŞ´ëÆù", "ÀåÀüµÈ ÅºÈ¯¿¡ ´ëÇÑ ¹Ì·¡ ¿¹Áö°¡ °¡´ÉÇÕ´Ï´Ù.")
+            new ItemData(LTH.ItemType.Cigarette, "ë‹´ë°°", "í”Œë ˆì´ì–´ ì²´ë ¥ 1 íšŒë³µí•©ë‹ˆë‹¤."),
+            new ItemData(LTH.ItemType.Cellphone, "íœ´ëŒ€í°", "ì¥ì „ëœ íƒ„í™˜ì— ëŒ€í•œ ë¯¸ë˜ ì˜ˆì§€ê°€ ê°€ëŠ¥í•©ë‹ˆë‹¤.")
         };
 
-        // ·ÎÄÃ¿¡ »ı¼ºµÈ ¾ÆÀÌÅÛÀ» ÀúÀå
+        // ë¡œì»¬ì— ìƒì„±ëœ ì•„ì´í…œì„ ì €ì¥
         syncedItems[player] = generatedItems;
 
-        // ToDo: ÀÌ ¾ÆÀÌÅÛ ¸®½ºÆ®¸¦ ³×Æ®¿öÅ©·Î ´Ù¸¥ Å¬¶óÀÌ¾ğÆ®¿¡°Ô Àü¼ÛÇØ¾ß ÇÔ
-        // RPC·Î Àü¼Û ½Ã SerializeItemList() °°Àº ¹æ½ÄÀ¸·Î Á÷·ÄÈ­ ÇÊ¿ä
-        Debug.Log($"[ItemSyncManager] ¾ÆÀÌÅÛ »ı¼º ¹× µ¿±âÈ­µÊ: {player.FirebaseUID}"); ;
+        // ToDo: ì´ ì•„ì´í…œ ë¦¬ìŠ¤íŠ¸ë¥¼ ë„¤íŠ¸ì›Œí¬ë¡œ ë‹¤ë¥¸ í´ë¼ì´ì–¸íŠ¸ì—ê²Œ ì „ì†¡í•´ì•¼ í•¨
+        // RPCë¡œ ì „ì†¡ ì‹œ SerializeItemList() ê°™ì€ ë°©ì‹ìœ¼ë¡œ ì§ë ¬í™” í•„ìš”
+        Debug.Log($"[ItemSyncManager] ì•„ì´í…œ ìƒì„± ë° ë™ê¸°í™”ë¨: {player.FirebaseUID}"); ;
     }
 
     /// <summary>
-    /// ´Ù¸¥ ÇÃ·¹ÀÌ¾î°¡ º¸³½ ¾ÆÀÌÅÛÀ» ¹Ş¾Æ¼­ ÀúÀå
+    /// ë‹¤ë¥¸ í”Œë ˆì´ì–´ê°€ ë³´ë‚¸ ì•„ì´í…œì„ ë°›ì•„ì„œ ì €ì¥
     /// </summary>
     public void OnSyncReceived(Player player, List<ItemData> items)
     {
-        // ³×Æ®¿öÅ©¸¦ ÅëÇØ ¹ŞÀº ¾ÆÀÌÅÛ µ¥ÀÌÅÍ¸¦ ÇØ´ç ÇÃ·¹ÀÌ¾î¿¡ ÀúÀå
+        // ë„¤íŠ¸ì›Œí¬ë¥¼ í†µí•´ ë°›ì€ ì•„ì´í…œ ë°ì´í„°ë¥¼ í•´ë‹¹ í”Œë ˆì´ì–´ì— ì €ì¥
         syncedItems[player] = items;
-        // ToDo: ÀÌ ¸Ş¼­µå´Â PhotonÀÇ OnEvent ¶Ç´Â RPC ¼ö½Å ½Ã È£ÃâµÇ¾î¾ß ÇÔ
-        Debug.Log($"[ItemSyncManager] ¾ÆÀÌÅÛ µ¿±âÈ­ ¼ö½ÅµÊ: {player.FirebaseUID}");
+        // ToDo: ì´ ë©”ì„œë“œëŠ” Photonì˜ OnEvent ë˜ëŠ” RPC ìˆ˜ì‹  ì‹œ í˜¸ì¶œë˜ì–´ì•¼ í•¨
+        Debug.Log($"[ItemSyncManager] ì•„ì´í…œ ë™ê¸°í™” ìˆ˜ì‹ ë¨: {player.FirebaseUID}");
     }
 
     /// <summary>
-    /// Æ¯Á¤ ÇÃ·¹ÀÌ¾î°¡ ÇöÀç ¾î¶² ¾ÆÀÌÅÛÀ» µ¿±âÈ­¹Ş¾Ò´ÂÁö È®ÀÎ
+    /// íŠ¹ì • í”Œë ˆì´ì–´ê°€ í˜„ì¬ ì–´ë–¤ ì•„ì´í…œì„ ë™ê¸°í™”ë°›ì•˜ëŠ”ì§€ í™•ì¸
     /// </summary>
     public List<ItemData> GetSyncedItems(Player player)
     {
-        // Dictionary¿¡ Á¸ÀçÇÏ´Â °æ¿ì ÇØ´ç ¾ÆÀÌÅÛ ¸ñ·Ï ¹İÈ¯
+        // Dictionaryì— ì¡´ì¬í•˜ëŠ” ê²½ìš° í•´ë‹¹ ì•„ì´í…œ ëª©ë¡ ë°˜í™˜
         if (syncedItems.TryGetValue(player, out var items)) return items;
 
-        // ¾øÀ¸¸é ºó ¸®½ºÆ® ¹İÈ¯ (null ¹æÁö)
+        // ì—†ìœ¼ë©´ ë¹ˆ ë¦¬ìŠ¤íŠ¸ ë°˜í™˜ (null ë°©ì§€)
         return new List<ItemData>();
     }
 }
