@@ -20,8 +20,9 @@ namespace PMS_Test
             PhotonNetwork.ConnectUsingSettings();
         }
 
-        public override void OnConnectedToMaster() => PhotonNetwork.JoinOrCreateRoom("Room", new RoomOptions { MaxPlayers = 2 }, null);
+        public override void OnConnectedToMaster() => PhotonNetwork.JoinOrCreateRoom("Room", new RoomOptions { MaxPlayers = 4 }, null);
 
+        //방에 들어왔을 때 호출
         public override void OnJoinedRoom()
         {
             Debug.Log("입장완료");
@@ -49,9 +50,8 @@ namespace PMS_Test
 
         private void InstantiateLocalPlayerCharacter()
         {
-            // 스폰 지점 할당은 오직 마스터 클라이언트만 수행합니다.
-            // 다른 클라이언트들은 마스터 클라이언트가 스폰한 캐릭터를 감지하고,
-            // OnRoomPropertiesUpdate 콜백을 통해 스폰 지점 상태 변화를 인지합니다.
+            // 스폰 지점 할당은 오직 마스터 클라이언트만 수행
+            // 다른 클라이언트들은 마스터 클라이언트가 스폰한 캐릭터를 감지하고, OnRoomPropertiesUpdate 콜백을 통해 스폰 지점 상태 변화를 인지함.
             if (PhotonNetwork.IsMasterClient)
             {
                 Debug.Log("InstantiateLocalPlayerCharacter: 마스터 클라이언트입니다. 스폰 지점 할당 시도 전 룸 프로퍼티 상태:");
@@ -74,10 +74,10 @@ namespace PMS_Test
                 {
                     // PhotonNetwork.Instantiate를 사용하여 플레이어 캐릭터/컨트롤러 프리팹을 네트워크 상에 생성
                     // 프리팹 경로 및 이름 확인 (예: Assets/Resources/Prefabs/PlayerController)
-                    GameObject playerGO = PhotonNetwork.Instantiate(Path.Combine("Prefabs", "PlayerConrtoller"), spawnPoint.position, spawnPoint.rotation);
+                    GameObject playerobj = PhotonNetwork.Instantiate(Path.Combine("Prefabs", "PlayerConrtoller"), spawnPoint.position, spawnPoint.rotation);
 
                     // GamePlayer 컴포넌트를 가져와 초기화 RPC 호출
-                    GamePlayer newPlayer = playerGO.GetComponent<GamePlayer>();
+                    GamePlayer newPlayer = playerobj.GetComponent<GamePlayer>();
                     if (newPlayer != null)
                     {
                         // PlayerData 초기화 (Firebase에서 불러온 데이터를 RPC로 전달하는 부분)
@@ -89,7 +89,7 @@ namespace PMS_Test
 
                         // 플레이어를 PlayerManager에 추가 (플레이어 관리)
                         PMS_Test.PlayerManager.Instance.AddPlayer(newPlayer); // Namespace PMS_Test 가정
-                        Debug.Log($"로컬 플레이어 컨트롤러({playerGO.name})를 성공적으로 생성하고 PlayerManager에 추가했습니다!");
+                        Debug.Log($"로컬 플레이어 컨트롤러({playerobj.name})를 성공적으로 생성하고 PlayerManager에 추가했습니다!");
                     }
                     else
                     {
@@ -144,9 +144,10 @@ namespace PMS_Test
             base.OnPlayerLeftRoom(otherPlayer);
             Debug.Log($"{otherPlayer.NickName} 님이 방을 나갔습니다.");
 
-            // 마스터 클라이언트만 스폰 지점을 반환하는 책임을 가집니다.
+            // 마스터 클라이언트만 스폰 지점을 반환하는 책임을 가지게
             if (PhotonNetwork.IsMasterClient)
             {
+                // 나간 유저의 정보가 필요하다.
                 // 방을 나간 플레이어가 사용하던 스폰 지점을 찾아 반환하는 로직 구현 필요.
                 // GamePlayer에서 스폰 인덱스를 저장해두었으므로, PlayerManager에서 해당 플레이어를 찾아 인덱스를 얻습니다.
                 GamePlayer exitedPlayer = PMS_Test.PlayerManager.Instance.FindPlayerByActorNumber(otherPlayer.ActorNumber); // PlayerManager에 FindPlayerByActorNumber 추가 가정
@@ -162,8 +163,4 @@ namespace PMS_Test
             }
         }
     }
-    /*private void SpawnPlayer()
-    {
-        PlayerData playerData = new PlayerData(PhotonNetwork.LocalPlayer.NickName, "abc" + Random.Range(1, 1000).ToString("0000"), 0, 0);
-    }*/
 }

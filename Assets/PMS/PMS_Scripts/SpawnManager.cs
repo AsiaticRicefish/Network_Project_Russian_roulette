@@ -86,6 +86,7 @@ public class SpawnManager : MonoBehaviour
             return (null, -1);
         }
         List<int> availableIndices = new List<int>();
+
         // 모든 스폰 지점을 순회하며 룸 프로퍼티에서 사용 가능 상태(값이 true)인 스폰 지점의 인덱스를 수집
         for (int i = 0; i < _allSpawnPoints.Length; i++) 
         {
@@ -106,7 +107,7 @@ public class SpawnManager : MonoBehaviour
             if (PhotonNetwork.CurrentRoom.CustomProperties.ContainsKey(key) &&
                 (bool)PhotonNetwork.CurrentRoom.CustomProperties[key] == true)
             {
-                Debug.Log("반복 호출 횟수 : ?");
+                Debug.Log($"반복 호출 횟수 : {i}");
                 availableIndices.Add(i); // 사용 가능한 스폰 지점 인덱스 리스트에 추가
             }
         }
@@ -117,13 +118,14 @@ public class SpawnManager : MonoBehaviour
             return (null, -1);
         }
 
-        // 사용 가능한 스폰 지점 중 하나를 무작위로 선택
-        int selectedIndex = availableIndices[Random.Range(0, availableIndices.Count)];
+        //제일 빠른 위치에 앉게하기
+        int selectedIndex = availableIndices[0];
         Transform selectedSpawnPoint = _allSpawnPoints[selectedIndex];
 
-        // 룸 프로퍼티 업데이트: 선택된 스폰 지점을 '사용 중' (false)으로 설정
+        // 룸 프로퍼티 업데이트: 선택된 스폰 지점을 사용 중(false)으로 설정
         ExitGames.Client.Photon.Hashtable propsToSet = new ExitGames.Client.Photon.Hashtable();
         propsToSet.Add(SP_KEY_PREFIX + selectedIndex.ToString(), false);
+
         // SetCustomProperties를 호출하여 변경된 프로퍼티를 모든 클라이언트에 동기화
         PhotonNetwork.CurrentRoom.SetCustomProperties(propsToSet);
 
@@ -131,7 +133,7 @@ public class SpawnManager : MonoBehaviour
     }
 
     /// <summary>
-    /// 마스터 클라이언트만 써야한다. 
+    /// 마스터 클라이언트만 써야하기는 하는데 유저가 나가면 해당 함수가 호출 되게 해야함. 
     /// 사용이 끝난 스폰 지점을 다시 사용 가능(true) 상태로 되돌리는 함수
     /// </summary>
     /// <param name="spawnPointIndex">반환할 스폰 지점의 _allSpawnPoints 인덱스</param>
