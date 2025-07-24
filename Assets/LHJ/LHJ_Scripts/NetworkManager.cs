@@ -9,6 +9,7 @@ using DesignPattern;
 
 public class NetworkManager : MonoBehaviourPunCallbacks
 {
+    [SerializeField] private GameObject loadingPanel;
     [SerializeField] private GameObject nicknamePanel;
     [SerializeField] private TMP_InputField nicknameField;
     [SerializeField] private Button nicknameAdmitButton;
@@ -31,7 +32,15 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     // 마스터 서버 연결
     public override void OnConnectedToMaster()
     {
-        Debug.Log("서버 접속 완료");
+        if (loadingPanel.activeSelf)
+        {
+            loadingPanel.SetActive(false);
+            nicknamePanel.SetActive(true);
+        }
+        else
+        {
+            PhotonNetwork.JoinLobby();  // 로비로 진입
+        }
     }
     public override void OnDisconnected(DisconnectCause cause)
     {
@@ -82,7 +91,10 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     {
         lobbyPanel.SetActive(false);
         roomPanel.SetActive(true);
-        roomManager.PlayerPanelSpawn(PhotonNetwork.LocalPlayer);
+        foreach (Player player in PhotonNetwork.PlayerList)
+        {
+            roomManager.PlayerPanelSpawn(player);
+        }
     }
 
     // 다른 플레이어가 방에 입장했을때 
@@ -115,17 +127,11 @@ public class NetworkManager : MonoBehaviourPunCallbacks
             else
             {
                 GameObject roomListItem = Instantiate(roomListPrefabs);
-                roomListItem.transform.SetParent(roomListContent);
+                roomListItem.transform.SetParent(roomListContent, false);
                 roomListItem.GetComponent<RoomList>().Init(info);
                 roomList.Add(info.Name, roomListItem);
             }
         }
-    }
-    // 내가 방에서 나갔을때
-    public override void OnLeftRoom()
-    {
-        roomPanel.SetActive(false);
-        lobbyPanel.SetActive(true);
     }
     // 다른 플레이어가 방에서 나갔을때 
     public override void OnPlayerLeftRoom(Player otherPlayer)
