@@ -1,16 +1,45 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Photon.Pun;
 
 public class GamePlayer : MonoBehaviour
 {
+    private PhotonView _pv;
+
     [SerializeField] private PlayerData _data;
+    public int AssignedSpawnPointIndex { get; private set; } = -1; // 할당된 스폰 지점 인덱스 (-1은 할당되지 않음을 의미)
     public string Nickname => _data.nickname;
     public string PlayerId => _data.playerId;
     public int MaxHp => _data.maxHp;
     public int CurrentHp => _data.currentHp;
     public bool IsAlive => _data.isAlive;
 
+    private void Awake()
+    {
+        _pv = GetComponent<PhotonView>();
+    }
+
+    /// <summary>
+    /// 플레이어 데이터를 초기화하고, 스폰 지점 인덱스를 저장하는 RPC
+    /// </summary>
+    /// <param name="nickname"></param>
+    /// <param name="firebaseUID"></param>
+    /// <param name="winCount"></param>
+    /// <param name="loseCount"></param>
+    /// <param name="initialSpawnPointIndex">이 플레이어가 스폰된 스폰 지점의 인덱스</param>
+    [PunRPC]
+    public void RPC_InitializePlayer(string nickname, string firebaseUID, int winCount, int loseCount, int initialSpawnPointIndex)
+    {
+        _data = new PlayerData(nickname, firebaseUID, winCount, loseCount);
+        _data.maxHp = 3; // 예시 HP
+        _data.currentHp = _data.maxHp;
+        _data.isAlive = true;
+        AssignedSpawnPointIndex = initialSpawnPointIndex; // 스폰 지점 인덱스 저장
+
+        Debug.Log($"Initialized GamePlayer: {Nickname}, HP: {CurrentHp} at spawn index {AssignedSpawnPointIndex}");
+        // UIManager 등을 통해 플레이어 UI 업데이트 로직 호출 가능
+    }
 
     private void Start()
     {

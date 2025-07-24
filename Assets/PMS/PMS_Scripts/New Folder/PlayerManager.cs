@@ -2,6 +2,7 @@ using DesignPattern;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Photon.Pun; // ActorNumber를 사용하기 위해 추가
 
 namespace PMS_Test
 {
@@ -63,6 +64,13 @@ namespace PMS_Test
         public GamePlayer FindPlayerByUID(string uid)
         {
             return _players.Find(p => p.PlayerId == uid);
+        }
+
+        // 플레이어 고유값인 ActorNumber로 리스트에서 플레이어 찾기
+        public GamePlayer FindPlayerByActorNumber(int actorNumber)
+        {
+            // _players 리스트의 각 GamePlayer에 연결된 PhotonView의 owner.ActorNumber를 비교
+            return _players.Find(p => p.GetComponent<PhotonView>().Owner.ActorNumber == actorNumber);
         }
 
         public void PlayerListPrint()

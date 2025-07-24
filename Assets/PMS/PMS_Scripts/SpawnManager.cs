@@ -65,6 +65,10 @@ public class SpawnManager : MonoBehaviour
 
         Debug.Log($"SpawnManager: Initialized {customProperties.Count} spawn point properties in room.");
 
+        /*foreach(var c in customProperties)
+        {
+            Debug.Log($"key : {c.Key}, value : {c.Value} ,");
+        }*/
     }
 
     /// <summary>
@@ -81,17 +85,32 @@ public class SpawnManager : MonoBehaviour
             return (null, -1);
         }
 
+        int a = 1;
+        string keye = SP_KEY_PREFIX + a.ToString();
+        Debug.Log(PhotonNetwork.CurrentRoom.CustomProperties[keye].ToString());
+
         List<int> availableIndices = new List<int>();
         // 모든 스폰 지점을 순회하며 룸 프로퍼티에서 사용 가능 상태(값이 true)인 스폰 지점의 인덱스를 수집
-        for (int i = 0; i < _allSpawnPoints.Length; i++)
+        for (int i = 0; i < _allSpawnPoints.Length; i++) 
         {
             string key = SP_KEY_PREFIX + i.ToString();
+            Debug.Log($"키이름{key}");
             // 룸 프로퍼티에 해당 키가 존재하고, 값이 true(사용 가능)인지 확인
             //(bool)PhotonNetwork.CurrentRoom.CustomProperties[key] 커스텀 프로퍼티에 등록되어 있을 때 object타입으로 들어가 있음
             //하지만 실제 우리는 bool타입이 들어가 있는거 알 기 때문에 명시적 캐스팅이 가능하다.
+            if(PhotonNetwork.CurrentRoom.CustomProperties.ContainsKey(key))
+            {
+                Debug.Log("들어있음");
+            }
+            else
+            {
+                Debug.Log("안들어 있음");
+            }
+
             if (PhotonNetwork.CurrentRoom.CustomProperties.ContainsKey(key) &&
                 (bool)PhotonNetwork.CurrentRoom.CustomProperties[key] == true)
             {
+                Debug.Log("반복 호출 횟수 : ?");
                 availableIndices.Add(i); // 사용 가능한 스폰 지점 인덱스 리스트에 추가
             }
         }
@@ -127,16 +146,27 @@ public class SpawnManager : MonoBehaviour
             Debug.LogError("마스터 클라이언트만 자리를 되돌려 놓을 수 있다");
             return;
         }
+
         //자리 index 유효값 검사
-        if(spawnPointIndex < 0 || spawnPointIndex > _allSpawnPoints.Length)
+        if (spawnPointIndex < 0 || spawnPointIndex >= _allSpawnPoints.Length)
         {
             Debug.LogError($"해당 인덱스 {spawnPointIndex}번은 범위를 벗어났습니다");
+            return;
         }
-        // 룸 프로퍼티 업데이트: 스폰 지점을 '사용 가능' (true)으로 설정
+
+        string key = SP_KEY_PREFIX + spawnPointIndex.ToString();
+
+        //해당 인덱스를 통한 자리가 이미 사용 가능 자리이면 return
+        if (PhotonNetwork.CurrentRoom.CustomProperties.ContainsKey(key) &&
+            (bool)PhotonNetwork.CurrentRoom.CustomProperties[key] == true)
+        {
+            return;
+        }
+   
+        // 룸 프로퍼티 업데이트: 스폰 지점을 사용 가능(true) 으로 설정
         ExitGames.Client.Photon.Hashtable props = new ExitGames.Client.Photon.Hashtable();
-        props.Add(SP_KEY_PREFIX + spawnPointIndex, true);
+        props.Add(key, true);
         PhotonNetwork.CurrentRoom.SetCustomProperties(props);
         Debug.Log($"SpawnManager: Master Client returned spawn point index {spawnPointIndex}.");
     }
-
 }
