@@ -25,6 +25,7 @@ public class RoomManager : MonoBehaviour
     // 개별 플레이어 패널 생성
     public void PlayerPanelSpawn(Player player)
     {
+        PhotonNetwork.AutomaticallySyncScene = true;
         Transform targetParent = player.IsMasterClient ? hostPanel : clientPanel;
 
         GameObject obj = Instantiate(playerPanelPrefabs);
@@ -42,7 +43,7 @@ public class RoomManager : MonoBehaviour
     public void GameStart()
     {
         if (PhotonNetwork.IsMasterClient && AllPlayerReadyCheck())
-            PhotonNetwork.LoadLevel("TestGameScene");
+            PhotonNetwork.LoadLevel("LHJ_GameScene");
     }
 
     // 모든플레이어가 준비완료 상태인지
