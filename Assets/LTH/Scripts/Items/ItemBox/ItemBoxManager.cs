@@ -19,7 +19,7 @@ public class ItemBoxManager : Singleton<ItemBoxManager>
     [Header("상자 오브젝트")]
     [SerializeField] private Transform containerTransform;  // 서랍식으로 열릴 부분
     [SerializeField] private GameObject itemBoxPrefabs;     // 상자 전체 오브젝트
-    [SerializeField] private Renderer[] boxRenderers;          // 머티리얼 투명도 조절용
+    [SerializeField] private Renderer[] boxRenderers;       // 머티리얼 투명도 조절용
 
     [Header("슬롯 연결")]
     [SerializeField] private DeskUI deskUI;

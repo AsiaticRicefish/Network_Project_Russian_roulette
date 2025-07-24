@@ -626,8 +626,8 @@ MonoBehaviour:
   containerTransform: {fileID: 1689772115}
   itemBoxPrefabs: {fileID: 1689772114}
   boxRenderers:
-  - {fileID: 1689772120}
   - {fileID: 1921148870}
+  - {fileID: 1689772120}
   deskUI: {fileID: 1028275371}
 --- !u!4 &1000075369
 Transform:
