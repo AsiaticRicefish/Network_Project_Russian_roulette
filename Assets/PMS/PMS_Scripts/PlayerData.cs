@@ -9,33 +9,13 @@ public class PlayerData
     public int winCount;
     public int loseCount;
 
-    public int maxHp;
-    public int currentHp;
-    public bool isAlive;
-
     public PlayerData(string nickname, string firebaseUID, int winCount, int loseCount)
     {
         this.nickname = nickname;
         playerId = firebaseUID;
         this.winCount = winCount;
         this.loseCount = loseCount;
-
-        //게임을 시작하지도 않았는데 있어야 할까?
-        /*this.maxHp = 3;
-        this.currentHp = maxHp;
-        this.isAlive = true;*/
     }
-
-    /*public PlayerData(string id, string uid, int winCount, int loseCount, int maxHp,int currentHp,bool isAlive)
-    {
-        playerId = id;
-        firebaseUid = uid;
-        this.winCount = winCount;
-        this.loseCount = loseCount;
-        this.maxHp = maxHp;
-        this.currentHp = currentHp;
-        this.isAlive = isAlive;
-    }*/
 
     /// <summary>
     /// Firebase에서 불러온 데이터를 바탕으로 PlayerData 생성
@@ -48,6 +28,16 @@ public class PlayerData
     public static PlayerData CreatePlayerDataFromFirebase(string nickname, string firebaseUID, int winCount, int loseCount)
     {
         return new PlayerData(nickname, firebaseUID, winCount, loseCount);
+    }
+
+    public void WinCountUpdate()
+    {
+        winCount += 1;
+    }
+
+    public void LoseCountUpdate()
+    {
+        loseCount += 1;
     }
 }
 
