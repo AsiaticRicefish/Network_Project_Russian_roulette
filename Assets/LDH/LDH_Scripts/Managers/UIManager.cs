@@ -25,7 +25,7 @@ namespace Managers
         
         //Popup prefab path Folder Path
         [SerializeField] private string _popupPrefabFolder = "Prefabs/UI/Popup";
-        
+        [SerializeField] private string _globalUIPrefabFolder = "Prefabs/UI/Global";
 
         private void Awake() => Init();
 
@@ -52,7 +52,26 @@ namespace Managers
 
         private void InitGlobalUI()
         {
-            //todo: 전역 UI 생성, 딕셔너리 추가, enum으로 처리할지 고려중
+            string[] globalUIs = System.Enum.GetNames(typeof(Define_LDH.GlobalUI));
+            foreach (string typeString in globalUIs)
+            {
+                GameObject go = Util_LDH.Instantiate<GameObject>(
+                    Path.Combine(_globalUIPrefabFolder, typeString), UIRoot.transform);
+                
+                // 타입 얻기 (주의: 네임스페이스 포함 필요)
+                Type uiType = Type.GetType($"GameUI.{typeString}"); // 예: GameUI.InventoryUI
+                
+                if (uiType == null)
+                {
+                    Debug.LogError($"[{GetType().Name}] 타입을 찾을 수 없습니다: {typeString}");
+                    continue;
+                }
+
+                UI_Base ui = Util_LDH.GetOrAddComponent(go, uiType) as UI_Base;
+                _globalUIDict.Add(uiType, ui);
+                
+                ui.gameObject.SetActive(false);
+            }
             
         }
 
@@ -72,20 +91,70 @@ namespace Managers
 
         #region Global UI Control
 
-        public T GetGlobalUI<T>(string name = null) where T : UI_Base
+        public UI_Base GetGlobalUI(Define_LDH.GlobalUI globalUIType)
+        {
+            Type type = Type.GetType($"GameUI.{globalUIType}");
+            return _globalUIDict.GetValueOrDefault(type);
+        }
+
+        public T GetGlobalUI<T>() where T : UI_Base
         {
             return _globalUIDict.TryGetValue(typeof(T), out var ui) ? ui as T : null;
         }
 
-        public void ToggleGlobalUI<T>(bool isActive) where T : UI_Base
-        {
-            if (_globalUIDict.TryGetValue(typeof(T), out var ui))
-            {
-                ui.gameObject.SetActive(isActive);
-            }
-        }
-        
+        // public void ToggleGlobalUI<T>(bool isActive) where T : UI_Base
+        // {
+        //     if (_globalUIDict.TryGetValue(typeof(T), out var ui))
+        //     {
+        //         ui.gameObject.SetActive(isActive);
+        //     }
+        // }
 
+        public UI_Base ShowGlobalUI(Define_LDH.GlobalUI globalUIType)
+        {
+            Type type = Type.GetType($"GameUI.{globalUIType}");
+
+            if (!_globalUIDict.TryGetValue(type, out var ui)) return null;
+            
+            SetCanvas(ui.gameObject, true);
+            
+            if (ui is UI_Popup popup)
+                _popupStack.Push(popup);
+
+            ui.gameObject.SetActive(true);
+            
+            return ui;
+        }
+
+
+        public void CloseGlobalUI(Define_LDH.GlobalUI globalUIType)
+        {
+            Type type = Type.GetType($"GameUI.{globalUIType}");
+
+            if (!_globalUIDict.TryGetValue(type, out var ui)) return;
+
+
+            if (ui is UI_Popup popup)
+            {
+                if (_popupStack.Count == 0)
+                    return;
+               
+                if (_popupStack.Peek() != popup)
+                {
+                    Debug.Log($"[{GetType().Name}] pop up이 가장 위에 있는 팝업이 아닙니다.");
+                    return;
+                }
+                
+                _popupStack.Pop();
+              
+            }
+            
+            ui.gameObject.SetActive(false);
+
+            _order--;
+           
+            
+        }
         #endregion
         
         #region World UI Control
@@ -107,6 +176,7 @@ namespace Managers
                 name = typeof(T).Name;
             
             T popup = Util_LDH.Instantiate<T>(Path.Combine(_popupPrefabFolder, name), UIRoot.transform);
+            
             _popupStack.Push(popup);
             
             return popup;
@@ -119,7 +189,7 @@ namespace Managers
 
             if (_popupStack.Peek() != popup)
             {
-                Debug.Log($"[{GetType().Name}] pop up이 가장 위에 있는 팝업이 아닙니다..?");
+                Debug.Log($"[{GetType().Name}] pop up이 가장 위에 있는 팝업이 아닙니다.");
                 return;
             }
 
