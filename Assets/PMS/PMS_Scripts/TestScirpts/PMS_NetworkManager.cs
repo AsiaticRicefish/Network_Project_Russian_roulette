@@ -80,7 +80,7 @@ namespace PMS_Test
                 {
                     // PhotonNetwork.Instantiate를 사용하여 플레이어 캐릭터/컨트롤러 프리팹을 네트워크 상에 생성
                     // 프리팹 경로 및 이름 확인 (예: Assets/Resources/Prefabs/PlayerController)
-                    GameObject playerobj = PhotonNetwork.Instantiate(Path.Combine("Prefabs", "PlayerConrtoller"), spawnPoint.position, spawnPoint.rotation);
+                    GameObject playerobj = PhotonNetwork.Instantiate(Path.Combine("Prefabs", "PlayerConrtoller"), spawnPoint.position, spawnPoint.rotation);            // 이 부분이 바로 진행 할 필요가 없을 것 같다. JoinRoom했을 때 에는 단순히 PlayerData까지만 들고 있어도 되지 않을까
 
                     // GamePlayer 컴포넌트를 가져와 초기화 RPC 호출
                     GamePlayer newPlayer = playerobj.GetComponent<GamePlayer>();
