@@ -339,6 +339,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a3ff605b4ca0d934cb4f8c5750151898, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _loadedBullet: 0
 --- !u!4 &1115845300
 Transform:
   m_ObjectHideFlags: 0
@@ -346,6 +347,50 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1115845298}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.46218464, y: -0.5, z: -2.65}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1297735534
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1297735536}
+  - component: {fileID: 1297735535}
+  m_Layer: 0
+  m_Name: GameManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1297735535
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1297735534}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8c5bcb9e7c2028b499e2f6fe3a65ce15, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &1297735536
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1297735534}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0.46218464, y: -0.5, z: -2.65}
@@ -365,7 +410,7 @@ GameObject:
   - component: {fileID: 1346424005}
   - component: {fileID: 1346424004}
   m_Layer: 0
-  m_Name: GameObject
+  m_Name: CopyItemSyncManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -716,6 +761,7 @@ SceneRoots:
   - {fileID: 119389446}
   - {fileID: 1909980767}
   - {fileID: 1067473397}
-  - {fileID: 1346424005}
   - {fileID: 1623375039}
+  - {fileID: 1297735536}
   - {fileID: 1115845300}
+  - {fileID: 1346424005}

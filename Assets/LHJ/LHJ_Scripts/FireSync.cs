@@ -42,5 +42,7 @@ public class FireSync : MonoBehaviourPun
             Debug.Log($"{targetId}이 데미지를 입었습니다.");
         else
             Debug.Log($"{targetId}이 데미지를 입지않았습니다.");
+
+        GameManager.Instance.EndTurn();     // 게임 매니저 EndTurn호출
     }
 }
