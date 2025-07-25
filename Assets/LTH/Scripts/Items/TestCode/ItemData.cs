@@ -7,6 +7,7 @@ namespace LTH
     [CreateAssetMenu(fileName = "NewItemData", menuName = "LTH/ItemData")]
     public class ItemData : ScriptableObject
     {
+        public string itemId;
         public ItemType itemType;   // 아이템 유형
         public string displayName;  // UI 등에 표시할 이름
         public string description;  // 아이템 설명
