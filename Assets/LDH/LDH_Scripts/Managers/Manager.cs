@@ -46,10 +46,10 @@ namespace Managers
 
         public static GunManager Gun => GunManager.Instance;            // 총 매니저
 
-        public static GameManager Game => GameManager.Instance;         // 게임 매니저
-
         public static PlayerManager PlayerManager => PlayerManager.Instance;   // 플레이어 매니저
 
+        public static InGameManager Game => InGameManager.Instance;         // 게임 매니저
+        
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void Initialize()
@@ -63,6 +63,7 @@ namespace Managers
             manager.AddComponent<TestManager>();
             manager.AddComponent<SoundManager>();
             manager.AddComponent<PlayerManager>();
+            manager.AddComponent<UIManager>();
         }
     }
 }

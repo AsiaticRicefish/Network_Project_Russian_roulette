@@ -10,7 +10,7 @@ namespace GameUI
             Manager.UI.SetCanvas(gameObject, true);
         }
 
-        public virtual void ClosedPopupUI()
+        public override void Close()
         {
             Manager.UI.ClosePopupUI(this);
 

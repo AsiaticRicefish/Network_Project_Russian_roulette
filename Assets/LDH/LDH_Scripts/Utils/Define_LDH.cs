@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace Utils
@@ -19,6 +20,10 @@ namespace Utils
             PointExit,
             Drag,
         }
-
+        
+        public enum GlobalUI
+        {
+            UI_Setting,
+        }
     }
 }

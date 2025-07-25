@@ -1,6 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace Utils
 {
@@ -17,6 +19,14 @@ namespace Utils
             if (go.TryGetComponent<T>(out T component))
                 return component;
             return go.AddComponent<T>();
+        }
+        
+        public static Component GetOrAddComponent(GameObject go, Type type)
+        {
+            if (go.TryGetComponent(type, out var component))
+                return component;
+
+            return go.AddComponent(type);
         }
 
         #endregion
