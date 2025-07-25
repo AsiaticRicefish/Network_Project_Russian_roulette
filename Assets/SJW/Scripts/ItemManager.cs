@@ -2,10 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+using DesignPattern;
+
 public class ItemManager : Singleton<ItemManager>
 {
-    protected override bool ShouldDontDestroy => true;
-
     public void UseItem(ItemData item, GamePlayer user, GamePlayer target)
     {
         if (item == null || item.isUsed)
