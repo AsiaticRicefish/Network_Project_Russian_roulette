@@ -46,7 +46,7 @@ namespace Managers
 
         public static GunManager Gun => GunManager.Instance;            // 총 매니저
 
-        public static GameManager Game => GameManager.Instance;         // 게임 매니저
+        public static InGameManager Game => InGameManager.Instance;         // 게임 매니저
         
         
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
