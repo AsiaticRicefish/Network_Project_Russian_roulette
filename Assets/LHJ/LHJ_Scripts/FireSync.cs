@@ -23,7 +23,7 @@ public class FireSync : MonoBehaviourPun
             // 발사 동기화: 모든 클라이언트에게 발사 정보 전달
             // photonView.RPC("Fire", RpcTarget.All, myId, (int)fireBullet);
             // 발사 처리
-            GunManager.Instance.Fire();
+            GunManager.Instance.Fire(null);
         }
     }
 
@@ -43,6 +43,6 @@ public class FireSync : MonoBehaviourPun
         else
             Debug.Log($"{targetId}이 데미지를 입지않았습니다.");
 
-        GameManager.Instance.EndTurn();     // 게임 매니저 EndTurn호출
+        InGameManager.Instance.EndTurn();     // 게임 매니저 EndTurn호출
     }
 }
