@@ -2,83 +2,99 @@ using DesignPattern;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Photon.Pun; // ActorNumber를 사용하기 위해 추가
+using Photon.Pun; 
+using Photon.Realtime;
+using ExitGames.Client.Photon;
 
-namespace PMS_Test
+//인게임 플레이어 매니저를 만드는게 빠를것같다.
+public class PlayerManager : Singleton<PlayerManager>
 {
-    public class PlayerManager : Singleton<PlayerManager>
+    //리스트가 아닌 Dictionary로 관리  Key - FirebaseUID Value - PlayData
+    private Dictionary<string, PlayerData> _playerData;
+    private Dictionary<string, GamePlayer> _players;  
+    public Dictionary<string, GamePlayer> GetAllPlayers() => _players;
+
+    //리스트에서 플레이어를 지우거나 추가를 할 때 자동 동기화 될 수 있도록 하는방법? 
+    //public List<Player> Players { get { return _players} set { } };
+    // TODO - 나중에 Manager 등록하게 해줘야한다.
+    private void Awake()
     {
-        private List<GamePlayer> _players;
-        public List<GamePlayer> Players => _players;
+        SingletonInit();
+        Init();
+    }
 
-        //리스트에서 플레이어를 지우거나 추가를 할 때 자동 동기화 될 수 있도록 하는방법? 
-        //public List<Player> Players { get { return _players} set { } };
-        // TODO - 나중에 Manager 등록하게 해줘야한다.
-        private void Awake()
+    private void Init()
+    {
+        _players = new Dictionary<string, GamePlayer>();
+    }
+
+    public GamePlayer CreateGamePlayer(Player photonPlayer, PlayerData playerData)
+    {
+        string uid = photonPlayer.CustomProperties["uid"]?.ToString() ?? "unknown";
+        string nickname = photonPlayer.NickName;
+
+        GamePlayer gamePlayer = new GamePlayer();
+        gamePlayer.Initialize(playerData);
+        RegisterPlayer(gamePlayer);
+        return gamePlayer;
+    }
+
+
+    public void RegisterPlayer(GamePlayer player)
+    {
+        if (!_players.ContainsKey(player.PlayerId))
         {
-            SingletonInit();
-            _players = new List<GamePlayer>(); // _players 리스트 초기화
+            _players.Add(player.PlayerId, player);
+            Debug.Log($"Player added! Player FirebaseUID Number : {player.PlayerId}. Current players: {_players.Count}");
         }
-
-        public void AddPlayer(GamePlayer player)
+        else
         {
-            if (!_players.Contains(player))
-            {
-                _players.Add(player);
-                Debug.Log($"Player added! Player FirebaseUID Number : {player.PlayerId}. Current players: {_players.Count}");
-            }
-            else
-            {
-                Debug.LogWarning($"Player ID : {player.PlayerId} 에 해당되는 유저가 이미 존재 합니다.");
-            }
+            Debug.LogWarning($"Player ID : {player.PlayerId} 에 해당되는 유저가 이미 존재 합니다.");
         }
+    }
 
-        public void RemovePlayer(GamePlayer player)
+    public void RemovePlayer(GamePlayer player)
+    {
+        if (_players.ContainsKey(player.PlayerId))
         {
-            if (_players.Contains(player))
-            {
-                _players.Remove(player);
-            }
-            else
-            {
-                Debug.LogWarning($"Player ID : {player.PlayerId}에 해당되는 유저가 존재하지 않습니다.");
-            }
+            _players.Remove(player.PlayerId);
         }
-
-        //Player 고유값인 uid로 리스트에서 삭제하기 
-        public bool RemovePlayerByUID(string uid)
+        else
         {
-            GamePlayer player = FindPlayerByUID(uid);
-            if (player != null)
-            {
-                _players.Remove(player);
-                return true;
-            }
-            else
-            {
-                Debug.LogWarning($"Player UID: {uid} 가 리스트에 없습니다.");
-                return false;
-            }
+            Debug.LogWarning($"Player ID : {player.PlayerId}에 해당되는 유저가 존재하지 않습니다.");
         }
+    }
 
-        public GamePlayer FindPlayerByUID(string uid)
+    //Player 고유값인 uid로 리스트에서 삭제하기 
+    public bool RemovePlayerByUID(string uid)
+    {
+        GamePlayer player = FindPlayerByUID(uid);
+        if (player != null)
         {
-            return _players.Find(p => p.PlayerId == uid);
+            _players.Remove(player.PlayerId);
+            return true;
         }
-
-        // 플레이어 고유값인 ActorNumber로 리스트에서 플레이어 찾기
-        public GamePlayer FindPlayerByActorNumber(int actorNumber)
+        else
         {
-            // _players 리스트의 각 GamePlayer에 연결된 PhotonView의 owner.ActorNumber를 비교
-            return _players.Find(p => p.GetComponent<PhotonView>().Owner.ActorNumber == actorNumber);
+            Debug.LogWarning($"Player UID: {uid} 가 리스트에 없습니다.");
+            return false;
         }
+    }
 
-        public void PlayerListPrint()
+    public GamePlayer FindPlayerByUID(string uid)
+    {
+        if (_players.TryGetValue(uid, out GamePlayer player))
         {
-            foreach (var player in _players)
-            {
-                Debug.Log(player.Nickname);
-            }
+            return player;
+        }
+        return null;
+    }
+
+    public void PlayerListPrint()
+    {
+        foreach (var player in _players)
+        {
+            Debug.Log(player.Value.Nickname);
         }
     }
 }
