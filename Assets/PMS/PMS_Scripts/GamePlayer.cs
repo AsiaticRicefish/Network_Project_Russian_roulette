@@ -2,18 +2,28 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
+using Photon.Realtime;
 
 public class GamePlayer : MonoBehaviour
 {
-    private PhotonView _pv;
+    public PhotonView _pv;
 
     [SerializeField] private PlayerData _data;
-    public int AssignedSpawnPointIndex { get; private set; } = -1; // 할당된 스폰 지점 인덱스 (-1은 할당되지 않음을 의미)
-    public string Nickname => _data.nickname;
+
+    //데이터를 읽기는 해야하는데 Write하면 안되는 데이터
+    public string Nickname => _data.nickname;       
     public string PlayerId => _data.playerId;
-    public int MaxHp => _data.maxHp;
-    public int CurrentHp => _data.currentHp;
-    public bool IsAlive => _data.isAlive;
+
+    //읽고 써야 하는 데이터
+    private int _maxHp;
+    private int _currentHp;
+    private bool _isAlive;
+
+    public int MaxHp { get { return _maxHp; } }
+    public int CurrentHp { get { return _currentHp; } }
+    public bool IsAlive { get { return _isAlive; } }
+
+    //public int AssignedSpawnPointIndex { get; private set; } = -1; // 할당된 스폰 지점 인덱스 (-1은 할당되지 않음을 의미)
 
     public bool IsCuffedThisTurn = false;
 
@@ -22,41 +32,13 @@ public class GamePlayer : MonoBehaviour
         _pv = GetComponent<PhotonView>();
     }
 
-    /// <summary>
-    /// 플레이어 데이터를 초기화하고, 스폰 지점 인덱스를 저장하는 RPC
-    /// </summary>
-    /// <param name="nickname"></param>
-    /// <param name="firebaseUID"></param>
-    /// <param name="winCount"></param>
-    /// <param name="loseCount"></param>
-    /// <param name="initialSpawnPointIndex">이 플레이어가 스폰된 스폰 지점의 인덱스</param>
-    [PunRPC]
-    public void RPC_InitializePlayer(string nickname, string firebaseUID, int winCount, int loseCount, int initialSpawnPointIndex)
-    {
-        _data = new PlayerData(nickname, firebaseUID, winCount, loseCount);
-        _data.maxHp = 3; // 예시 HP
-        _data.currentHp = _data.maxHp;
-        _data.isAlive = true;
-        AssignedSpawnPointIndex = initialSpawnPointIndex; // 스폰 지점 인덱스 저장
-
-        Debug.Log($"Initialized GamePlayer: {Nickname}, HP: {CurrentHp} at spawn index {AssignedSpawnPointIndex}");
-        // UIManager 등을 통해 플레이어 UI 업데이트 로직 호출 가능
-    }
-
-    private void Start()
-    {
-        //Debug.Log($"{Nickname},{PlayerId}");
-    }
+    //플레이어 생성 -> 게임 매니저에 있어야할 것같은데
 
     public void Initialize(PlayerData data)
     {
         _data = data;
     }
 
-    /// <summary>
-    /// Player MaxHp Setting 메서드
-    /// </summary>
-    /// <param name="newHp"> 설정 시킬 MaxHp값 </param>
     public void SetMaxHp(int newHp)
     {
         if (newHp < 0)
@@ -64,28 +46,43 @@ public class GamePlayer : MonoBehaviour
             Debug.LogError("0보다 작은 값으로 MaxHp 설정 불가");
             return;
         }
-        _data.maxHp = newHp;
+        _maxHp = newHp;
     }
 
-    /// <summary>
-    /// Player hp 관련 메서드
-    /// </summary>
-    /// <param name="amount"></param>
     public void IncreaseHp(int amount)
     {
-        _data.currentHp = Mathf.Min(_data.currentHp + amount, _data.maxHp);
+        _currentHp = Mathf.Min(_currentHp + amount, _maxHp);
     }
 
     public void DecreaseHp(int amount)
     {
-        _data.currentHp = Mathf.Max(_data.currentHp - amount, 0);
-        if (_data.currentHp <= 0)
-            _data.isAlive = false;
+        _currentHp = Mathf.Max(_currentHp - amount, 0);
+        if (_currentHp <= 0)
+            _isAlive = false;
     }
 
-    //Player에서 PlayerData를 넘겨주는 메서드
+    //Player에서 PlayerData를 넘겨주는 메서드 - 필요하진 모르겟다 
     public PlayerData ToPlayerData()
     {
         return _data;
+    }
+
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.IsWriting)
+        {
+            // 자신의 데이터를 다른 클라이언트로 전송
+            stream.SendNext(_maxHp);
+            stream.SendNext(_currentHp);
+            stream.SendNext(_isAlive);
+        }
+        else
+        {
+            // 다른 클라이언트로부터 데이터를 수신하여 적용
+            _maxHp = (int)stream.ReceiveNext();
+            _currentHp = (int)stream.ReceiveNext();
+            _isAlive = (bool)stream.ReceiveNext();
+            Debug.Log($"보낸 플레이어 : {info.Sender.NickName} , 보낸 서버 시간 : {info.SentServerTime}"); 
+        }
     }
 }

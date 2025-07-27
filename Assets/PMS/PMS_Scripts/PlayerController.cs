@@ -36,6 +36,13 @@ public class PlayerController : MonoBehaviour
     {
         if (!_pv.IsMine) return;
 
+        if(Input.GetKeyDown(KeyCode.Space))
+        {
+            //PlayerManager.Instance.PlayerListPrint();
+            //Debug.Log(PlayerManager.Instance.GetAllPlayers().Count);
+            Debug.Log(GetComponent<GamePlayer>().CurrentHp);
+        }
+
         PlayerLook();
         PlayerMove();
         PlayerJump();
@@ -54,7 +61,6 @@ public class PlayerController : MonoBehaviour
     {
         // 총알 종류에 따라 효과 적용
         Debug.Log("총 발사!");
-
         //GunManager.Instance.Fire(Player player);
     }
 
@@ -83,8 +89,7 @@ public class PlayerController : MonoBehaviour
     private void PlayerJump()
     {
         if (Input.GetKeyDown(KeyCode.Space))
-        {
-            Debug.Log("Hi");
+        { 
             _rb.AddForce(transform.up * 5.0f, ForceMode.Impulse);
         }
     }

@@ -18,7 +18,6 @@ public class ItemBoxManager : Singleton<ItemBoxManager>
 
     [Header("ItemBox Object")]
     [SerializeField] private GameObject itemBoxPrefabs;     // 상자 전체 오브젝트
-    [SerializeField] private Renderer[] boxRenderers;       // 머티리얼 투명도 조절용
     [SerializeField] private Transform lidTransform;        // 상자 뚜껑 (CommonMediumLid)
     [SerializeField] private Vector3 openRotation = new Vector3(-120f, 0f, 0f); // 뚜껑 열리는 각도
 
@@ -26,35 +25,11 @@ public class ItemBoxManager : Singleton<ItemBoxManager>
     [SerializeField] private DeskUI deskUI;
 
     private bool isOpened = false;
-    private Material[] boxMaterials;
 
     private void Awake()
     {
         SingletonInit();
-
-        InitMaterials();
-
         CloseBoxImmediately(); // 시작 시 닫힌 상태로 초기화
-    }
-
-    private void InitMaterials()
-    {
-        boxMaterials = new Material[boxRenderers.Length];
-        for (int i = 0; i < boxRenderers.Length; i++)
-        {
-            boxMaterials[i] = boxRenderers[i].material;
-
-            // 내부는 뒤쪽에 렌더링되도록 설정
-            if (boxMaterials[i].name.ToLower().Contains("container"))
-                boxMaterials[i].renderQueue = 3100;
-            else
-                boxMaterials[i].renderQueue = 3000;
-
-            // 초기 알파값 0
-            var color = boxMaterials[i].color;
-            color.a = 0f;
-            boxMaterials[i].color = color;
-        }
     }
 
     /// <summary>
@@ -66,19 +41,6 @@ public class ItemBoxManager : Singleton<ItemBoxManager>
         gameObject.SetActive(true);
 
         CloseBoxImmediately(); // Dotween으로 아이템 상자 닫힌 상태 유지
-
-        FadeInBox(); // 서서히 등장
-    }
-
-    private void FadeInBox()
-    {
-        for (int i = 0; i < boxMaterials.Length; i++)
-        {
-            float delay = i * 0.3f;
-            boxMaterials[i].DOFade(1f, 1.2f)
-                          .SetDelay(delay)
-                          .SetEase(Ease.OutQuad);
-        }
     }
 
     /// <summary>
@@ -88,16 +50,6 @@ public class ItemBoxManager : Singleton<ItemBoxManager>
     {
         lidTransform.localRotation = Quaternion.identity; // 뚜껑 닫기
         itemBoxPrefabs.SetActive(true);
-    }
-
-    private void SetBoxAlpha(float alpha)
-    {
-        foreach (var mat in boxMaterials)
-        {
-            var color = mat.color;
-            color.a = alpha;
-            mat.color = color;
-        }
     }
 
 
@@ -144,7 +96,8 @@ public class ItemBoxManager : Singleton<ItemBoxManager>
         var emptySlots = deskUI.GetEmptySlots();
         for (int i = 0; i < rewards.Count && i < emptySlots.Count; i++)
         {
-            emptySlots[i].PlaceItem(rewards[i].itemPrefab);
+            string itemId = rewards[i].itemId;
+            emptySlots[i].PlaceItemById(itemId);
         }
     }
 
@@ -155,7 +108,6 @@ public class ItemBoxManager : Singleton<ItemBoxManager>
     {
         yield return new WaitForSeconds(1.5f);
         itemBoxPrefabs.SetActive(false);
-        SetBoxAlpha(0f);
         gameObject.SetActive(false);
     }
 
