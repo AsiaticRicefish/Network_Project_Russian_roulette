@@ -72,6 +72,15 @@ public class GameManager : Singleton<GameManager>
     {
         TurnInit();
 
+        var currentPlayer = PlayerManager.Instance.GetPlayerByTurn(_currentTurnIndex.Value);
+        if (currentPlayer != null && currentPlayer.IsCuffedThisTurn)
+        {
+            Debug.Log($"[턴 스킵] {currentPlayer.Nickname}는 수갑 상태 → 턴 스킵됨");
+            currentPlayer.IsCuffedThisTurn = false; // 스킵 후 초기화
+            EndTurn(); // 턴 바로 넘김
+            return;
+        }
+
         OnTurnStart?.Invoke();
     }
     public void EndTurn()

@@ -23,23 +23,23 @@ public class ItemManager : Singleton<ItemManager>
         switch (itemType)
         {
             case ItemType.Cigarette:
-                //user.useCigarette();
-                Debug.Log("담배 사용");
+                user.IncreaseHp(1);
+                Debug.Log("담배 사용 → 피1 회복");
                 break;
 
             case ItemType.Cuffs:
-                //user.useCuffs(target);
-                Debug.Log("수갑 사용");
+                target.IsCuffedThisTurn = true;
+                Debug.Log("수갑 사용 → 대상의 다음 턴 스킵 예약됨");
                 break;
 
             case ItemType.Dial:
                 //user.useDial();
-                Debug.Log("다이얼 사용");
+                Debug.Log("다이얼 사용 → 현재 탄 타입 변환");
                 break;
 
             case ItemType.Cellphone:
                 //user.useCellphone();
-                Debug.Log("휴대폰 사용");
+                Debug.Log("휴대폰 사용 → 랜덤 탄 종류 알려줌");
                 break;
 
             default:

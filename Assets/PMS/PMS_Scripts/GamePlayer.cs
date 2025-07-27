@@ -15,6 +15,8 @@ public class GamePlayer : MonoBehaviour
     public int CurrentHp => _data.currentHp;
     public bool IsAlive => _data.isAlive;
 
+    public bool IsCuffedThisTurn = false;
+
     private void Awake()
     {
         _pv = GetComponent<PhotonView>();
