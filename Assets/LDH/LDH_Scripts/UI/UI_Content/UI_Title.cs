@@ -147,9 +147,7 @@ namespace GameUI
         private IEnumerator ClosePanelAndShowTitle(Animator panelAnimator)
         {
             panelAnimator.Play(panelFadeOutHash);
-            Debug.Log("delay");
             yield return _titlePanelWait;
-            Debug.Log("afterdelay");
             _titlePanel.SetActive(true);
         }
         

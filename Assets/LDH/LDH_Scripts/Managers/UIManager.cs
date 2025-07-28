@@ -172,16 +172,7 @@ namespace Managers
         }
 
         #endregion
-
-        #region World UI Control
-
-        ///todo : 텍스트 같은 world space UI
-        // public T MakeWorldSapceUI<T>()
-        // {
-        //        
-        // }
-
-        #endregion
+        
 
         #region Popup UI control
 

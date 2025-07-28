@@ -24,6 +24,7 @@ namespace Utils
         public enum GlobalUI
         {
             UI_Setting,
+            UI_InventoryInfo,
         }
         
         public enum NotifyType
