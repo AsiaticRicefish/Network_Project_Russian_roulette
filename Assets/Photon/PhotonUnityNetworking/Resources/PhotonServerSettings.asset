@@ -44,6 +44,8 @@ MonoBehaviour:
   - InitPlayerItems
   - UseItem
   - RPC_PlaceItem
+  - OpenBox
+  - Reload
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1
