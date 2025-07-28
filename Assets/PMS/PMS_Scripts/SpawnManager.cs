@@ -4,23 +4,22 @@ using UnityEngine;
 using Photon.Pun;
 using ExitGames.Client.Photon;
 
-public class SpawnManager : MonoBehaviour
+public class SpawnManager : MonoBehaviourPunCallbacks
 {
     public static SpawnManager Instance;
 
     //룸에서 사용되는 룸 프로퍼티 접두사
-    public const string SP_KEY_PREFIX = "SP_";
+    public const string SP_KEY_PREFIX = "SpawnPoint_";      //S
 
-    [SerializeField] private Transform[] _allSpawnPoints;
-
+    private Transform[] _allSpawnPoints;
 
     //여기까지는 모든 유저가 해도됨.
     private void Awake()
     {
         //방마다 존재 + 초반 게임 시작후 자리 배정할 때만 사용
-        if (Instance != null && Instance != this)
+        if (Instance != null)
         {
-            Destroy(gameObject); 
+            Destroy(gameObject);
             return;
         }
         Instance = this;
@@ -40,10 +39,7 @@ public class SpawnManager : MonoBehaviour
         }
     }
 
-    //마스터 클라이언트(방장)만 룸을 초기화 해야함 일단 
-
     //이 함수의 예상 호출 시점은 게임시작 할 때
-    // 게임 시작 시 또는 라운드 시작 시 호출하여 사용 가능한 스폰 포인트를 초기화
     public void InitializeAvailableSpawnPoints()
     {
         if (!PhotonNetwork.IsMasterClient) // 마스터 클라이언트가 아니면 실행하지 않음
@@ -59,6 +55,7 @@ public class SpawnManager : MonoBehaviour
         {
             // 각 스폰 지점의 상태를 "사용 가능" (true)으로 설정하여 Hashtable에 추가       
             customProperties.Add(SP_KEY_PREFIX + i.ToString(), true);
+            Debug.Log(SP_KEY_PREFIX + i);
         }
         // 설정된 프로퍼티를 현재 방에 적용 -> 모든 클라이언트에 동기화
         PhotonNetwork.CurrentRoom.SetCustomProperties(customProperties);
@@ -79,26 +76,22 @@ public class SpawnManager : MonoBehaviour
     /// <returns>선택된 스폰 지점 Transform과 _allSpawnPoints 배열에서의 인덱스. 없으면 (null, -1)</returns>
     public (Transform spawnPoint, int index) GetAndClaimRandomSpawnPoint()
     {
-        if (!PhotonNetwork.IsMasterClient) // 마스터 클라이언트가 아니면 오류 로그 출력
+        /*if (!PhotonNetwork.IsMasterClient) // 마스터 클라이언트가 아니면 오류 로그 출력
         {
             Debug.LogError("마스터 클라이언트만 룸 프로퍼티에 대한 부분을 설정할 수 있음.");
             return (null, -1);
-        }
-
-        int a = 1;
-        string keye = SP_KEY_PREFIX + a.ToString();
-        Debug.Log(PhotonNetwork.CurrentRoom.CustomProperties[keye].ToString());
-
+        }*/
         List<int> availableIndices = new List<int>();
+
         // 모든 스폰 지점을 순회하며 룸 프로퍼티에서 사용 가능 상태(값이 true)인 스폰 지점의 인덱스를 수집
-        for (int i = 0; i < _allSpawnPoints.Length; i++) 
+        for (int i = 0; i < _allSpawnPoints.Length; i++)
         {
             string key = SP_KEY_PREFIX + i.ToString();
             Debug.Log($"키이름{key}");
             // 룸 프로퍼티에 해당 키가 존재하고, 값이 true(사용 가능)인지 확인
             //(bool)PhotonNetwork.CurrentRoom.CustomProperties[key] 커스텀 프로퍼티에 등록되어 있을 때 object타입으로 들어가 있음
             //하지만 실제 우리는 bool타입이 들어가 있는거 알 기 때문에 명시적 캐스팅이 가능하다.
-            if(PhotonNetwork.CurrentRoom.CustomProperties.ContainsKey(key))
+            if (PhotonNetwork.CurrentRoom.CustomProperties.ContainsKey(key))
             {
                 Debug.Log("들어있음");
             }
@@ -110,7 +103,7 @@ public class SpawnManager : MonoBehaviour
             if (PhotonNetwork.CurrentRoom.CustomProperties.ContainsKey(key) &&
                 (bool)PhotonNetwork.CurrentRoom.CustomProperties[key] == true)
             {
-                Debug.Log("반복 호출 횟수 : ?");
+                Debug.Log($"반복 호출 횟수 : {i}");
                 availableIndices.Add(i); // 사용 가능한 스폰 지점 인덱스 리스트에 추가
             }
         }
@@ -121,13 +114,14 @@ public class SpawnManager : MonoBehaviour
             return (null, -1);
         }
 
-        // 사용 가능한 스폰 지점 중 하나를 무작위로 선택
-        int selectedIndex = availableIndices[Random.Range(0, availableIndices.Count)];
+        //제일 빠른 위치에 앉게하기
+        int selectedIndex = availableIndices[0];
         Transform selectedSpawnPoint = _allSpawnPoints[selectedIndex];
 
-        // 룸 프로퍼티 업데이트: 선택된 스폰 지점을 '사용 중' (false)으로 설정
+        // 룸 프로퍼티 업데이트: 선택된 스폰 지점을 사용 중(false)으로 설정
         ExitGames.Client.Photon.Hashtable propsToSet = new ExitGames.Client.Photon.Hashtable();
         propsToSet.Add(SP_KEY_PREFIX + selectedIndex.ToString(), false);
+
         // SetCustomProperties를 호출하여 변경된 프로퍼티를 모든 클라이언트에 동기화
         PhotonNetwork.CurrentRoom.SetCustomProperties(propsToSet);
 
@@ -135,7 +129,7 @@ public class SpawnManager : MonoBehaviour
     }
 
     /// <summary>
-    /// 마스터 클라이언트만 써야한다. 
+    /// 마스터 클라이언트만 써야하기는 하는데 유저가 나가면 해당 함수가 호출 되게 해야함. 
     /// 사용이 끝난 스폰 지점을 다시 사용 가능(true) 상태로 되돌리는 함수
     /// </summary>
     /// <param name="spawnPointIndex">반환할 스폰 지점의 _allSpawnPoints 인덱스</param>
@@ -162,7 +156,7 @@ public class SpawnManager : MonoBehaviour
         {
             return;
         }
-   
+
         // 룸 프로퍼티 업데이트: 스폰 지점을 사용 가능(true) 으로 설정
         ExitGames.Client.Photon.Hashtable props = new ExitGames.Client.Photon.Hashtable();
         props.Add(key, true);

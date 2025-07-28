@@ -19,7 +19,7 @@ MonoBehaviour:
     AppIdVoice: 
     AppVersion: 
     UseNameServer: 1
-    FixedRegion: 
+    FixedRegion: kr
     Server: 
     Port: 0
     ProxyServer: 
@@ -43,6 +43,14 @@ MonoBehaviour:
   - RPC_InitializePlayer
   - InitPlayerItems
   - UseItem
+  - RPC_PlaceItem
+  - OpenBox
+  - Reload
+  - RPC_Clear
+  - RPC_DistributeRewards
+  - RPC_ShowBoxWithItems
+  - RPC_RegisterPlayerOnMaster
+  - ReceivePlayerData
   DisableAutoOpenWizard: 1
-  ShowSettings: 0
+  ShowSettings: 1
   DevRegionSetOnce: 1

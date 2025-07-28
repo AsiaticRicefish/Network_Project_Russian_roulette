@@ -331,6 +331,7 @@ GameObject:
   - component: {fileID: 1587334431355697619}
   - component: {fileID: 3502527441228534993}
   - component: {fileID: 5933732107222557802}
+  - component: {fileID: 652835476720586870}
   m_Layer: 0
   m_Name: PlayerConrtoller
   m_TagString: Untagged
@@ -508,3 +509,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _cameraHolder: {fileID: 3455099749874392749}
   _mouseSensitivity: 1
+--- !u!114 &652835476720586870
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5930080417927383745}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 34dd7d4b94903e9449ad881307522640, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _pv: {fileID: 0}
+  _data:
+    nickname: 
+    playerId: 
+    winCount: 0
+    loseCount: 0
+  _spawnPointindex: -1
