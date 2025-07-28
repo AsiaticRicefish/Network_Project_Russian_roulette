@@ -108,14 +108,7 @@ namespace Managers
         /// </summary>
         private IEnumerator LoadSavedVolumes()
         {
-            
-            Debug.Log($"[SoundManager] BGMVolume: {PlayerPrefs.GetFloat(BgmVolumeKey)}");
-            Debug.Log($"[SoundManager] SFXVolume: {PlayerPrefs.GetFloat(SfxVolumeKey)}");
-            Debug.Log($"[SoundManager] audioMixer is null? {audioMixer == null}");
             audioMixer.GetFloat(BgmVolumeKey, out float currentBgmDb);
-            Debug.Log($"BGM Mixer value: {currentBgmDb} dB");
-            
-            Debug.Log($"[{GetType().Name}] 저장된 사운드 볼륨 데이터를 가져옵니다.");
 
             yield return null;
             SetBgmVolume((PlayerPrefs.HasKey(BgmVolumeKey)) ? PlayerPrefs.GetFloat(BgmVolumeKey) : 0.5f);
@@ -135,13 +128,11 @@ namespace Managers
         {
             //볼륨 clamp
             BgmVolume = ClampVolume(value);
-            Debug.Log($"매개변수로 전달받은값 = {value} / clamp = {BgmVolume} / 데시벨 = {ToDecibel(BgmVolume)}");
             
             //오디오 믹서 설정
             audioMixer.SetFloat(BgmVolumeKey, ToDecibel(BgmVolume));
             
             audioMixer.GetFloat(BgmVolumeKey, out float currentBgmDb);
-            Debug.Log($"BGM Mixer !!!!: {currentBgmDb} dB");
             //로컬 저장
             PlayerPrefs.SetFloat(BgmVolumeKey, BgmVolume);  //mixer 값이 아닌 0~1 사이의 값 저장
         }

@@ -804,7 +804,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _signupSuccess: 0
-  _emailCheckSuccess: 0
   failType: 0
   _failTitle: Sign Up Failed
   _failMessage: Something went wrong. Please try again.
@@ -3333,11 +3332,28 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4703739439316451996, guid: 6fcc83045d9124f0e9dfcc46a303aef1,
+        type: 3}
+      propertyPath: _iconImage
+      value: 
+      objectReference: {fileID: 657204850753288033}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6fcc83045d9124f0e9dfcc46a303aef1, type: 3}
+--- !u!114 &657204850753288033 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4167482622492960355, guid: 6fcc83045d9124f0e9dfcc46a303aef1,
+    type: 3}
+  m_PrefabInstance: {fileID: 3515907271292768514}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!224 &836962742887925483 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 4275743602816849897, guid: 6fcc83045d9124f0e9dfcc46a303aef1,
