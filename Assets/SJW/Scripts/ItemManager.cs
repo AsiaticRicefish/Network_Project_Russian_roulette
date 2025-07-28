@@ -1,8 +1,10 @@
+using DesignPattern;
+using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-using DesignPattern;
+using LTH;
 
 public class ItemManager : Singleton<ItemManager>
 {
@@ -23,7 +25,7 @@ public class ItemManager : Singleton<ItemManager>
         switch (itemType)
         {
             case ItemType.Cigarette:
-                user.IncreaseHp(1);
+                user.GetComponent<PhotonView>().RPC("RPC_IncreaseHp", RpcTarget.All, 1);
                 Debug.Log("담배 사용 → 피1 회복");
                 break;
 

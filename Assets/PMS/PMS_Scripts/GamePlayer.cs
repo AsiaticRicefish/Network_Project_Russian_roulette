@@ -61,6 +61,13 @@ public class GamePlayer : MonoBehaviour
             _isAlive = false;
     }
 
+    [PunRPC]
+    public void RPC_IncreaseHp(int amount)
+    {
+        _currentHp = Mathf.Min(_currentHp + amount, _maxHp);
+        Debug.Log($"[HP 회복] {Nickname} → 현재 HP: {_currentHp}/{_maxHp}");
+    }
+
     //Player에서 PlayerData를 넘겨주는 메서드 - 필요하진 모르겟다 
     public PlayerData ToPlayerData()
     {
