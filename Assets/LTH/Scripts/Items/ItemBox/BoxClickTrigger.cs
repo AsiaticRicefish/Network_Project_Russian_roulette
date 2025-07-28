@@ -6,6 +6,7 @@ public class BoxClickTrigger : MonoBehaviour
 {
     private void OnMouseDown()
     {
-        ItemBoxManager.Instance.OnBoxClicked();
+        var itemSync = FindObjectOfType<ItemSync>();
+        itemSync.BoxOpen();
     }
 }
