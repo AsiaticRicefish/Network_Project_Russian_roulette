@@ -4,45 +4,60 @@ using UnityEngine;
 using Photon.Pun;
 using System.IO;
 
-namespace PMS_Test
-{
     //이친구를 생성을 하고 
-    public class InGamePlayerManager : MonoBehaviourPunCallbacks
+public class InGamePlayerManager : MonoBehaviourPunCallbacks
+{
+    private PhotonView _pv;
+   
+    private string key = "GameStart";
+    private bool flag = false;
+
+    public PlayerData _playerData;
+    private void Awake()
     {
-        private PhotonView _pv;
-        private string key = "GameStart";
-        private bool flag = false;
+        _pv = GetComponent<PhotonView>();
+    }
 
-        private void Awake()
+    public override void OnRoomPropertiesUpdate(ExitGames.Client.Photon.Hashtable propertiesThatChanged)
+    {
+        if (_pv.IsMine && 
+            propertiesThatChanged.ContainsKey(key) &&
+            (bool)propertiesThatChanged[key] == true)
         {
-            _pv = GetComponent<PhotonView>();
+            CreateController();
         }
+    }
 
-        private void Start()
+    //마스터 클라이언트 스폰 기준
+    /*private void CreateController()
+    {
+        foreach (Photon.Realtime.Player player in PhotonNetwork.PlayerList)
         {
-            //룸 프로터피의 값이 true로 바뀔 때 
-            /*if (_pv.IsMine && PhotonNetwork.CurrentRoom.CustomProperties.ContainsKey(key) &&
-            (bool)PhotonNetwork.CurrentRoom.CustomProperties[key] == true) //&& isGameStart = true면 생성하도록 해보게 하기 //여기서 제어 한번 해보자
-            {
-                CreateController();
-            }*/
-        }
-
-        public override void OnRoomPropertiesUpdate(ExitGames.Client.Photon.Hashtable propertiesThatChanged)
-        {
-            if (_pv.IsMine && propertiesThatChanged.ContainsKey(key) &&
-                (bool)propertiesThatChanged[key] == true && !flag)
-            {
-                CreateController();
-                flag = true; 
-            }
-        }   
-
-        private void CreateController()
-        {
-            //Instantiate player controller
             GameObject go = PhotonNetwork.Instantiate(Path.Combine("Prefabs", "PlayerConrtoller"), Vector3.zero, Quaternion.identity);
-            Debug.Log("호출");
+            GamePlayer gp = go.GetComponent<GamePlayer>();
+            PlayerData pd = PlayerManager.Instance.GetFindPlayerDataFromID(PhotonNetwork.LocalPlayer.UserId);
+            //firebase아이디와,nickname을 가져오게 하는 함수가 필요할 것 같다.
+            if (pd != null)
+            {
+                gp.GetComponent<GamePlayer>()._data = pd;
+            }
+
+            PhotonView photonView = go.GetComponent<PhotonView>();
+            if (photonView != null && photonView.Owner != player)
+            {
+                photonView.TransferOwnership(player); // 생성 후 바로 해당 플레이어에게 소유권 이전
+            }
+
         }
+    }*/
+
+    private void CreateController()
+    {
+        GameObject go = PhotonNetwork.Instantiate(Path.Combine("Prefabs", "PlayerConrtoller"), Vector3.zero, Quaternion.identity);
+        GamePlayer player = go.GetComponent<GamePlayer>();
+        player._data= _playerData;
+
+        //내가 만들었으니깐 다른 애들은 나에 대한 정보를 모름 알려줘야함.
+        player.SendMyPlayerDataRPC();
     }
 }

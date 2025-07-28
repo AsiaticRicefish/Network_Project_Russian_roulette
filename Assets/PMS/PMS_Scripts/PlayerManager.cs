@@ -10,7 +10,9 @@ using ExitGames.Client.Photon;
 public class PlayerManager : Singleton<PlayerManager>
 {
     //리스트가 아닌 Dictionary로 관리  Key - FirebaseUID Value - PlayData
-    private Dictionary<string, PlayerData> _playerData;
+    public Dictionary<string, PlayerData> _playerData;
+    public List<PlayerData> _playerDataList;
+
     private Dictionary<string, GamePlayer> _players;  
     public Dictionary<string, GamePlayer> GetAllPlayers() => _players;
 
@@ -23,9 +25,32 @@ public class PlayerManager : Singleton<PlayerManager>
         Init();
     }
 
+    //게임 스타트시 추가
+    public bool AllGamePlayerAdd()
+    {
+        if (!PhotonNetwork.IsMasterClient) return false;
+
+        GamePlayer[] players = FindObjectsOfType<GamePlayer>();
+        Debug.Log($"마스터 클라이언트: 씬에서 {players.Length} 개의 GamePlayer 객체를 찾았습니다.");
+
+        foreach (GamePlayer player in players) 
+        {
+            RegisterPlayer(player);
+            Debug.Log($"등록된 플레이어 : {player.Nickname}, 플레이어 ID : {player.PlayerId}");
+        }
+
+        if (_players.Count != PhotonNetwork.CurrentRoom.PlayerCount)
+        {
+            Debug.Log($"dic플레이어 추가 오류! 현재 방안에 존재하는 플레이어 수 : {PhotonNetwork.CurrentRoom.PlayerCount},딕셔너리에 저장된 플레이어 수 : {_players.Count}");           
+            return false;
+        }
+        return true;
+    }
+
     private void Init()
     {
         _players = new Dictionary<string, GamePlayer>();
+        _playerDataList = new List<PlayerData>();
     }
 
     public GamePlayer CreateGamePlayer(Player photonPlayer, PlayerData playerData)
@@ -96,5 +121,17 @@ public class PlayerManager : Singleton<PlayerManager>
         {
             Debug.Log(player.Value.Nickname);
         }
+    }
+
+    public PlayerData GetFindPlayerDataFromID(string id)
+    {
+        foreach(var playerData in _playerDataList) 
+        {
+            if (playerData.playerId == id)
+                return playerData;
+        }
+
+        Debug.Log($"해당ID : {id} 와 일치 하는 ID를 가진 유저가 존재 하지 않습니다.");
+        return null;
     }
 }

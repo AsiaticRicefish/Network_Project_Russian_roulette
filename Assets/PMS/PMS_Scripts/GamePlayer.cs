@@ -8,7 +8,7 @@ public class GamePlayer : MonoBehaviour
 {
     public PhotonView _pv;
 
-    [SerializeField] private PlayerData _data;
+    public PlayerData _data;
 
     //데이터를 읽기는 해야하는데 Write하면 안되는 데이터
     public string Nickname => _data.nickname;       
@@ -82,5 +82,21 @@ public class GamePlayer : MonoBehaviour
             _isAlive = (bool)stream.ReceiveNext();
             Debug.Log($"보낸 플레이어 : {info.Sender.NickName} , 보낸 서버 시간 : {info.SentServerTime}"); 
         }
+    }
+
+    // PlayerData 객체를 직접 전송하는 RPC 함수
+    [PunRPC]
+    public void ReceivePlayerData(string receivedNickname, string receivedPlayerId, int receivedWinCount, int receivedLoseCount)
+    {
+        // 수신된 데이터를 사용하여 플레이어 업데이트
+        _data = new PlayerData(receivedNickname, receivedPlayerId, receivedWinCount, receivedLoseCount);
+        Debug.Log($"RPC로 수신된 플레이어 닉네임: {_data.nickname}, 플레이어 ID: {_data.playerId}, 승리: {_data.winCount}, 패배: {_data.loseCount}"); 
+    }
+
+    // 내 PlayerData를 다른 클라이언트에게 보내는 함수
+    public void SendMyPlayerDataRPC()
+    {
+        // RpcTarget.AllViaServer는 모든 클라이언트에게 RPC를 전송  전송자 -> 서버 -> 클라이언트 RpcTarget.AllViaServer
+        _pv.RPC("ReceivePlayerData", RpcTarget.All, _data.nickname,_data.playerId,_data.winCount,_data.loseCount);
     }
 }
