@@ -40,7 +40,7 @@ public class PlayerController : MonoBehaviour
         {
             //PlayerManager.Instance.PlayerListPrint();
             //Debug.Log(PlayerManager.Instance.GetAllPlayers().Count);
-            Debug.Log(GetComponent<GamePlayer>().CurrentHp);
+            Debug.Log(PlayerManager.Instance.GetAllPlayers().Count);
         }
 
         PlayerLook();

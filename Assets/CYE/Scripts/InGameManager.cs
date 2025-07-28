@@ -12,17 +12,33 @@ using Managers;
 /// </summary>
 public class InGameManager : Singleton<InGameManager>
 {
+    private class PlayerPointPair
+    {
+        string playerId;
+        int winPoint;
+        int losePoint;
+        public PlayerPointPair(string playerId)
+        {
+            this.playerId = playerId;
+            this.winPoint = 0;
+            this.losePoint = 0;
+        }
+    }
+    #region >> Constants
     private const int MAX_ROUND = 3;
+    #endregion
 
-    // TO DO: 금일 머지 작업 후 _playerList 사용 부분을 Manager.Player.players로 변경해야 함
-    private List<GamePlayer> _playerList = new();
+    #region  >> Variables
     private LinkedList<string> _turnOrder = new();
     private LinkedListNode<string> _currentTurn;
     private int _currentRound;
     public int CurrentRound { get { return _currentRound; } private set { _currentRound = value; } }
     private int _totalRound;
     public int TotalRound { get { return _totalRound; } private set { _totalRound = value; } }
+    private List<PlayerPointPair> _playerPointPair = new();
+    #endregion
 
+    #region  >> Events
     // 각 게임 상태로 전환될때 실행되는 event 변수 
     // => 각 상태 전환시 필요한 동작을 개별적으로 등록
     // TO DO: Invoke를 서버(마스터 클라이언트)에서 실행, 플레이어는 해당 결과를 받기만 해야함.
@@ -33,20 +49,25 @@ public class InGameManager : Singleton<InGameManager>
     public event Action OnTurnStart;
     public event Action OnTurnEnd;
     public event Action<bool> OnPaused;
+    #endregion
 
+    #region >> Unity Message Function
     private void Awake() => Init();
     private void Init()
     {
         SingletonInit();
         _totalRound = MAX_ROUND;
     }
+    #endregion
 
+    #region >> Public Function
     /// <summary>
     /// 게임 시작시 호출되는 함수
     /// </summary>
     public void StartGame()
     {
         Debug.Log("StartGame");
+
         GameInit();
 
         OnGameStart?.Invoke();
@@ -59,6 +80,7 @@ public class InGameManager : Singleton<InGameManager>
     public void EndGame()
     {
         Debug.Log("EndGame");
+
         OnGameEnd?.Invoke();
         // 각 플레이어의 승패를 통해 결과 저장
     }
@@ -68,6 +90,7 @@ public class InGameManager : Singleton<InGameManager>
     public void StartRound()
     {
         Debug.Log("StartRound");
+
         RoundInit();
 
         OnRoundStart?.Invoke();
@@ -80,6 +103,7 @@ public class InGameManager : Singleton<InGameManager>
     public void EndRound()
     {
         Debug.Log("EndRound");
+
         OnRoundEnd?.Invoke();
 
         if (_currentRound >= _totalRound)
@@ -96,6 +120,7 @@ public class InGameManager : Singleton<InGameManager>
     public void StartTurn()
     {
         Debug.Log("StartTurn");
+
         TurnInit();
 
         OnTurnStart?.Invoke();
@@ -106,13 +131,14 @@ public class InGameManager : Singleton<InGameManager>
     public void EndTurn()
     {
         Debug.Log("EndTurn");
+
         OnTurnEnd?.Invoke();
 
-        foreach (GamePlayer player in _playerList)
+        foreach (KeyValuePair<string, GamePlayer> item in Manager.PlayerManager.GetAllPlayers())
         {
-            if (player.CurrentHp == 0)
+            if (item.Value.CurrentHp == 0)
             {
-                EndGame();
+                EndRound();
                 return;
             }
         }
@@ -127,12 +153,21 @@ public class InGameManager : Singleton<InGameManager>
     public void PauseGame(bool isPause)
     {
         Debug.Log("PauseGame");
+
         OnPaused?.Invoke(isPause);
     }
+    #endregion
 
+    #region >> Private Function
     private void GameInit()
     {
         _currentRound = 0;
+
+        // 플레이어 승패 수 관리용 변수 초기화
+        foreach (KeyValuePair<string, GamePlayer> item in Manager.PlayerManager.GetAllPlayers())
+        {
+            _playerPointPair.Add(new PlayerPointPair(item.Value.PlayerId));
+        }
     }
     private void RoundInit()
     {
@@ -141,6 +176,7 @@ public class InGameManager : Singleton<InGameManager>
     }
     private void TurnInit()
     {
-        // 턴 시작시 뭐... 실행할거 암거나 부르기
+
     }
+    #endregion
 }
