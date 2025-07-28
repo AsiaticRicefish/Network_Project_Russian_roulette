@@ -11,9 +11,12 @@ public class PlayerManager : Singleton<PlayerManager>
 {
     //리스트가 아닌 Dictionary로 관리  Key - FirebaseUID Value - PlayData
     public Dictionary<string, PlayerData> _playerData;
-    public List<PlayerData> _playerDataList;
 
+    //리스트를 딱한번 공유해야하는 상황 -> 모든 유저가 다 등록이 되었을 때 모든 유저가 해당 데이터를 들고 있도록 해야한다.
+    public List<PlayerData> _playerDataList;
     private Dictionary<string, GamePlayer> _players;  
+
+
     public Dictionary<string, GamePlayer> GetAllPlayers() => _players;
 
     private void Awake()

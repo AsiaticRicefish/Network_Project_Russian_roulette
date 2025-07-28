@@ -21,10 +21,10 @@ public class PMS_GameManager : MonoBehaviour
     }
 
 
-    //개별 생성된 플레이어들이 다른 유저들에게 자기 정보를 보내는 RPC 함수 전송 및 수신 시간 생각해서 2초뒤에 실행하도록
+    //개별적으로 플레이어 생성 및 플레이어들이 다른 유저들에게 자기 정보를 보내는 RPC 함수 전송 및 수신 시간 생각해서 만든 코루틴
     private IEnumerator Delay()
     {
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(0.1f); 
         PlayerManager.Instance.AllGamePlayerAdd();
     }
 }

@@ -86,12 +86,14 @@ public class GamePlayer : MonoBehaviour
         }
     }
 
+    //receiveSpawnPointIndex 범위 0 ~ 플레이어수-1  -> 이값을 가지고 List를 넣는 순서를 제어해도 괜찮을 것 같다. 이유 : 일단 자리에 앉으면 오른쪽으로 도는형식, 1대1에서 의미가 없지만 3인이상일 경우 턴순서를 확인할 수 있다.
     // PlayerData 객체를 직접 전송하는 RPC 함수
     [PunRPC]
-    public void ReceivePlayerData(string receivedNickname, string receivedPlayerId, int receivedWinCount, int receivedLoseCount)
+    public void ReceivePlayerData(string receivedNickname, string receivedPlayerId, int receivedWinCount, int receivedLoseCount, int receiveSpawnPointIndex)
     {
         // 수신된 데이터를 사용하여 플레이어 업데이트
         _data = new PlayerData(receivedNickname, receivedPlayerId, receivedWinCount, receivedLoseCount);
+        _spawnPointindex = receiveSpawnPointIndex; 
         Debug.Log($"RPC로 수신된 플레이어 닉네임: {_data.nickname}, 플레이어 ID: {_data.playerId}, 승리: {_data.winCount}, 패배: {_data.loseCount}"); 
     }
 

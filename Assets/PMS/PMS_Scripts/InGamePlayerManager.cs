@@ -28,6 +28,8 @@ public class InGamePlayerManager : MonoBehaviourPunCallbacks
         }
     }
 
+    //TODO - 리펙토링의 필요 - 다인전 할 때 생성 순서를 정해줘서 생성해야한다.
+    //<Before : 마스터 클라이언트 먼저 생성, After : 나머지 사람 생성> 구조 
     private void CreateController()
     {
         if (!PhotonNetwork.IsMasterClient)
