@@ -50,7 +50,6 @@ public class ItemSlot : MonoBehaviourPun
         if (itemData != null && itemData.itemPrefab != null)
         {
             currentItem = Instantiate(itemData.itemPrefab, anchorPoint.position, anchorPoint.rotation, anchorPoint);
-            currentItem.transform.SetParent(anchorPoint, worldPositionStays: true);
         }
         else
         {
@@ -86,6 +85,12 @@ public class ItemSlot : MonoBehaviourPun
     private void UseItem()
     {
         Debug.Log("아이템 사용!");
+        photonView.RPC(nameof(RPC_Clear), RpcTarget.All); // 동기화된 제거
+    }
+
+    [PunRPC]
+    private void RPC_Clear()
+    {
         Clear();
     }
     #endregion

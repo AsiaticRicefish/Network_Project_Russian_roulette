@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using LTH; // 임시 Playerm ItemData 정의용 네임스페이스
+using Photon.Pun;
 using DesignPattern; 
 using DG.Tweening;
 
@@ -10,10 +11,9 @@ using DG.Tweening;
 /// 클릭 시 상자가 열리며, 아이템이 자동으로 빈 슬롯에 배치됨
 /// </summary>
 
-public class ItemBoxManager : Singleton<ItemBoxManager>
+public class ItemBoxManager : MonoBehaviourPun
 {
     [Header("TurnEnd NewItem")]
-    [SerializeField] private List<ItemData> newItems; // 등장 가능한 아이템 목록
     [SerializeField] private int newItemCount;
 
     [Header("ItemBox Object")]
@@ -23,12 +23,21 @@ public class ItemBoxManager : Singleton<ItemBoxManager>
 
     [Header("Connect Slot")]
     [SerializeField] private DeskUI deskUI;
+    
+    private string ownerId; // 각 플레이어의 DeskUI와 연결하기 위한 소유자 ID
+    public string OwnerId => ownerId;
 
     private bool isOpened = false;
+    public bool IsMine => ownerId == PhotonNetwork.LocalPlayer.NickName;
+    public int NewItemCount => newItemCount;
 
-    private void Awake()
+    /// <summary>
+    /// 각 플레이어에 대한 초기화
+    /// </summary>
+    public void Init(string playerId, DeskUI deskUI)
     {
-        SingletonInit();
+        ownerId = playerId;
+        this.deskUI = deskUI;
         CloseBoxImmediately(); // 시작 시 닫힌 상태로 초기화
     }
 
@@ -58,47 +67,46 @@ public class ItemBoxManager : Singleton<ItemBoxManager>
     /// </summary>
     public void OnBoxClicked()
     {
-        if (isOpened) return;
+        if (isOpened || !IsMine) return;
+
+        isOpened = true;
+        var rewards = ItemDatabaseManager.Instance.GetRandomItems(newItemCount);
+        var rewardIds = new List<string>();
+        foreach (var item in rewards)
+            rewardIds.Add(item.itemId);
+
+        photonView.RPC(nameof(RPC_DistributeRewards), RpcTarget.All, rewardIds.ToArray());
+    }
+
+    [PunRPC]
+    private void RPC_DistributeRewards(string[] itemIds)
+    {
         isOpened = true;
 
         lidTransform.DOLocalRotate(openRotation, 0.7f)
-                 .SetEase(Ease.OutBack)
-                 .OnComplete(() =>
-                 {
-                     var rewards = PickRandomRewards();
-                     AutoPlaceToSlots(rewards);
-                     StartCoroutine(HideBoxAfterDelay());
-                 });
-    }
-
-
-    /// <summary>
-    /// 아이템을 랜덤하게 선택
-    /// </summary>
-    private List<ItemData> PickRandomRewards()
-    {
-        var result = new List<ItemData>();
-
-        for (int i = 0; i < newItemCount; i++)
-        {
-            int rand = Random.Range(0, newItems.Count);
-            result.Add(newItems[rand]); // 중복 허용
-        }
-
-        return result;
+            .SetEase(Ease.OutBack)
+            .OnComplete(() =>
+            {
+                AutoPlaceToSlots(itemIds);
+                StartCoroutine(HideBoxAfterDelay());
+            });
     }
 
     /// <summary>
     /// 빈 슬롯에 아이템 자동 배치
     /// </summary>
-    private void AutoPlaceToSlots(List<ItemData> rewards)
+    private void AutoPlaceToSlots(string[] itemIds)
     {
         var emptySlots = deskUI.GetEmptySlots();
-        for (int i = 0; i < rewards.Count && i < emptySlots.Count; i++)
+        for (int i = 0; i < itemIds.Length && i < emptySlots.Count; i++)
         {
-            string itemId = rewards[i].itemId;
-            emptySlots[i].PlaceItemById(itemId);
+            emptySlots[i].PlaceItemById(itemIds[i]);
         }
+    }
+
+    public List<ItemData> PickRandomRewards()
+    {
+        return ItemDatabaseManager.Instance.GetRandomItems(newItemCount);
     }
 
     /// <summary>
@@ -111,12 +119,16 @@ public class ItemBoxManager : Singleton<ItemBoxManager>
         gameObject.SetActive(false);
     }
 
-    /// <summary>
-    /// 테스트용: 외부에서 아이템 직접 지정하여 상자 호출
-    /// </summary>
     public void ShowBoxWithCustomItems(List<ItemData> customList)
     {
-        newItems = customList;
-        ShowBox();
+        isOpened = false;
+        gameObject.SetActive(true);
+        CloseBoxImmediately();
+
+        var rewardIds = new List<string>();
+        foreach (var item in customList)
+            rewardIds.Add(item.itemId);
+
+        photonView.RPC(nameof(RPC_DistributeRewards), RpcTarget.All, rewardIds.ToArray());
     }
 }
