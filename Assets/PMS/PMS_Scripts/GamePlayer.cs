@@ -25,6 +25,8 @@ public class GamePlayer : MonoBehaviour
 
     //public int AssignedSpawnPointIndex { get; private set; } = -1; // 할당된 스폰 지점 인덱스 (-1은 할당되지 않음을 의미)
 
+    public bool IsCuffedThisTurn = false;
+
     private void Awake()
     {
         _pv = GetComponent<PhotonView>();
@@ -57,6 +59,13 @@ public class GamePlayer : MonoBehaviour
         _currentHp = Mathf.Max(_currentHp - amount, 0);
         if (_currentHp <= 0)
             _isAlive = false;
+    }
+
+    [PunRPC]
+    public void RPC_IncreaseHp(int amount)
+    {
+        _currentHp = Mathf.Min(_currentHp + amount, _maxHp);
+        Debug.Log($"[HP 회복] {Nickname} → 현재 HP: {_currentHp}/{_maxHp}");
     }
 
     //Player에서 PlayerData를 넘겨주는 메서드 - 필요하진 모르겟다 
