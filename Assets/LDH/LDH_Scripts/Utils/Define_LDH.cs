@@ -25,5 +25,13 @@ namespace Utils
         {
             UI_Setting,
         }
+        
+        public enum NotifyType
+        {
+            Error,
+            Help,
+            Notify,
+            Check,
+        }
     }
 }
