@@ -10,28 +10,56 @@ using ExitGames.Client.Photon;
 public class PlayerManager : Singleton<PlayerManager>
 {
     //리스트가 아닌 Dictionary로 관리  Key - FirebaseUID Value - PlayData
-    private Dictionary<string, PlayerData> _playerData;
+    public Dictionary<string, PlayerData> _playerData;
+
+    //리스트를 딱한번 공유해야하는 상황 -> 모든 유저가 다 등록이 되었을 때 모든 유저가 해당 데이터를 들고 있도록 해야한다.
+    public List<PlayerData> _playerDataList;
     private Dictionary<string, GamePlayer> _players;  
+
+
     public Dictionary<string, GamePlayer> GetAllPlayers() => _players;
 
-    //리스트에서 플레이어를 지우거나 추가를 할 때 자동 동기화 될 수 있도록 하는방법? 
-    //public List<Player> Players { get { return _players} set { } };
-    // TODO - 나중에 Manager 등록하게 해줘야한다.
     private void Awake()
     {
         SingletonInit();
         Init();
     }
 
+    //게임 스타트시 추가
+    public bool AllGamePlayerAdd()
+    {
+        if (!PhotonNetwork.IsMasterClient) return false;
+
+        GamePlayer[] players = FindObjectsOfType<GamePlayer>();
+        Debug.Log($"마스터 클라이언트: 씬에서 {players.Length} 개의 GamePlayer 객체를 찾았습니다.");
+
+        foreach (GamePlayer player in players) 
+        {
+            RegisterPlayer(player);
+            Debug.Log($"등록된 플레이어 : {player.Nickname}, 플레이어 ID : {player.PlayerId}");
+        }
+
+        if (_players.Count != PhotonNetwork.CurrentRoom.PlayerCount)
+        {
+            Debug.Log($"dic플레이어 추가 오류! 현재 방안에 존재하는 플레이어 수 : {PhotonNetwork.CurrentRoom.PlayerCount},딕셔너리에 저장된 플레이어 수 : {_players.Count}");           
+            return false;
+        }
+
+        //딕셔너리에 다 추가 된 상황이면 해당 Dictionary를 게임매니저 List에게 넣게 해줘야한다.
+        //InGameManager.Instance._playerList.Add(players);
+        return true;
+    }
+
     private void Init()
     {
         _players = new Dictionary<string, GamePlayer>();
+        _playerDataList = new List<PlayerData>();
     }
 
     public GamePlayer CreateGamePlayer(Player photonPlayer, PlayerData playerData)
     {
-        string uid = photonPlayer.CustomProperties["uid"]?.ToString() ?? "unknown";
-        string nickname = photonPlayer.NickName;
+        string uid = photonPlayer.CustomProperties["playerId"]?.ToString() ?? "unknown";        //등록
+        string nickname = photonPlayer.NickName;                                                //닉네임으로 설정
 
         GamePlayer gamePlayer = new GamePlayer();
         gamePlayer.Initialize(playerData);
@@ -96,5 +124,17 @@ public class PlayerManager : Singleton<PlayerManager>
         {
             Debug.Log(player.Value.Nickname);
         }
+    }
+
+    public PlayerData GetFindPlayerDataFromID(string id)
+    {
+        foreach(var playerData in _playerDataList) 
+        {
+            if (playerData.playerId == id)
+                return playerData;
+        }
+
+        Debug.Log($"해당ID : {id} 와 일치 하는 ID를 가진 유저가 존재 하지 않습니다.");
+        return null;
     }
 }

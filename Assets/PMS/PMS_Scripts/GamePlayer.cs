@@ -8,7 +8,7 @@ public class GamePlayer : MonoBehaviour
 {
     public PhotonView _pv;
 
-    [SerializeField] private PlayerData _data;
+    public PlayerData _data;
 
     //데이터를 읽기는 해야하는데 Write하면 안되는 데이터
     public string Nickname => _data.nickname;       
@@ -18,6 +18,8 @@ public class GamePlayer : MonoBehaviour
     private int _maxHp;
     private int _currentHp;
     private bool _isAlive;
+
+    public int _spawnPointindex = -1;
 
     public int MaxHp { get { return _maxHp; } }
     public int CurrentHp { get { return _currentHp; } }
@@ -91,5 +93,23 @@ public class GamePlayer : MonoBehaviour
             _isAlive = (bool)stream.ReceiveNext();
             Debug.Log($"보낸 플레이어 : {info.Sender.NickName} , 보낸 서버 시간 : {info.SentServerTime}"); 
         }
+    }
+
+    //receiveSpawnPointIndex 범위 0 ~ 플레이어수-1  -> 이값을 가지고 List를 넣는 순서를 제어해도 괜찮을 것 같다. 이유 : 일단 자리에 앉으면 오른쪽으로 도는형식, 1대1에서 의미가 없지만 3인이상일 경우 턴순서를 확인할 수 있다.
+    // PlayerData 객체를 직접 전송하는 RPC 함수
+    [PunRPC]
+    public void ReceivePlayerData(string receivedNickname, string receivedPlayerId, int receivedWinCount, int receivedLoseCount, int receiveSpawnPointIndex)
+    {
+        // 수신된 데이터를 사용하여 플레이어 업데이트
+        _data = new PlayerData(receivedNickname, receivedPlayerId, receivedWinCount, receivedLoseCount);
+        _spawnPointindex = receiveSpawnPointIndex; 
+        Debug.Log($"RPC로 수신된 플레이어 닉네임: {_data.nickname}, 플레이어 ID: {_data.playerId}, 승리: {_data.winCount}, 패배: {_data.loseCount}"); 
+    }
+
+    // 내 PlayerData를 다른 클라이언트에게 보내는 함수
+    public void SendMyPlayerDataRPC()
+    {
+        // RpcTarget.AllViaServer는 모든 클라이언트에게 RPC를 전송  전송자 -> 서버 -> 클라이언트 RpcTarget.AllViaServer
+        _pv.RPC("ReceivePlayerData", RpcTarget.All, _data.nickname,_data.playerId,_data.winCount,_data.loseCount);
     }
 }

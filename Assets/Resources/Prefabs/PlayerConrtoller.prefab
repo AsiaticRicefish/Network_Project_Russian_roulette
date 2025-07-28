@@ -527,3 +527,4 @@ MonoBehaviour:
     playerId: 
     winCount: 0
     loseCount: 0
+  _spawnPointindex: -1

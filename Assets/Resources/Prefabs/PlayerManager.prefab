@@ -67,3 +67,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3d4d9c8f1d08b6c47a75e4c4a552f5b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _playerData:
+    nickname: 
+    playerId: 
+    winCount: 0
+    loseCount: 0
