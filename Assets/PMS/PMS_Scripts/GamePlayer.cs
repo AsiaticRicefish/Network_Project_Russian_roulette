@@ -19,6 +19,8 @@ public class GamePlayer : MonoBehaviour
     private int _currentHp;
     private bool _isAlive;
 
+    public int _spawnPointindex = -1;
+
     public int MaxHp { get { return _maxHp; } }
     public int CurrentHp { get { return _currentHp; } }
     public bool IsAlive { get { return _isAlive; } }

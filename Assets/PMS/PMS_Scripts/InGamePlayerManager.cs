@@ -28,6 +28,58 @@ public class InGamePlayerManager : MonoBehaviourPunCallbacks
         }
     }
 
+    private void CreateController()
+    {
+        if (!PhotonNetwork.IsMasterClient)
+        {
+            StartCoroutine(HeyWait());
+        }
+
+        if (PhotonNetwork.IsMasterClient)
+        {
+            Transform playerSpawnPos;
+            int playerSpawnIndex;
+            (playerSpawnPos, playerSpawnIndex) = SpawnManager.Instance.GetAndClaimRandomSpawnPoint();
+
+            if (playerSpawnPos == null)
+            {
+                Debug.LogError("playerSpawnPos가 null입니다!");
+                return;
+            }
+
+            GameObject go = PhotonNetwork.Instantiate(Path.Combine("Prefabs", "PlayerConrtoller"), playerSpawnPos.position, Quaternion.identity);
+            GamePlayer player = go.GetComponent<GamePlayer>();
+
+            player._data = _playerData;
+            player._spawnPointindex = playerSpawnIndex;
+            //내가 만들었으니깐 다른 애들은 나에 대한 정보를 모름 알려줘야함.
+            player.SendMyPlayerDataRPC();
+        }
+    }
+
+    private IEnumerator HeyWait()
+    {
+        Debug.Log("잠시멈춤");
+        yield return new WaitForSeconds(5.0f);
+
+        Transform playerSpawnPos;
+        int playerSpawnIndex;
+        (playerSpawnPos, playerSpawnIndex) = SpawnManager.Instance.GetAndClaimRandomSpawnPoint();
+
+        if (playerSpawnPos == null)
+        {
+            Debug.LogError("playerSpawnPos가 null입니다!");
+        }
+
+        GameObject go = PhotonNetwork.Instantiate(Path.Combine("Prefabs", "PlayerConrtoller"), playerSpawnPos.position, Quaternion.identity);
+        GamePlayer player = go.GetComponent<GamePlayer>();
+
+        player._data = _playerData;
+        player._spawnPointindex = playerSpawnIndex;
+        //내가 만들었으니깐 다른 애들은 나에 대한 정보를 모름 알려줘야함.
+        player.SendMyPlayerDataRPC();
+    }
+
     //마스터 클라이언트 스폰 기준
     /*private void CreateController()
     {
@@ -50,14 +102,4 @@ public class InGamePlayerManager : MonoBehaviourPunCallbacks
 
         }
     }*/
-
-    private void CreateController()
-    {
-        GameObject go = PhotonNetwork.Instantiate(Path.Combine("Prefabs", "PlayerConrtoller"), Vector3.zero, Quaternion.identity);
-        GamePlayer player = go.GetComponent<GamePlayer>();
-        player._data= _playerData;
-
-        //내가 만들었으니깐 다른 애들은 나에 대한 정보를 모름 알려줘야함.
-        player.SendMyPlayerDataRPC();
-    }
 }

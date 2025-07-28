@@ -21,7 +21,6 @@ public class PMS_NetworkManager : MonoBehaviourPunCallbacks
     public override void OnConnectedToMaster()
     {
         PhotonNetwork.JoinOrCreateRoom("Room", new RoomOptions { MaxPlayers = 2 }, null);
-        Debug.Log("실행?");
     }
 
     //방에 들어왔을 때 호출
@@ -35,6 +34,8 @@ public class PMS_NetworkManager : MonoBehaviourPunCallbacks
         }
 
         Debug.Log("입장완료");
+        Debug.Log("스폰 초기화");
+        SpawnManager.Instance.InitializeAvailableSpawnPoints(); //모든 유저가 초기화시도 -> 어차피 마스터 클라이언트만 가능
 
         //닉네임 설정
         PhotonNetwork.LocalPlayer.NickName = $"Player_{Random.Range(1, 1000).ToString("0000")}";

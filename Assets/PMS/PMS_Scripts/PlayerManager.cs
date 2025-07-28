@@ -16,9 +16,6 @@ public class PlayerManager : Singleton<PlayerManager>
     private Dictionary<string, GamePlayer> _players;  
     public Dictionary<string, GamePlayer> GetAllPlayers() => _players;
 
-    //리스트에서 플레이어를 지우거나 추가를 할 때 자동 동기화 될 수 있도록 하는방법? 
-    //public List<Player> Players { get { return _players} set { } };
-    // TODO - 나중에 Manager 등록하게 해줘야한다.
     private void Awake()
     {
         SingletonInit();
@@ -44,6 +41,9 @@ public class PlayerManager : Singleton<PlayerManager>
             Debug.Log($"dic플레이어 추가 오류! 현재 방안에 존재하는 플레이어 수 : {PhotonNetwork.CurrentRoom.PlayerCount},딕셔너리에 저장된 플레이어 수 : {_players.Count}");           
             return false;
         }
+
+        //딕셔너리에 다 추가 된 상황이면 해당 Dictionary를 게임매니저 List에게 넣게 해줘야한다.
+        //InGameManager.Instance._playerList.Add(players);
         return true;
     }
 
@@ -55,8 +55,8 @@ public class PlayerManager : Singleton<PlayerManager>
 
     public GamePlayer CreateGamePlayer(Player photonPlayer, PlayerData playerData)
     {
-        string uid = photonPlayer.CustomProperties["uid"]?.ToString() ?? "unknown";
-        string nickname = photonPlayer.NickName;
+        string uid = photonPlayer.CustomProperties["playerId"]?.ToString() ?? "unknown";        //등록
+        string nickname = photonPlayer.NickName;                                                //닉네임으로 설정
 
         GamePlayer gamePlayer = new GamePlayer();
         gamePlayer.Initialize(playerData);
