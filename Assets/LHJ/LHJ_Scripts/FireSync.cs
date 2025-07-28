@@ -6,16 +6,25 @@ using Photon.Pun;
 public class FireSync : MonoBehaviourPun
 {
     private string myId;
+    private string currentTurnId;
+    private bool isMyTurn = false;
 
     private void Start()
     {
         myId = PhotonNetwork.IsMasterClient ? "player1" : "player2";
+        InGameManager.Instance.OnTurnStart += () =>
+        {
+            currentTurnId = PhotonNetwork.IsMasterClient ? "player1" : "player2";
+        };
     }
+
 
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
+            if (!isMyTurn) 
+                return;
             // Todo: 현재 GunManager._loadedBullet가 private이라 참조 에러 발생 중 추후 코드 주석 해제 예정
             // 발사 직전 현재 장전된 탄을 가져옴
             // BulletType fireBullet = GunManager.Instance._loadedBullet;
@@ -58,7 +67,7 @@ public class FireSync : MonoBehaviourPun
         GunManager.Instance.Fire(null);
 
         //_loadedBullet 보호수준떄문에 주석처리
-        //Debug.LogError($"장전된 탄: {GunManager.Instance._loadedBullet}, 남은 탄 수: {GunManager.Instance.Magazine.Count}");
+        // Debug.LogError($"장전된 탄: {GunManager.Instance._loadedBullet}, 남은 탄 수: {GunManager.Instance.Magazine.Count}");
         // InGameManager.Instance.EndTurn();     // 게임 매니저 EndTurn호출
     }
     [PunRPC]
@@ -73,6 +82,11 @@ public class FireSync : MonoBehaviourPun
             GunManager.Instance.Magazine.Enqueue((BulletType)b);
         }
         //_loadedBullet 보호수준떄문에 주석처리
-        //Debug.LogWarning($"남은 탄 수: {GunManager.Instance.Magazine.Count}, 첫 탄: {GunManager.Instance._loadedBullet}");
+        // Debug.LogWarning($"남은 탄 수: {GunManager.Instance.Magazine.Count}, 첫 탄: {GunManager.Instance._loadedBullet}");
+    }
+    [PunRPC]
+    private void SetTurnActive(bool value)
+    {
+        isMyTurn = value;
     }
 }
