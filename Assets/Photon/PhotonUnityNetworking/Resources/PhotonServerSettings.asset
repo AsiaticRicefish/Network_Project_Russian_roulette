@@ -46,6 +46,9 @@ MonoBehaviour:
   - RPC_PlaceItem
   - OpenBox
   - Reload
+  - RPC_Clear
+  - RPC_DistributeRewards
+  - RPC_ShowBoxWithItems
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1
