@@ -35,9 +35,10 @@ public class ItemManager : Singleton<ItemManager>
                 break;
 
             case ItemType.Dial:
-                //user.useDial();
+                GunManager.Instance.PV.RPC("RPC_SwitchNextBullet", RpcTarget.All);
                 Debug.Log("다이얼 사용 → 현재 탄 타입 변환");
                 break;
+
 
             case ItemType.Cellphone:
                 //user.useCellphone();
