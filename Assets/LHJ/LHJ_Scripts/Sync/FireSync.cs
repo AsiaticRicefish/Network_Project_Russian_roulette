@@ -7,6 +7,7 @@ using System;
 
 public class FireSync : MonoBehaviourPun
 {
+    [SerializeField] private TurnSync turnSync;
     private string myId;
     private void Start()
     {
@@ -35,6 +36,7 @@ public class FireSync : MonoBehaviourPun
             BulletType fireBullet = GunManager.Instance.LoadedBullet;
             // 발사 동기화: 모든 클라이언트에게 발사 정보 전달
             photonView.RPC("Fire", RpcTarget.All, myId, (int)fireBullet);
+            turnSync.photonView.RPC("RequestEndTurn", RpcTarget.MasterClient);
         }
     }
 
@@ -79,7 +81,7 @@ public class FireSync : MonoBehaviourPun
         Debug.LogError($"장전된 탄: {GunManager.Instance.LoadedBullet}, 남은 탄 수: {GunManager.Instance.Magazine.Count}");
 
         // 탄을 모두 소진했을 경우 마스터만 자동 장전 후 동기화
-        if (GunManager.Instance.LoadedBullet == default &&GunManager.Instance.Magazine.Count == 0)
+        if (PhotonNetwork.IsMasterClient && GunManager.Instance.LoadedBullet == default && GunManager.Instance.Magazine.Count == 0)
         {
             GunManager.Instance.Reload();
 
@@ -111,6 +113,6 @@ public class FireSync : MonoBehaviourPun
             if (bullet == BulletType.live) liveCount++;
             else if (bullet == BulletType.blank) blankCount++;
         }
-        Debug.LogWarning($"[동기화 완료] 장전된 탄: {GunManager.Instance.LoadedBullet}, 남은 탄 수: {GunManager.Instance.Magazine.Count}, 실탄: {liveCount}, 공포탄: {blankCount}");
+        Debug.LogWarning($"장전된 탄: {GunManager.Instance.LoadedBullet}, 남은 탄 수: {GunManager.Instance.Magazine.Count}, 실탄: {liveCount}, 공포탄: {blankCount}");
     }
 }
