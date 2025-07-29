@@ -151,6 +151,7 @@ GameObject:
   - component: {fileID: 3475012635922473015}
   - component: {fileID: 5041451895918633474}
   - component: {fileID: 2124523103393312641}
+  - component: {fileID: 606653789671651936}
   m_Layer: 0
   m_Name: PlayerTest
   m_TagString: Untagged
@@ -287,3 +288,23 @@ MonoBehaviour:
   - {fileID: 11400000, guid: a795c02c8b364f842b3a3e9d40d32b12, type: 2}
   - {fileID: 11400000, guid: 24b984c3a5c0f0b429ca367f0a467476, type: 2}
   myItemBox: {fileID: 0}
+--- !u!114 &606653789671651936
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5578550799413524171}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 34dd7d4b94903e9449ad881307522640, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _pv: {fileID: 0}
+  _data:
+    nickname: 
+    playerId: 
+    winCount: 0
+    loseCount: 0
+  _spawnPointindex: -1
+  IsCuffedThisTurn: 0

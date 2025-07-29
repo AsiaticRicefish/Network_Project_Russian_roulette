@@ -5,6 +5,7 @@ using Sound;
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.Events;
+using UnityEngine.Rendering.VirtualTexturing;
 using Utils;
 
 namespace Managers
@@ -108,11 +109,10 @@ namespace Managers
         /// </summary>
         private IEnumerator LoadSavedVolumes()
         {
-            audioMixer.GetFloat(BgmVolumeKey, out float currentBgmDb);
-
             yield return null;
-            SetBgmVolume((PlayerPrefs.HasKey(BgmVolumeKey)) ? PlayerPrefs.GetFloat(BgmVolumeKey) : 0.5f);
-            SetSfxVolume((PlayerPrefs.HasKey(SfxVolumeKey)) ? PlayerPrefs.GetFloat(SfxVolumeKey) : 0.5f);
+            SetBgmVolume((PlayerPrefs.HasKey(BgmVolumeKey)) ? PlayerPrefs.GetFloat(BgmVolumeKey) : 50f);
+            SetSfxVolume((PlayerPrefs.HasKey(SfxVolumeKey)) ? PlayerPrefs.GetFloat(SfxVolumeKey) : 50f);
+            
         }
         
         #endregion
@@ -132,7 +132,6 @@ namespace Managers
             //오디오 믹서 설정
             audioMixer.SetFloat(BgmVolumeKey, ToDecibel(BgmVolume));
             
-            audioMixer.GetFloat(BgmVolumeKey, out float currentBgmDb);
             //로컬 저장
             PlayerPrefs.SetFloat(BgmVolumeKey, BgmVolume);  //mixer 값이 아닌 0~1 사이의 값 저장
         }
@@ -150,12 +149,16 @@ namespace Managers
         /// <summary>
         /// 볼륨 입력값을 0.0001 ~ 1.0 범위로 클램핑
         /// </summary>
-        private float ClampVolume(float value) => Mathf.Clamp(value, 0.0001f, 1f);
+        private float ClampVolume(float value) => Mathf.Clamp(value, 0.0001f, 100f);
 
         /// <summary>
         /// 0~1 범위의 값을 데시벨(-80~0) 값으로 변환
         /// </summary>
-        private float ToDecibel(float value) => Mathf.Log10(value) * 20f;
+        private float ToDecibel(float value)
+        {
+            float volume = Mathf.Max(value / 100f, 0.0001f);
+            return Mathf.Log10(volume) * 20f;
+        }
 
 
 

@@ -101,7 +101,7 @@ namespace Managers
                 UI_Base ui = Util_LDH.GetOrAddComponent(go, uiType) as UI_Base;
                 _globalUIDict.Add(uiType, ui);
 
-                ui.gameObject.SetActive(false);
+                ui.Close();
             }
             
         }

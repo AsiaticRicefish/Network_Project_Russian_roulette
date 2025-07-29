@@ -5,6 +5,7 @@ using DesignPattern;
 using System;
 using Managers;
 
+using Photon.Pun;
 
 public enum BulletType
 {
@@ -13,6 +14,20 @@ public enum BulletType
 
 public class GunManager : Singleton<GunManager>
 {
+    private PhotonView _pv;
+
+    private void Awake()
+    {
+        SingletonInit();
+        _pv = GetComponent<PhotonView>();
+        _isEnhanced = false;
+        Manager.Game.OnTurnStart += Reload;
+    }
+
+
+    // 다른 곳에서 RPC 호출 가능하게
+    public PhotonView PV => _pv;
+
     #region >> Constants
     private const int BULLET_MIN_COUNT = 1; // 최소 총일 갯수 2개(공포탄 1개, 실탄 1개)
     private const int BULLET_MAX_COUNT = 4; // 최대 총알 갯수 8개(공포탄 4개, 실탄 4개)
@@ -29,7 +44,7 @@ public class GunManager : Singleton<GunManager>
     #endregion
 
     #region  >> Unity Message Function
-    private void Awake() => Init();
+    //private void Awake() => Init();
 
     private void Init()
     {
@@ -156,4 +171,36 @@ public class GunManager : Singleton<GunManager>
         return preSet.ToArray();
     }
     #endregion
+    
+    /// <summary>
+    /// 현재 장전은 마스터 클라이언트만 장전하고 탄창을 클라이언트와 공유하는형식
+    /// 마스터는 Reload를 호출하여_loadedBullet 값을 변경하지만
+    /// 클라이언트는 Reload함수를 실행시키지않음으로 값을 변경하지않으면 읽지 못함
+    /// 클라이언트도 값이 변경되어 확인할 수 있는 set함수 
+    /// </summary>
+    public void SetLoadedBullet(BulletType bullet)
+    {
+        _loadedBullet = bullet;
+    }
+
+    [PunRPC]
+    public void RPC_SwitchNextBullet()
+    {
+        int loopCnt = 0, maxLoop = 10;
+        BulletType switchBullet = _loadedBullet;
+        while (switchBullet == _loadedBullet && loopCnt < maxLoop)
+        {
+            switchBullet = (BulletType)new System.Random().Next(0, Enum.GetValues(typeof(BulletType)).Length);
+            loopCnt++;
+        }
+
+        if (loopCnt >= maxLoop)
+        {
+            Debug.Log("다이얼 사용 실패 → 다른 탄환으로 교체 불가");
+            return;
+        }
+
+        _loadedBullet = switchBullet;
+        Debug.Log($"다이얼 사용 성공 → 현재 탄환: {_loadedBullet}");
+    }
 }
