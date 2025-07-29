@@ -15,6 +15,9 @@ EditorBuildSettings:
     path: Assets/CYE/Scene/Gameflow/CYE_AnteroomScene.unity
     guid: a137d9330af8ead47ae4a51386cf2a3c
   - enabled: 1
+    path: Assets/LTH/LTH_Scenes/LTH_StartScene.unity
+    guid: 664553e4d2586a5419f7d87b1fab00aa
+  - enabled: 1
     path: Assets/LTH/LTH_Scenes/LTH_GameScene.unity
     guid: ede080dae4fb03b4ba964ec47515be69
   m_configObjects: {}
