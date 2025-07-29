@@ -1,16 +1,16 @@
 using System;
 using Managers;
+using Michsky.UI.ModernUIPack;
 using UnityEngine;
+using UnityEngine.Rendering.VirtualTexturing;
 using UnityEngine.UI;
 
 namespace GameUI
 {
     public class UI_VolumeSetting : MonoBehaviour
     {
-        [SerializeField] private Slider _bgmSlider;
-        [SerializeField] private Slider _sfxSlider;
-        [SerializeField] private float _sliderMinVal = 0f;
-        [SerializeField] private float _sliderMaxVal = 1f;
+        [SerializeField] private RadialSlider _bgmSlider;
+        [SerializeField] private RadialSlider _sfxSlider;
 
         private float epsilon = 0.0001f;
 
@@ -37,21 +37,23 @@ namespace GameUI
 
         private void Init()
         {
-            _bgmSlider.minValue = _sfxSlider.minValue = _sliderMinVal;
-            _bgmSlider.maxValue = _sfxSlider.maxValue = _sliderMaxVal;
+            // _bgmSlider.minValue = _sfxSlider.minValue = _sliderMinVal;
+            // _bgmSlider.maxValue = _sfxSlider.maxValue = _sliderMaxVal;
         }
 
         private void SetSlider()
         {
-            _bgmSlider.value = Manager.Sound.BgmVolume;
-            _sfxSlider.value = Manager.Sound.SfxVolume;
+            _bgmSlider.SliderValue = Manager.Sound.BgmVolume;
+            _sfxSlider.SliderValue = Manager.Sound.SfxVolume;
+            _bgmSlider.UpdateUI();
+            _sfxSlider.UpdateUI();
         }
 
         #endregion
 
         #region Volume Control
 
-        private void SetBgmVolume(float sliderValue)
+        public void SetBgmVolume(float sliderValue)
         {
             if (Mathf.Abs(sliderValue - Manager.Sound.BgmVolume) > epsilon)
             {
@@ -59,7 +61,7 @@ namespace GameUI
             }
         }
 
-        private void SetSfxVolume(float sliderValue)
+        public void SetSfxVolume(float sliderValue)
         {
             if (Mathf.Abs(sliderValue - Manager.Sound.SfxVolume) > epsilon)
             {
