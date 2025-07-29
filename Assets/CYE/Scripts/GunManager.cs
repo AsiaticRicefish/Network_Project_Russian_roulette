@@ -171,6 +171,17 @@ public class GunManager : Singleton<GunManager>
         return preSet.ToArray();
     }
     #endregion
+    
+    /// <summary>
+    /// 현재 장전은 마스터 클라이언트만 장전하고 탄창을 클라이언트와 공유하는형식
+    /// 마스터는 Reload를 호출하여_loadedBullet 값을 변경하지만
+    /// 클라이언트는 Reload함수를 실행시키지않음으로 값을 변경하지않으면 읽지 못함
+    /// 클라이언트도 값이 변경되어 확인할 수 있는 set함수 
+    /// </summary>
+    public void SetLoadedBullet(BulletType bullet)
+    {
+        _loadedBullet = bullet;
+    }
 
     [PunRPC]
     public void RPC_SwitchNextBullet()
@@ -192,5 +203,4 @@ public class GunManager : Singleton<GunManager>
         _loadedBullet = switchBullet;
         Debug.Log($"다이얼 사용 성공 → 현재 탄환: {_loadedBullet}");
     }
-
 }
