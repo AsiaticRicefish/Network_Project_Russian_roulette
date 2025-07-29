@@ -2,91 +2,115 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
+using Managers;
+using System;
 
 public class FireSync : MonoBehaviourPun
 {
     private string myId;
-    private string currentTurnId;
-    private bool isMyTurn = false;
-
     private void Start()
     {
         myId = PhotonNetwork.IsMasterClient ? "player1" : "player2";
-        InGameManager.Instance.OnTurnStart += () =>
-        {
-            currentTurnId = PhotonNetwork.IsMasterClient ? "player1" : "player2";
-        };
-    }
 
+        // 마스터 클라이언트가 게임 시작 시 탄을 장전하고 전체에 동기화
+        if (PhotonNetwork.IsMasterClient)
+        {
+            GunManager.Instance.SetLoadedBullet(default); // 현재 탄 초기화
+            GunManager.Instance.Magazine.Clear();         // 탄창 비우기
+            GunManager.Instance.Reload();                 // 새로운 탄 장전
+
+            // 탄 정보 리스트 생성: 첫 번째는 장전된 탄, 이후는 탄창
+            var current = GunManager.Instance.Magazine.ToArray();
+            var bullets = new List<int> { (int)GunManager.Instance.LoadedBullet };
+            bullets.AddRange(Array.ConvertAll(current, b => (int)b));
+
+            photonView.RPC("ReloadSync", RpcTarget.All, bullets.ToArray(), bullets[0]);
+        }
+    }
 
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            if (!isMyTurn) 
-                return;
-            // Todo: 현재 GunManager._loadedBullet가 private이라 참조 에러 발생 중 추후 코드 주석 해제 예정
-            // 발사 직전 현재 장전된 탄을 가져옴
-            // BulletType fireBullet = GunManager.Instance._loadedBullet;
+            BulletType fireBullet = GunManager.Instance.LoadedBullet;
             // 발사 동기화: 모든 클라이언트에게 발사 정보 전달
-            // photonView.RPC("Fire", RpcTarget.All, myId, (int)fireBullet);
-        }
-        if (Input.GetKeyDown(KeyCode.R))
-        {
-            // 마스터 클라이언트만 탄창 장전
-            if (PhotonNetwork.IsMasterClient)
-            {
-                GunManager.Instance.Reload();
-
-                // 클라이언트에게 탄창 정보 전달
-                List<int> bulletList = new();
-                foreach (var bullet in GunManager.Instance.Magazine)
-                {
-                    bulletList.Add((int)bullet);
-                }
-                photonView.RPC("Reload", RpcTarget.All, bulletList.ToArray());
-            }
+            photonView.RPC("Fire", RpcTarget.All, myId, (int)fireBullet);
         }
     }
 
+    // 탄창 전체를 클라이언트와 동기화하는 함수
+    private void SendReloadSync()
+    {
+        BulletType[] currentMagazine = GunManager.Instance.Magazine.ToArray();
+
+        List<int> totalBullets = new();
+        totalBullets.Add((int)GunManager.Instance.LoadedBullet); // 첫 탄
+        foreach (BulletType bullet in currentMagazine)
+        {
+            totalBullets.Add((int)bullet); // 나머지 탄
+        }
+
+        photonView.RPC("ReloadSync", RpcTarget.All, totalBullets.ToArray(), totalBullets[0]);
+    }
+
+    // 모든 클라이언트에서 발사 동작을 실행하는 RPC
     [PunRPC]
     private void Fire(string playerId, int bulletInt)
     {
-        // 발사된 탄 종류를 enum으로 변환
         BulletType bullet = (BulletType)bulletInt;
-
-        // 타겟 ID는 발사한 플레이어의 반대편으로 설정
         string targetId = (playerId == "player1") ? "player2" : "player1";
-        Debug.LogError($"[발사] {playerId}이(가) {bullet} 탄을 발사했습니다.");
-
+        Debug.LogError($"{playerId}이(가) {bullet} 탄을 발사했습니다.");
         if (bullet == BulletType.live)
-            Debug.LogError($"{targetId}이 데미지를 입었습니다.");
-        else
-            Debug.LogError($"{targetId}이 데미지를 입지않았습니다.");
-        // 발사 처리 타겟현재 null
-        GunManager.Instance.Fire(null);
-
-        //_loadedBullet 보호수준떄문에 주석처리
-        // Debug.LogError($"장전된 탄: {GunManager.Instance._loadedBullet}, 남은 탄 수: {GunManager.Instance.Magazine.Count}");
-        // InGameManager.Instance.EndTurn();     // 게임 매니저 EndTurn호출
-    }
-    [PunRPC]
-    private void Reload(int[] bullets)
-    {
-        // 기존 탄창 초기화 
-        GunManager.Instance.Magazine.Clear();
-        
-        // 배열로 탄창 구성
-        foreach (int b in bullets)
         {
-            GunManager.Instance.Magazine.Enqueue((BulletType)b);
+            Debug.LogError($"{targetId}이 데미지를 입었습니다.");
         }
-        //_loadedBullet 보호수준떄문에 주석처리
-        // Debug.LogWarning($"남은 탄 수: {GunManager.Instance.Magazine.Count}, 첫 탄: {GunManager.Instance._loadedBullet}");
+        else
+        {
+            Debug.LogError($"{targetId}이 데미지를 입지 않았습니다.");
+        }
+
+        // 탄 소모 및 다음 탄 장전
+        GunManager.Instance.IsEnhanced = false;
+        if (!GunManager.Instance.Magazine.TryDequeue(out var next))
+        {
+            next = default;
+        }
+        GunManager.Instance.SetLoadedBullet(next);
+        Debug.LogError($"장전된 탄: {GunManager.Instance.LoadedBullet}, 남은 탄 수: {GunManager.Instance.Magazine.Count}");
+
+        // 탄을 모두 소진했을 경우 마스터만 자동 장전 후 동기화
+        if (GunManager.Instance.LoadedBullet == default &&GunManager.Instance.Magazine.Count == 0)
+        {
+            GunManager.Instance.Reload();
+
+            BulletType[] current = GunManager.Instance.Magazine.ToArray();
+            List<int> bullets = new List<int> { (int)GunManager.Instance.LoadedBullet };
+            bullets.AddRange(Array.ConvertAll(current, b => (int)b));
+
+            photonView.RPC("ReloadSync", RpcTarget.All, bullets.ToArray(), bullets[0]);
+        }
+
     }
+
+    // 마스터에서 생성된 탄창을 클라이언트에게 동기화
     [PunRPC]
-    private void SetTurnActive(bool value)
+    private void ReloadSync(int[] bullets, int loadedBullet)
     {
-        isMyTurn = value;
+        GunManager.Instance.Magazine.Clear();
+        GunManager.Instance.SetLoadedBullet((BulletType)loadedBullet);
+
+        for (int i = 1; i < bullets.Length; i++)
+        {
+            GunManager.Instance.Magazine.Enqueue((BulletType)bullets[i]);
+        }
+
+        int liveCount = 0;
+        int blankCount = 0;
+        foreach (BulletType bullet in GunManager.Instance.Magazine)
+        {
+            if (bullet == BulletType.live) liveCount++;
+            else if (bullet == BulletType.blank) blankCount++;
+        }
+        Debug.LogWarning($"[동기화 완료] 장전된 탄: {GunManager.Instance.LoadedBullet}, 남은 탄 수: {GunManager.Instance.Magazine.Count}, 실탄: {liveCount}, 공포탄: {blankCount}");
     }
 }
