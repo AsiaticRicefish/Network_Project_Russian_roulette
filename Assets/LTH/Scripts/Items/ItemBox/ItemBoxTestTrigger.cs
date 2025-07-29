@@ -3,73 +3,96 @@ using LTH;
 using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class ItemBoxTestTrigger : MonoBehaviourPun
 {
-    [Header("플레이어별 상자 매핑")]
-    [SerializeField] private List<ItemBoxManager> itemBoxManagers;
+    private Dictionary<string, ItemBoxManager> itemBoxDict = new();
+
+    private void Start()
+    {
+        // 마스터가 아니면 리턴
+        if (!PhotonNetwork.IsMasterClient) return;
+
+        var allPlayers = PlayerManager.Instance.GetAllPlayers().Values;
+
+        foreach (var player in allPlayers)
+        {
+            string playerId = player.PlayerId;
+
+            if (ItemBoxSpawnerManager.Instance.TryGetItemBox(playerId, out var box))
+            {
+                itemBoxDict[playerId] = box;
+                Debug.Log($"[TEST] {playerId} 상자 연결 완료");
+            }
+            else
+            {
+                Debug.LogWarning($"[TEST] {playerId} 상자 연결 실패");
+            }
+        }
+    }
 
     private void Update()
     {
-        // B 키 입력 시, 마스터 클라이언트가 각 플레이어에게 보상 아이템 할당
         if (Input.GetKeyDown(KeyCode.B) && PhotonNetwork.IsMasterClient)
         {
             Debug.Log("[TEST] 마스터가 아이템 박스를 띄움");
 
-            foreach (var boxManager in itemBoxManagers)
+            foreach (var kvp in itemBoxDict)
             {
-                if (boxManager == null || string.IsNullOrEmpty(boxManager.OwnerId))
+                string playerId = kvp.Key;
+                var boxManager = kvp.Value;
+
+                if (boxManager == null)
                 {
-                    Debug.LogWarning("[TEST] BoxManager가 null이거나 OwnerId가 비어 있음 → 스킵");
+                    Debug.LogWarning($"[TEST] {playerId} 상자가 null입니다.");
                     continue;
                 }
 
-                // 개별 상자에 지정된 보상 개수 기반으로 아이템 생성
                 var itemIds = GenerateRandomItemIds(boxManager.NewItemCount);
-                photonView.RPC(nameof(RPC_ShowBoxWithItems), RpcTarget.All, itemIds, boxManager.OwnerId);
+                photonView.RPC(nameof(RPC_ShowBoxWithItems), RpcTarget.All, itemIds, playerId);
+            }
+
+            // 나에게만 강제로 상자 띄우기
+            if (Input.GetKeyDown(KeyCode.K))
+            {
+                string myId = PhotonNetwork.LocalPlayer.NickName;
+
+                if (!ItemBoxSpawnerManager.Instance.TryGetItemBox(myId, out var myBox))
+                {
+                    Debug.LogWarning($"[TEST] [K] {myId} 상자 없음 → 생성 또는 연결 실패");
+                    return;
+                }
+
+                var itemIds = GenerateRandomItemIds(myBox.NewItemCount);
+                photonView.RPC(nameof(RPC_ShowBoxWithItems), RpcTarget.All, itemIds, myId);
+                Debug.Log($"[TEST] [K] {myId}에게 강제 상자 노출 테스트");
             }
         }
     }
 
-    /// <summary>
-    /// 주어진 개수만큼 랜덤 아이템 ID 리스트 생성
-    /// </summary>
     private string[] GenerateRandomItemIds(int count)
     {
         var items = ItemDatabaseManager.Instance.GetRandomItems(count);
-        var ids = new List<string>();
-
-        foreach (var item in items)
-        {
-            if (item != null)
-                ids.Add(item.itemId);
-        }
-
-        return ids.ToArray();
+        return items.Select(item => item.itemId).ToArray();
     }
 
-    /// <summary>
-    /// 각 클라이언트에서 자신에게 해당하는 상자에 아이템 지급
-    /// </summary>
     [PunRPC]
     private void RPC_ShowBoxWithItems(string[] itemIds, string targetOwnerId)
     {
-        foreach (var boxManager in itemBoxManagers)
+        if (!ItemBoxSpawnerManager.Instance.TryGetItemBox(targetOwnerId, out var targetBox))
         {
-            if (boxManager == null || boxManager.OwnerId != targetOwnerId)
-                continue;
-
-            var itemDataList = new List<ItemData>();
-            foreach (var id in itemIds)
-            {
-                var item = ItemDatabaseManager.Instance.GetItemById(id);
-                if (item != null)
-                    itemDataList.Add(item);
-            }
-
-            boxManager.ShowBoxWithCustomItems(itemDataList);
-            Debug.Log($"[TEST] {targetOwnerId}에게 아이템 {itemDataList.Count}개 지급 완료");
+            Debug.LogWarning($"[TEST] {targetOwnerId}의 상자 못 찾음");
+            return;
         }
+
+        var itemDataList = itemIds
+            .Select(id => ItemDatabaseManager.Instance.GetItemById(id))
+            .Where(item => item != null)
+            .ToList();
+
+        targetBox.ShowBoxWithCustomItems(itemDataList);
+        Debug.Log($"[TEST] {targetOwnerId}에게 아이템 {itemDataList.Count}개 지급 완료");
     }
 }

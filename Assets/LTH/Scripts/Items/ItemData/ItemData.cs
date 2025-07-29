@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace LTH
 {
-    [CreateAssetMenu(fileName = "NewItemData", menuName = "LTH/ItemData")]
+    [CreateAssetMenu(fileName = "NewItemData", menuName = "Item/ItemData")]
     public class ItemData : ScriptableObject
     {
         public string itemId;

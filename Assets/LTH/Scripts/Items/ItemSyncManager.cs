@@ -17,7 +17,6 @@ using UnityEngine;
 public class ItemSyncManager : Singleton<ItemSyncManager>
 {
     // 각 플레이어별 동기화된 아이템 목록 저장
-    // private Dictionary<Player, List<ItemData>> syncedItems = new(); firebase UID를 키로 사용
     private Dictionary<string, List<ItemData>> syncedItems = new(); // key: player.NickName
 
     private void Awake()
@@ -30,20 +29,20 @@ public class ItemSyncManager : Singleton<ItemSyncManager>
     /// </summary>
     public void GenerateAndSync(string playerId)
     {
-        // ToDo: 실제 게임 로직에 맞는 아이템 생성 로직으로 교체 필요
         var generatedItems = new List<ItemData>
         {
-
-            new ItemData(ItemType.Cigarette, "담배", "플레이어 체력 1 회복합니다."),
-            new ItemData(ItemType.Cuffs, "수갑", "상대 플레이어 턴 1회 건너뜁니다"),
-            new ItemData(ItemType.MagnifyingGlass, "돋보기", "실탄인지 공포탄인지 구분합니다."),
-            new ItemData(ItemType.Saw, "톱", "총 2배로 데미지 증가합니다.")
+            ItemDatabaseManager.Instance.GetItemById("cigarette"),
+            ItemDatabaseManager.Instance.GetItemById("cuffs"),
+            ItemDatabaseManager.Instance.GetItemById("magnifyingGlass"),
+            ItemDatabaseManager.Instance.GetItemById("saw"),
+            //new ItemData(ItemType.Cigarette, "담배", "플레이어 체력 1 회복합니다."),
+            //new ItemData(ItemType.Cuffs, "수갑", "상대 플레이어 턴 1회 건너뜁니다"),
+            //new ItemData(ItemType.MagnifyingGlass, "돋보기", "실탄인지 공포탄인지 구분합니다."),
+            //new ItemData(ItemType.Saw, "톱", "총 2배로 데미지 증가합니다.")
         };
 
-        // syncedItems[player] = generatedItems;
         syncedItems[playerId] = generatedItems;
 
-        // Debug.Log($"[ItemSyncManager] 아이템 생성 및 동기화됨: {player.FirebaseUID}");
         Debug.Log($"[ItemSyncManager] 아이템 생성 및 동기화됨: {playerId}");
     }
 
@@ -53,11 +52,8 @@ public class ItemSyncManager : Singleton<ItemSyncManager>
     public void OnSyncReceived(string playerId, List<ItemData> items)
     {
         // 네트워크를 통해 받은 아이템 데이터를 해당 플레이어에 저장
-        // syncedItems[player] = items;
         syncedItems[playerId] = items;
         
-        // ToDo: 이 메서드는 Photon의 OnEvent 또는 RPC 수신 시 호출되어야 함
-        // Debug.Log($"[ItemSyncManager] 아이템 동기화 수신됨: {player.FirebaseUID}");
         Debug.Log($"[ItemSyncManager] 아이템 동기화 수신됨: {playerId}");
     }
 
@@ -67,7 +63,6 @@ public class ItemSyncManager : Singleton<ItemSyncManager>
     public List<ItemData> GetSyncedItems(string playerId)
     {
         // Dictionary에 존재하는 경우 해당 아이템 목록 반환
-        // if (syncedItems.TryGetValue(player, out var items)) return items;
         if (syncedItems.TryGetValue(playerId, out var items)) return items;
 
         // 없으면 빈 리스트 반환 (null 방지)
