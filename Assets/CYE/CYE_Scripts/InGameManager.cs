@@ -181,6 +181,8 @@ public class InGameManager : Singleton<InGameManager>
             return;
         }
 
+        // 현재 턴을 다음으로 넘긴다.
+        _currentTurn = _currentTurn.Next;
         // 턴 시작
         StartTurn();
     }
@@ -223,8 +225,6 @@ public class InGameManager : Singleton<InGameManager>
 
     private void TurnInit()
     {
-        // 현재 턴을 다음으로 넘긴다.
-        _currentTurn = _currentTurn.Next;
         OnTurnChange?.Invoke();
     }
 
