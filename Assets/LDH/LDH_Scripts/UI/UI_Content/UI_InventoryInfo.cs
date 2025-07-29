@@ -1,5 +1,7 @@
+using Managers;
 using TMPro;
 using UnityEngine;
+using Utils;
 
 namespace GameUI
 {
@@ -21,6 +23,11 @@ namespace GameUI
             base.Show();
             
             //override 원하는 경우 추가
+        }
+
+        public override void Close()
+        {
+            Manager.UI.CloseGlobalUI(Define_LDH.GlobalUI.UI_InventoryInfo);
         }
 
         /// <summary>

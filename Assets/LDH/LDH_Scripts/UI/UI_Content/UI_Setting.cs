@@ -1,55 +1,48 @@
 using GameUI;
 using Managers;
+using Michsky.UI.ModernUIPack;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering.VirtualTexturing;
 using Utils;
+using UIManager = Managers.UIManager;
 
 namespace GameUI
 {
     public class UI_Setting : UI_Popup
     {
-        [SerializeField] private GameObject settingPanelRoot;
-
-        private RectTransform panelRect;
-        private CanvasGroup panelCanvasGroup;
-
+        public ModalWindowManager settingModal;
+        [SerializeField] private UI_VolumeSetting _volumeSetting;
+        
         protected override void Init()
         {
             base.Init();
-            
-            panelRect = settingPanelRoot.GetComponent<RectTransform>();
-
-            panelCanvasGroup = Util_LDH.GetOrAddComponent<CanvasGroup>(settingPanelRoot);
+            //InitSubscribe();
         }
+        
 
         private void OnEnable()
         {
-           
+           Show();
         }
-        
-        
 
-        private void ShowEffect()
+        public void InitSubscribe()
         {
-            AnimationManager.Instance
-                .Create(panelRect)
-                .FadeIn(panelCanvasGroup, 0.3f)
-                .MoveTo(Vector2.zero, 0.3f) // 정위치로 올라오기
-                .Play();
+            settingModal.onCancel.AddListener(Close);
         }
+        
 
+        public override void Show()
+        {
+           settingModal.OpenWindow();
+        }
 
         public override void Close()
         {
-            AnimationManager.Instance
-                .Create(panelRect)
-                .FadeOut(panelCanvasGroup, 0.3f)
-                .MoveBy(Vector2.down * 100f, 0.3f)
-                .OnComplete(() => base.Close()) // 비활성화 처리
-                .Play();
+            settingModal.CloseWindow();
+            Manager.UI.CloseGlobalUI(Define_LDH.GlobalUI.UI_Setting);
         }
-        
     }
 }

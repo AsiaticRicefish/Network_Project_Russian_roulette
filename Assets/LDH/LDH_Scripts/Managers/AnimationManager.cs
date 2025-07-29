@@ -7,6 +7,8 @@ namespace Managers
 {
     public class AnimationManager : Singleton<AnimationManager>
     {
+
+        private void Awake() => SingletonInit();
         public AnimationBuilder Create(Transform target)
         {
             return new AnimationBuilder(target);

@@ -1,3 +1,6 @@
+using Managers;
+using Michsky.UI.ModernUIPack;
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -18,26 +21,22 @@ namespace GameUI
 
         [Header("Panels")] 
         [SerializeField] private GameObject _titlePanel;
-        [SerializeField] private Animator _anim_signupPanel;
-        [SerializeField] private Animator _anim_loginPanel;
-        // private ModalWindowManager _signupPanel;
-        // private ModalWindowManager _loginPanel;
+        [SerializeField] private ModalWindowManager _signupPanel;
+        [SerializeField] private ModalWindowManager _loginPanel;
+        private UI_Setting _settingUI;
+        private ModalWindowManager _settingPanel;
 
 
         [Header("Buttons")] 
         [SerializeField] private GameObject _signupButton;
         [SerializeField] private GameObject _loginButton;
-
+        [SerializeField] private GameObject _settingButton;
+        
 
         [Header("Panel Animation Config")]
         [SerializeField] private float _showTitlePanelDelay = 0.3f;
         private WaitForSeconds _titlePanelWait;
-
-        // Animator 해시값
-        private static int panelFadeInHash = Animator.StringToHash("Fade-in");
-        private static int panelFadeOutHash = Animator.StringToHash("Fade-out");
-
-
+        
         private void Awake()
         {
             Init();
@@ -58,6 +57,9 @@ namespace GameUI
             _titlePanel.SetActive(false);
             _titlePanelWait = new WaitForSeconds(_showTitlePanelDelay);
 
+            _settingUI = Manager.UI.GetGlobalUI<UI_Setting>();
+            _settingPanel = _settingUI.settingModal;
+
             // _signupPanel = _anim_signupPanel.GetComponent<ModalWindowManager>();
             // _loginPanel = _anim_loginPanel.GetComponent<ModalWindowManager>();
         }
@@ -76,6 +78,20 @@ namespace GameUI
 
             // log in button
             UI_Base.BindUIEvent(_loginButton, ShowLoginPanel, Define_LDH.UIEvent.Click);
+            
+            // setting button
+            UI_Base.BindUIEvent(_settingButton, ShowSettingPanel);
+            
+            
+            // 타이틀 씬에서만 setting modal 이벤트 구독 처리
+           _settingPanel.onCancel.AddListener(CloseSettingPanel);
+        }
+
+        private void Unsubscribe()
+        {
+            //setting modal 구독 해제
+            _settingPanel.onCancel.RemoveAllListeners();
+            _settingUI.InitSubscribe();
         }
 
         #region Video
@@ -109,7 +125,7 @@ namespace GameUI
         private void ShowSignupPanel(PointerEventData eventData)
         {
             _titlePanel.SetActive(false);
-            _anim_signupPanel.Play(panelFadeInHash);
+            _signupPanel.OpenWindow();
         }
 
         /// <summary>
@@ -118,7 +134,14 @@ namespace GameUI
         private void ShowLoginPanel(PointerEventData eventData)
         {
             _titlePanel.SetActive(false);
-            _anim_loginPanel.Play(panelFadeInHash);
+            _loginPanel.OpenWindow();
+        }
+
+
+        private void ShowSettingPanel(PointerEventData eventData)
+        {
+            _titlePanel.SetActive(false);
+            Manager.UI.ShowGlobalUI(Define_LDH.GlobalUI.UI_Setting);
         }
 
         #endregion
@@ -130,7 +153,7 @@ namespace GameUI
         /// </summary>
         public void CloseSignupPanel()
         {
-            StartCoroutine(ClosePanelAndShowTitle(_anim_signupPanel));
+            StartCoroutine(ClosePanelWithDelay(_signupPanel, () => _titlePanel.SetActive(true)));
         }
         
         /// <summary>
@@ -138,17 +161,28 @@ namespace GameUI
         /// </summary>
         public void CloseLoginPanel()
         {
-            StartCoroutine(ClosePanelAndShowTitle(_anim_loginPanel));
+            StartCoroutine(ClosePanelWithDelay(_loginPanel, () => _titlePanel.SetActive(true)));
         }
+        
+        public void CloseSettingPanel()
+        {
+            StartCoroutine(ClosePanelWithDelay(_settingPanel, () =>
+            {
+                Manager.UI.CloseGlobalUI(Define_LDH.GlobalUI.UI_Setting);
+                _titlePanel.SetActive(true);
+            }));
+            
+        }
+
 
         /// <summary>
         /// 닫기 애니메이션 재생 후 타이틀 패널 활성화
         /// </summary>
-        private IEnumerator ClosePanelAndShowTitle(Animator panelAnimator)
+        private IEnumerator ClosePanelWithDelay(ModalWindowManager modal, Action onCompelte = null)
         {
-            panelAnimator.Play(panelFadeOutHash);
+            modal.CloseWindow();
             yield return _titlePanelWait;
-            _titlePanel.SetActive(true);
+            onCompelte?.Invoke();
         }
         
         
