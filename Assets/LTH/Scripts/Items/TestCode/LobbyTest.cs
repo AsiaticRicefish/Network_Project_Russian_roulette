@@ -22,8 +22,13 @@ public class LobbyTest : MonoBehaviourPunCallbacks
 
     private void Start()
     {
+        Debug.Log("[Lobby] Start 호출됨");
+
         PhotonNetwork.AutomaticallySyncScene = true;
+        PhotonNetwork.NickName = "Tester_" + Random.Range(1000, 9999);
         PhotonNetwork.ConnectUsingSettings();
+
+        Debug.Log($"[Lobby] 닉네임 설정됨: {PhotonNetwork.NickName}");
 
         ShowPanel(panelConnecting);
         startButton.interactable = false;

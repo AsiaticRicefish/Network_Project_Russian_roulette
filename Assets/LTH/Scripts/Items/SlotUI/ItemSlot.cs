@@ -85,6 +85,8 @@ public class ItemSlot : MonoBehaviourPun
     private void UseItem()
     {
         Debug.Log("아이템 사용!");
+        ItemSync itemSync = FindObjectOfType<ItemSync>();
+        itemSync.UseItemRequest(itemData.itemId);
         photonView.RPC(nameof(RPC_Clear), RpcTarget.All); // 동기화된 제거
     }
 
