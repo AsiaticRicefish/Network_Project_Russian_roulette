@@ -24,7 +24,8 @@ public class ItemBoxSpawnerManager : Singleton<ItemBoxSpawnerManager>
 
     private void Start()
     {
-        Manager.Game.OnTurnEnd += HandleTurnEnd;
+        Manager.Game.OnTurnEnd += HandleTurnEnd; // 턴 끝날 때 박스 생성
+        Manager.Game.OnGameStart += HandleGameStart;
     }
 
     private void OnDestroy()
@@ -35,8 +36,15 @@ public class ItemBoxSpawnerManager : Singleton<ItemBoxSpawnerManager>
         }
     }
 
+    private void HandleGameStart()
+    {
+        Debug.Log("[Spawner] 게임 시작됨 → 상자 초기화 또는 사전 준비 가능");
+    }
+
     private void HandleTurnEnd()
     {
+        Debug.Log("[Spawner] 턴 종료 → 아이템 박스 소환");
+
         var allPlayers = PlayerManager.Instance.GetAllPlayers().Values;
 
         int i = 0;
