@@ -37,8 +37,16 @@ public class PMS_NetworkManager : MonoBehaviourPunCallbacks
         Debug.Log("스폰 초기화");
         SpawnManager.Instance.InitializeAvailableSpawnPoints(); //모든 유저가 초기화시도 -> 어차피 마스터 클라이언트만 가능
 
+        //테스트코드
         //닉네임 설정
-        PhotonNetwork.LocalPlayer.NickName = $"Player_{Random.Range(1, 1000).ToString("0000")}";
+        if (PhotonNetwork.IsMasterClient)
+        {
+            PhotonNetwork.LocalPlayer.NickName = $"Player_1";
+        }
+        else
+        {
+            PhotonNetwork.LocalPlayer.NickName = $"Player_2";
+        }
 
         //들어온 유저 플레이어 데이터 생성
         PlayerData newPlayerData = new PlayerData(PhotonNetwork.LocalPlayer.NickName, PhotonNetwork.LocalPlayer.UserId, 0, 0);
