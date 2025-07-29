@@ -49,7 +49,12 @@ namespace Managers
         public static PlayerManager PlayerManager => PlayerManager.Instance;   // 플레이어 매니저
 
         public static InGameManager Game => InGameManager.Instance;         // 게임 매니저
-        
+
+        public static ItemBoxSpawnerManager ItemBoxSpawner => ItemBoxSpawnerManager.Instance; // 아이템 박스 스폰 매니저
+        public static ItemDatabaseManager ItemDatabase => ItemDatabaseManager.Instance; // 아이템 데이터베이스 매니저
+        public static ItemManager Item => ItemManager.Instance; // 아이템 매니저
+        public static DeskUIManager DeskUI => DeskUIManager.Instance; // 아이템 슬롯 UI 매니저
+        public static ItemSyncManager ItemSync => ItemSyncManager.Instance; // 아이템 싱크 매니저
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void Initialize()
@@ -64,7 +69,11 @@ namespace Managers
             manager.AddComponent<SoundManager>();
             manager.AddComponent<PlayerManager>();
             manager.AddComponent<UIManager>();
+            manager.AddComponent<ItemBoxSpawnerManager>();
+            manager.AddComponent<DeskUIManager>();
+            manager.AddComponent<ItemDatabaseManager>();
+            manager.AddComponent<ItemSyncManager>();
+            manager.AddComponent<ItemManager>();
         }
     }
 }
-
