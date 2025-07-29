@@ -528,3 +528,4 @@ MonoBehaviour:
     winCount: 0
     loseCount: 0
   _spawnPointindex: -1
+  IsCuffedThisTurn: 0

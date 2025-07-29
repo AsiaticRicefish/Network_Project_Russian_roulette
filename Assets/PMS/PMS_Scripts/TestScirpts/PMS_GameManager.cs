@@ -25,6 +25,6 @@ public class PMS_GameManager : MonoBehaviour
     private IEnumerator Delay()
     {
         yield return new WaitForSeconds(0.1f); 
-        PlayerManager.Instance.AllGamePlayerAdd();
+        //PlayerManager.Instance.AllGamePlayerAdd();
     }
 }

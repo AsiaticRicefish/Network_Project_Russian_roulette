@@ -26,7 +26,7 @@ public class PlayerManager : Singleton<PlayerManager>
     }
 
     //게임 스타트시 추가
-    public bool AllGamePlayerAdd()
+    /*public bool AllGamePlayerAdd()
     {
         if (!PhotonNetwork.IsMasterClient) return false;
 
@@ -48,7 +48,7 @@ public class PlayerManager : Singleton<PlayerManager>
         //딕셔너리에 다 추가 된 상황이면 해당 Dictionary를 게임매니저 List에게 넣게 해줘야한다.
         //InGameManager.Instance._playerList.Add(players);
         return true;
-    }
+    }*/
 
     private void Init()
     {
@@ -56,13 +56,14 @@ public class PlayerManager : Singleton<PlayerManager>
         _playerDataList = new List<PlayerData>();
     }
 
+    //안씀
     public GamePlayer CreateGamePlayer(Player photonPlayer, PlayerData playerData)
     {
         string uid = photonPlayer.CustomProperties["playerId"]?.ToString() ?? "unknown";        //등록
         string nickname = photonPlayer.NickName;                                                //닉네임으로 설정
 
         GamePlayer gamePlayer = new GamePlayer();
-        gamePlayer.Initialize(playerData);
+        //gamePlayer.Initialize(playerData);
         RegisterPlayer(gamePlayer);
         return gamePlayer;
     }
@@ -73,7 +74,7 @@ public class PlayerManager : Singleton<PlayerManager>
         if (!_players.ContainsKey(player.PlayerId))
         {
             _players.Add(player.PlayerId, player);
-            Debug.Log($"Player added! Player FirebaseUID Number : {player.PlayerId}. Current players: {_players.Count}");
+            Debug.Log($"Player added! Player FirebaseUID Number : {player.PlayerId}, Player NickName : {player.Nickname}. Current players: {_players.Count}");
         }
         else
         {

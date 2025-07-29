@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -18,14 +19,49 @@ public class GamePlayer : MonoBehaviour
     private int _maxHp;
     private int _currentHp;
     private bool _isAlive;
-
     public int _spawnPointindex = -1;
-
-    public int MaxHp { get { return _maxHp; } }
-    public int CurrentHp { get { return _currentHp; } }
-    public bool IsAlive { get { return _isAlive; } }
-
     //public int AssignedSpawnPointIndex { get; private set; } = -1; // 할당된 스폰 지점 인덱스 (-1은 할당되지 않음을 의미)
+
+    //플레이어 인게임 프로퍼티
+    //Maxhp를 수정할때에는 플레이어가 살아야 할 때 밖에 없지 않을까? 이걸
+    public int MaxHp { get { return _maxHp; } set { _maxHp = value; } }
+    public int CurrentHp
+    {
+        get { return _currentHp; }
+        set
+        {
+            // 현재 체력 변경 시 이벤트 발생 로직 추가
+            if (_currentHp != value) // 실제 값이 변경될 때만 이벤트 발생
+            {
+                _currentHp = value;
+                if (CurrentHp <= 0) IsAlive = false;
+
+                OnHpChanged?.Invoke(_currentHp,IsAlive);
+            }
+        }
+    }
+    public bool IsAlive
+    {
+        get { return _isAlive; }
+        set
+        {
+            // 생존 여부 변경 시 이벤트 발생 로직 추가
+            if (_isAlive != value) // 실제 값이 변경될 때만 이벤트 발생
+            {
+                _isAlive = value;
+                if (!value) // 사망 시
+                {
+                    OnPlayerDied?.Invoke(this); // 사망한 플레이어 객체 전달
+                }
+            }
+        }
+    }
+
+    //이벤트 
+    public event Action<int,bool> OnHpChanged;           //최대 체력 변경시 - 라운드가 종료 되었을 때
+    public event Action<int,bool> OnMaxHpChanged;         //현재 체력 변경시 - 총을 맞거나 피를 회복할때
+
+    public event Action<GamePlayer> OnPlayerDied;   // 사망한 플레이어 객체 전달 - 턴관리 넘겨야하는데
 
     public bool IsCuffedThisTurn = false;
 
@@ -40,14 +76,26 @@ public class GamePlayer : MonoBehaviour
         {
             // 자신의 GamePlayer 객체를 PlayerManager에 등록
             PlayerManager.Instance.RegisterPlayer(this);
+            Initialize();
+        }
+    }
+
+    private void Update()
+    {
+        if (PhotonNetwork.IsMasterClient)
+        {
+            _currentHp -= 1;
         }
     }
 
     //플레이어 생성 -> 게임 매니저에 있어야할 것같은데
 
-    public void Initialize(PlayerData data)
+    public void Initialize()
     {
-        _data = data;
+        //프로퍼티 사용해서 이벤트 호출하게 하여야함. 임시
+        MaxHp = 3;
+        CurrentHp = MaxHp;
+        IsAlive = true;
     }
 
     public void SetMaxHp(int newHp)
@@ -60,24 +108,41 @@ public class GamePlayer : MonoBehaviour
         _maxHp = newHp;
     }
 
+    #region 플레이어 hp 관련 메서드 및 동기화 관련 RPC함수
     public void IncreaseHp(int amount)
     {
-        _currentHp = Mathf.Min(_currentHp + amount, _maxHp);
+        if (!IsAlive) return;
+
+        CurrentHp -= amount;
+        CurrentHp = Mathf.Max(CurrentHp, 0); // CurrentHp setter에서 사망 처리
     }
 
     public void DecreaseHp(int amount)
     {
-        _currentHp = Mathf.Max(_currentHp - amount, 0);
-        if (_currentHp <= 0)
-            _isAlive = false;
+        if (!IsAlive) return;
+
+        CurrentHp += amount;
+        CurrentHp = Mathf.Min(CurrentHp, MaxHp);
     }
 
-    [PunRPC]
+    /*[PunRPC]
     public void RPC_IncreaseHp(int amount)
     {
         _currentHp = Mathf.Min(_currentHp + amount, _maxHp);
         Debug.Log($"[HP 회복] {Nickname} → 현재 HP: {_currentHp}/{_maxHp}");
     }
+
+    [PunRPC]
+    public void RPC_DecreaseHp(int amount)
+    {
+        _currentHp = Mathf.Max(_currentHp - amount, 0);
+        if (_currentHp <= 0)
+        {
+            _isAlive = false;
+        }
+        Debug.Log($"[HP 감소] {Nickname} → 현재 HP: {_currentHp}/{_maxHp}");
+    }*/
+    #endregion
 
     //Player에서 PlayerData를 넘겨주는 메서드 - 필요하진 모르겟다 
     public PlayerData ToPlayerData()
@@ -85,7 +150,8 @@ public class GamePlayer : MonoBehaviour
         return _data;
     }
 
-    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    #region OnPhotonSerializeView 사용 테스트
+    /*public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
         if (stream.IsWriting)
         {
@@ -102,7 +168,8 @@ public class GamePlayer : MonoBehaviour
             _isAlive = (bool)stream.ReceiveNext();
             Debug.Log($"보낸 플레이어 : {info.Sender.NickName} , 보낸 서버 시간 : {info.SentServerTime}"); 
         }
-    }
+    }*/
+    #endregion
 
     //receiveSpawnPointIndex 범위 0 ~ 플레이어수-1  -> 이값을 가지고 List를 넣는 순서를 제어해도 괜찮을 것 같다. 이유 : 일단 자리에 앉으면 오른쪽으로 도는형식, 1대1에서 의미가 없지만 3인이상일 경우 턴순서를 확인할 수 있다.
     // PlayerData 객체를 직접 전송하는 RPC 함수
