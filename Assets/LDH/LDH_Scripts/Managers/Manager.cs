@@ -46,7 +46,6 @@ namespace Managers
 
         public static GunManager Gun => GunManager.Instance;            // 총 매니저
 
-        public static PlayerManager PlayerManager => PlayerManager.Instance;   // 플레이어 매니저
 
         public static InGameManager Game => InGameManager.Instance;         // 게임 매니저
         
@@ -62,8 +61,10 @@ namespace Managers
             //각각의 매니저 스크립트를 프리팹에 스크립트를 직접 추가해두거나 아래와 같이 AddComponent로 동적으로 추가한다.
             manager.AddComponent<TestManager>();
             manager.AddComponent<SoundManager>();
-            manager.AddComponent<PlayerManager>();
+            manager.AddComponent<AnimationManager>();
             manager.AddComponent<UIManager>();
+            
+
         }
     }
 }
