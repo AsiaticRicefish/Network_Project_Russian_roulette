@@ -32,6 +32,15 @@ public class GamePlayer : MonoBehaviour
         _pv = GetComponent<PhotonView>();
     }
 
+    private void Start()
+    {
+        if (_pv.IsMine)
+        {
+            // 자신의 GamePlayer 객체를 PlayerManager에 등록
+            PlayerManager.Instance.RegisterPlayer(this);
+        }
+    }
+
     //플레이어 생성 -> 게임 매니저에 있어야할 것같은데
 
     public void Initialize(PlayerData data)
@@ -94,13 +103,14 @@ public class GamePlayer : MonoBehaviour
         // 수신된 데이터를 사용하여 플레이어 업데이트
         _data = new PlayerData(receivedNickname, receivedPlayerId, receivedWinCount, receivedLoseCount);
         _spawnPointindex = receiveSpawnPointIndex; 
-        Debug.Log($"RPC로 수신된 플레이어 닉네임: {_data.nickname}, 플레이어 ID: {_data.playerId}, 승리: {_data.winCount}, 패배: {_data.loseCount}"); 
+        Debug.Log($"RPC로 수신된 플레이어 닉네임: {_data.nickname}, 플레이어 ID: {_data.playerId}, 승리: {_data.winCount}, 패배: {_data.loseCount}");
+        PlayerManager.Instance.RegisterPlayer(this);
     }
 
     // 내 PlayerData를 다른 클라이언트에게 보내는 함수
     public void SendMyPlayerDataRPC()
     {
         // RpcTarget.AllViaServer는 모든 클라이언트에게 RPC를 전송  전송자 -> 서버 -> 클라이언트 RpcTarget.AllViaServer
-        _pv.RPC("ReceivePlayerData", RpcTarget.All, _data.nickname,_data.playerId,_data.winCount,_data.loseCount);
+        _pv.RPC("ReceivePlayerData", RpcTarget.All, _data.nickname,_data.playerId,_data.winCount,_data.loseCount,_spawnPointindex);
     }
 }
