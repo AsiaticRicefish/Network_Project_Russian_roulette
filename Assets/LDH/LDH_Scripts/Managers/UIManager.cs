@@ -7,95 +7,122 @@ using Utils;
 
 namespace Managers
 {
+    /// <summary>
+    /// 게임 내 UI 전체를 총괄하는 매니저.
+    /// 전역 UI, 팝업 UI, 캔버스 정렬 및 스타일 테이블 초기화 등을 담당한다.
+    /// </summary>
     public class UIManager : DesignPattern.Singleton<UIManager>
     {
-        //stack 관리
-        private int _order = 10;
-        private Stack<UI_Popup> _popupStack = new();
-
-        //UI Root 
-        public static GameObject UIRoot { get; private set; }
-
+        //---- Stack 관리 ----//
+        private int _order = 10;        // UI 정렬 순서 제어용
+        private Stack<UI_Popup> _popupStack = new();    // 팝업 UI Stack
         
-        //style scriptable
+        //---- 전역 UI 관리 (Global UI) ----//
+        private Dictionary<Type, UI_Base> _globalUIDict = new(); // 전역 UI Dictionary (Type 기준 캐싱)
+        
+        //---- UI Root 오브젝트 ---- //
+        public static GameObject UIRoot { get; private set; }
+        
+        //---- Notify 스타일 ScriptableObject ----//
         public NotifyStyleTable notifyStyle { get; private set; }
         
+        
+        [Header("Path Setting")]
         [SerializeField] private string _notifyStyleTablePath = "Data/NotifyStyleTable";
-
-        
-        
-        
-        //전역 UI 관리
-        //전역으로 사용되는 UI
-        private Dictionary<Type, UI_Base> _globalUIDict = new();
-
-        
-        
-        
-
-        //Popup prefab path Folder Path
         [SerializeField] private string _popupPrefabFolder = "Prefabs/UI/Popup";
         [SerializeField] private string _globalUIPrefabFolder = "Prefabs/UI/Global";
+        
+        
+        
 
         private void Awake() => Init();
 
+        // UI 매니저 초기화
         private void Init()
         {
             SingletonInit(); //싱글톤 초기화
             
-            LoadNotifyStyleTable();
-            
             InitUIRoot(); //UI Root를 생성
+            
+            LoadNotifyStyleTable(); // 스타일 테이블 로드
 
-            Clear(); //Popup Stack 초기화
+            CloseAllPopupUI(); //Popup Stack 초기화
 
-            InitGlobalUI(); // 전역 UI 생성 및 관리
+            InitGlobalUIs();   // 전역 UI 생성 및 등록
             
             
         }
 
+        #region Initialize
+        
+        /// <summary>
+        /// UI 루트 오브젝트 생성 및 초기화
+        /// </summary>
         private void InitUIRoot()
         {
-            if (UIRoot == null)
-            {
-                UIRoot = new GameObject("@UIRoot");
-                DontDestroyOnLoad(UIRoot);
-            }
+            if (UIRoot != null) return;
+            UIRoot = new GameObject("@UIRoot");
+            DontDestroyOnLoad(UIRoot);   // 파괴 방지
         }
 
-        private void InitGlobalUI()
+        /// <summary>
+        /// 알림 스타일 ScriptableObject 로드 및 초기화
+        /// </summary>
+        private void LoadNotifyStyleTable()
         {
-            string[] globalUIs = System.Enum.GetNames(typeof(Define_LDH.GlobalUI));
-            foreach (string typeString in globalUIs)
+            notifyStyle = Resources.Load<NotifyStyleTable>(_notifyStyleTablePath);
+            notifyStyle.Init();  // 내부 초기화
+        }
+
+        /// <summary>
+        /// 전역 UI 프리팹들을 로드 및 초기화
+        /// </summary>
+        private void InitGlobalUIs()
+        {
+            foreach (Define_LDH.GlobalUI uiEnum in Enum.GetValues(typeof(Define_LDH.GlobalUI)))
             {
-                GameObject go = Util_LDH.Instantiate<GameObject>(
-                    Path.Combine(_globalUIPrefabFolder, typeString), UIRoot.transform);
-
-                // 타입 얻기 (주의: 네임스페이스 포함 필요)
-                Type uiType = Type.GetType($"GameUI.{typeString}"); // 예: GameUI.InventoryUI
-
+                // 1. Enum → 이름 → 경로 변환
+                string globalUIName = uiEnum.ToString();
+                string fullPath = Path.Combine(_globalUIPrefabFolder, globalUIName);
+                
+                // 2. 프리팹 인스턴스화
+                GameObject go = Util_LDH.Instantiate<GameObject>(fullPath, UIRoot.transform);
+                
+                // 3. Type 얻기 (주의: 네임스페이스 포함 문자열 필요)
+                Type uiType = GetUIType(globalUIName);
+                
                 if (uiType == null)
                 {
-                    Debug.LogError($"[{GetType().Name}] 타입을 찾을 수 없습니다: {typeString}");
+                    Debug.LogError($"[{GetType().Name}] 타입을 찾을 수 없습니다: {globalUIName}");
                     continue;
                 }
-
+                
+                // 4. 컴포넌트 캐싱 및 비활성화
                 UI_Base ui = Util_LDH.GetOrAddComponent(go, uiType) as UI_Base;
                 _globalUIDict.Add(uiType, ui);
 
                 ui.gameObject.SetActive(false);
             }
+            
         }
         
-        private void LoadNotifyStyleTable()
-        {
-            notifyStyle = Resources.Load<NotifyStyleTable>(_notifyStyleTablePath);
-            notifyStyle.Init();
-        }
+        /// <summary>
+        /// UI 타입 문자열로부터 Type 객체 반환
+        /// </summary>
+        private Type GetUIType(string name) => Type.GetType($"GameUI.{name}");
 
+
+
+        #endregion
+
+      
+        
 
         #region Canvas Setting
 
+        /// <summary>
+        /// 지정한 오브젝트에 Canvas 컴포넌트를 설정하고 정렬 순서를 부여합니다.
+        /// </summary>
         public void SetCanvas(GameObject go, bool sort = true)
         {
             Canvas canvas = Util_LDH.GetOrAddComponent<Canvas>(go);
@@ -107,113 +134,120 @@ namespace Managers
 
         #endregion
 
-        #region Global UI Control
+        #region Global UI
 
-        public UI_Base GetGlobalUI(Define_LDH.GlobalUI globalUIType)
+        
+        /// <summary>
+        /// Enum 기반으로 전역 UI 인스턴스를 가져옵니다.
+        /// </summary>
+        public UI_Base GetGlobalUI(Define_LDH.GlobalUI uiEnum)
         {
-            Type type = Type.GetType($"GameUI.{globalUIType}");
+            Type type = GetUIType(uiEnum.ToString());
             return _globalUIDict.GetValueOrDefault(type);
         }
 
+        /// <summary>
+        /// 제네릭 타입으로 전역 UI를 가져옵니다.
+        /// </summary>
         public T GetGlobalUI<T>() where T : UI_Base
         {
             return _globalUIDict.TryGetValue(typeof(T), out var ui) ? ui as T : null;
         }
 
-        // public void ToggleGlobalUI<T>(bool isActive) where T : UI_Base
-        // {
-        //     if (_globalUIDict.TryGetValue(typeof(T), out var ui))
-        //     {
-        //         ui.gameObject.SetActive(isActive);
-        //     }
-        // }
-
-        public UI_Base ShowGlobalUI(Define_LDH.GlobalUI globalUIType)
+        /// <summary>
+        /// 전역 UI를 활성화합니다.
+        /// 팝업일 경우 Stack에 Push합니다.
+        /// </summary>
+        public UI_Base ShowGlobalUI(Define_LDH.GlobalUI uiEnum)
         {
-            Type type = Type.GetType($"GameUI.{globalUIType}");
-
+            Type type = GetUIType(uiEnum.ToString());
             if (!_globalUIDict.TryGetValue(type, out var ui)) return null;
 
-            SetCanvas(ui.gameObject, true);
-
+            SetCanvas(ui.gameObject);
+            
+            // 팝업일 경우 Stack에 등록
             if (ui is UI_Popup popup)
                 _popupStack.Push(popup);
 
             ui.gameObject.SetActive(true);
-
             return ui;
         }
-
-
-        public void CloseGlobalUI(Define_LDH.GlobalUI globalUIType)
+        
+        
+        /// <summary>
+        /// 전역 UI를 비활성화합니다. (팝업이면 Stack에서 Pop)
+        /// </summary>
+        public void CloseGlobalUI(Define_LDH.GlobalUI uiEnum)
         {
-            Type type = Type.GetType($"GameUI.{globalUIType}");
-
+            Type type = GetUIType(uiEnum.ToString());
             if (!_globalUIDict.TryGetValue(type, out var ui)) return;
 
-
-            if (ui is UI_Popup popup)
+            // 팝업일 경우 Stack 검사 후 Pop
+            if (ui is UI_Popup popup && _popupStack.Count > 0)
             {
-                if (_popupStack.Count == 0)
-                    return;
-
                 if (_popupStack.Peek() != popup)
                 {
-                    Debug.Log($"[{GetType().Name}] pop up이 가장 위에 있는 팝업이 아닙니다.");
+                    Debug.LogWarning($"[{GetType().Name}] 닫으려는 팝업이 최상단 팝업이 아닙니다.");
                     return;
                 }
-
                 _popupStack.Pop();
             }
 
             ui.gameObject.SetActive(false);
-
             _order--;
         }
 
         #endregion
         
 
-        #region Popup UI control
+        #region Popup UI
 
+        /// <summary>
+        /// 팝업 UI를 생성하고 Stack에 등록합니다. 활성화는 직접 Show를 호출해야 한다.
+        /// </summary>
         public T SpawnPopupUI<T>(string name = null) where T : UI_Popup
         {
-            if (string.IsNullOrEmpty(name))
-                name = typeof(T).Name;
-
+            name ??= typeof(T).Name;
             T popup = Util_LDH.Instantiate<T>(Path.Combine(_popupPrefabFolder, name), UIRoot.transform);
-
             _popupStack.Push(popup);
-
             return popup;
         }
-
+        
+        /// <summary>
+        /// 특정 팝업을 닫습니다. (최상단일 때만 가능)
+        /// </summary>
         public void ClosePopupUI(UI_Popup popup)
         {
-            if (_popupStack.Count == 0)
-                return;
-
-            if (_popupStack.Peek() != popup)
+            if (_popupStack.Count == 0 || _popupStack.Peek() != popup)
             {
-                Debug.Log($"[{GetType().Name}] pop up이 가장 위에 있는 팝업이 아닙니다.");
+                Debug.LogWarning($"[{GetType().Name}] 닫으려는 팝업이 최상단 팝업이 아닙니다.");
                 return;
             }
 
             ClosePopupUI();
         }
 
-
+        /// <summary>
+        /// 최상단 팝업을 닫습니다.
+        /// </summary>
         public void ClosePopupUI()
         {
+            // Stack 비어있을 경우 리턴
             if (_popupStack.Count == 0)
                 return;
-
+            
+            // 최상단 팝업 Pop 후 제거
             UI_Popup popup = _popupStack.Pop();
             Destroy(popup.gameObject);
             popup = null;
+            
+            // 정렬 순서 감소
             _order--;
         }
 
+        /// <summary>
+        /// 모든 팝업을 제거합니다.
+        /// </summary>
         public void CloseAllPopupUI()
         {
             while (_popupStack.Count > 0)
@@ -221,125 +255,7 @@ namespace Managers
         }
 
         #endregion
-
-
-        public void Clear()
-        {
-            CloseAllPopupUI();
-        }
-
-        #region RectTransform Control
-
-        /// <summary>
-        /// 주어진 RectTransform의 anchor, pivot, anchoredPosition, sizeDelta를 설정합니다.
-        /// basePosition은 anchoredPosition의 기준 위치이며, offset이 있다면 추가됩니다.
-        /// </summary>
-        /// <param name="rect">대상 RectTransform</param>
-        /// <param name="anchorMin">Anchor Min 값</param>
-        /// <param name="anchorMax">Anchor Max 값</param>
-        /// <param name="pivot">Pivot 기준</param>
-        /// <param name="basePosition">기준 위치 (anchoredPosition)</param>
-        /// <param name="sizeDelta">UI 크기 (width, height). 생략 시 기존 값 유지</param>
-        /// <param name="offset">basePosition에 추가로 더해질 오프셋</param>
-        public static void SetRectTransform(
-            RectTransform rect,
-            Vector2 anchorMin,
-            Vector2 anchorMax,
-            Vector2 pivot,
-            Vector2 basePosition,
-            Vector2? sizeDelta = null,
-            Vector2? offset = null
-        )
-        {
-            if (rect == null) return;
-
-            rect.anchorMin = anchorMin;
-            rect.anchorMax = anchorMax;
-            rect.pivot = pivot;
-
-            // 위치 = 기준 위치 + 오프셋
-            rect.anchoredPosition = basePosition + (offset ?? Vector2.zero);
-
-            if (sizeDelta.HasValue)
-                rect.sizeDelta = sizeDelta.Value;
-        }
-
-        /// <summary>
-        /// 부모 영역 전체를 가득 채우는 Full Stretch UI로 설정합니다.
-        /// (anchorMin = (0,0), anchorMax = (1,1), pivot = center)
-        /// sizeDelta는 (0,0)으로 설정됩니다.
-        /// </summary>
-        /// <param name="rect">대상 RectTransform</param>
-        /// <param name="offset">anchoredPosition에 적용할 오프셋</param>
-        public static void SetFullStretch(RectTransform rect, Vector2? offset = null)
-        {
-            SetRectTransform(rect, Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero,
-                offset);
-        }
-
-        /// <summary>
-        /// 화면 정중앙 기준으로 위치시키며, 명시한 크기로 설정합니다.
-        /// </summary>
-        /// <param name="rect">대상 RectTransform</param>
-        /// <param name="size">UI의 크기 (width, height)</param>
-        /// <param name="offset">기준 위치에서의 오프셋</param>
-        public static void SetCenter(RectTransform rect, Vector2 size, Vector2? offset = null)
-        {
-            Vector2 center = new Vector2(0.5f, 0.5f);
-            SetRectTransform(rect, center, center, center, Vector2.zero, size, offset);
-        }
-        
-        
-        /// <summary>
-        /// 오른쪽 위 모서리를 기준으로 UI를 배치합니다.
-        /// </summary>
-        /// <param name="rect">대상 RectTransform</param>
-        /// <param name="size">UI의 크기 (width, height)</param>
-        /// <param name="offset">오른쪽 위 기준 위치에서의 오프셋</param>
-        public static void SetRightTop(RectTransform rect, Vector2 size, Vector2? offset = null)
-        {
-            Vector2 pos = new Vector2(1f, 1f);
-            SetRectTransform(rect, pos, pos, pos, Vector2.zero, size, offset);
-        }
-        
-        /// <summary>
-        /// 오른쪽 아래 모서리를 기준으로 UI를 배치합니다.
-        /// </summary>
-        /// <param name="rect">대상 RectTransform</param>
-        /// <param name="size">UI의 크기 (width, height)</param>
-        /// <param name="offset">오른쪽 아래 기준 위치에서의 오프셋</param>
-        public static void SetRightBottom(RectTransform rect, Vector2 size, Vector2? offset = null)
-        {
-            Vector2 pos = new Vector2(1f, 0f);
-            SetRectTransform(rect, pos, pos, pos, Vector2.zero, size, offset);
-        }
         
 
-        /// <summary>
-        /// 왼쪽 위 모서리를 기준으로 UI를 배치합니다.
-        /// </summary>
-        /// <param name="rect">대상 RectTransform</param>
-        /// <param name="size">UI의 크기 (width, height)</param>
-        /// <param name="offset">왼쪽 위 기준 위치에서의 오프셋</param>
-        public static void SetLeftTop(RectTransform rect, Vector2 size, Vector2? offset = null)
-        {
-            Vector2 pos = new Vector2(0f, 1f);
-            SetRectTransform(rect, pos, pos, pos, Vector2.zero, size, offset);
-        }
-
-        
-        /// <summary>
-        /// 왼쪽 아래 모서리를 기준으로 UI를 배치합니다.
-        /// </summary>
-        /// <param name="rect">대상 RectTransform</param>
-        /// <param name="size">UI의 크기 (width, height)</param>
-        /// <param name="offset">왼쪽 아래 기준 위치에서의 오프셋</param>
-        public static void SetLeftBottom(RectTransform rect, Vector2 size, Vector2? offset = null)
-        {
-            Vector2 pos = new Vector2(0f, 0f);
-            SetRectTransform(rect, pos, pos, pos, Vector2.zero, size, offset);
-        }
-        
-        #endregion
     }
 }

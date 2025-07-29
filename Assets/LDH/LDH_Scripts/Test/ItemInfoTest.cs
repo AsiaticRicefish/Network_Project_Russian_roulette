@@ -27,7 +27,6 @@ namespace Test
 
         public void ShowInfo()
         {
-            Debug.Log("aafasfasfaf");
             //ui manager로 부터 UI_InventoryInfo 전역 ui를 받아온다.
             var inventoryInfoUI = Manager.UI.GetGlobalUI<UI_InventoryInfo>();
             

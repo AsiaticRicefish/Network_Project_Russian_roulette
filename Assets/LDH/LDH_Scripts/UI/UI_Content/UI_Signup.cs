@@ -114,7 +114,7 @@ namespace GameUI
             RectTransform modalRect = modal.GetComponent<RectTransform>();
             
             //rect transform 설정
-            UIManager.SetRightBottom(modalRect, modalRect.rect.size, new Vector2(_offset.x, _offset.y));
+            Util_LDH.SetRightBottom(modalRect, modalRect.rect.size, new Vector2(_offset.x, _offset.y));
             
             //모달 보이게
             modal.Show();
