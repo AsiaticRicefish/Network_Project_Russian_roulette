@@ -82,9 +82,9 @@ public class GamePlayer : MonoBehaviour
 
     private void Update()
     {
-        if (PhotonNetwork.IsMasterClient)
+        if (PhotonNetwork.IsMasterClient && Input.GetKeyDown(KeyCode.Space))
         {
-            _currentHp -= 1;
+            CurrentHp -= 1;
         }
     }
 
@@ -92,7 +92,7 @@ public class GamePlayer : MonoBehaviour
 
     public void Initialize()
     {
-        //프로퍼티 사용해서 이벤트 호출하게 하여야함. 임시
+        //프로퍼티 사용해서 이벤트 호출하게 하여야함. 임시 테스트 코드
         MaxHp = 3;
         CurrentHp = MaxHp;
         IsAlive = true;

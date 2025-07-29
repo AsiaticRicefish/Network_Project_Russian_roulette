@@ -55,6 +55,7 @@ MonoBehaviour:
   - SetTurnActive
   - RPC_UpdatePlayerState
   - RPC_UpdatePlayerCurrentHp
+  - RPC_UpdatePlayerMaxHp
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1
