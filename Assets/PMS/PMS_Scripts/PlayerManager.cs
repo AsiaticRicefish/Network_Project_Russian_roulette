@@ -11,6 +11,7 @@ public class PlayerManager : Singleton<PlayerManager>
 {
     //리스트가 아닌 Dictionary로 관리  Key - FirebaseUID Value - PlayData
     public Dictionary<string, PlayerData> _playerData;
+    public List<GamePlayer> _playerList;
 
     //리스트를 딱한번 공유해야하는 상황 -> 모든 유저가 다 등록이 되었을 때 모든 유저가 해당 데이터를 들고 있도록 해야한다.
     public List<PlayerData> _playerDataList;
@@ -53,6 +54,7 @@ public class PlayerManager : Singleton<PlayerManager>
     private void Init()
     {
         _players = new Dictionary<string, GamePlayer>();
+        _playerList = new List<GamePlayer>();
         _playerDataList = new List<PlayerData>();
     }
 
@@ -137,5 +139,15 @@ public class PlayerManager : Singleton<PlayerManager>
 
         Debug.Log($"해당ID : {id} 와 일치 하는 ID를 가진 유저가 존재 하지 않습니다.");
         return null;
+    }
+
+    public void PrintPlayerList()
+    {
+        string str = "";
+        foreach(var p in _playerList)
+        {
+            str += p.Nickname + " ";
+        }
+        Debug.Log(str);
     }
 }
