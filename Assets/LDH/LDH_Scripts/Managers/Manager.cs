@@ -64,6 +64,8 @@ namespace Managers
             manager.AddComponent<SoundManager>();
             manager.AddComponent<PlayerManager>();
             manager.AddComponent<UIManager>();
+            manager.AddComponent<GunManager>();
+            manager.AddComponent<InGameManager>();
         }
     }
 }
