@@ -79,4 +79,41 @@ public class DeskUIManager : Singleton<DeskUIManager>
         }
         deskUIDict.Clear();
     }
+
+    /// <summary>
+    /// GamePlayer 없이 Photon 플레이어만으로 DeskUI 생성 (테스트 함수)
+    /// </summary>
+    public void CreateDeskUIsForPhotonPlayers()
+    {
+        var photonPlayers = PhotonNetwork.PlayerList;
+        Debug.Log($"[DeskUIManager] Photon 플레이어 수: {photonPlayers.Length}");
+
+        for (int i = 0; i < photonPlayers.Length; i++)
+        {
+            var player = photonPlayers[i];
+            string playerId = player.NickName;
+
+            Transform spawnPoint = spawnPoints.Length > i ? spawnPoints[i] : null;
+            if (spawnPoint == null)
+            {
+                Debug.LogError($"[DeskUIManager] SpawnPoint 부족: Index {i} 없음");
+                continue;
+            }
+
+            var deskObj = Instantiate(deskUIPrefab, spawnPoint.position, spawnPoint.rotation);
+            var deskUI = deskObj.GetComponent<DeskUI>();
+
+            if (deskUI == null)
+            {
+                Debug.LogError("[DeskUIManager] DeskUI 컴포넌트 없음");
+                continue;
+            }
+
+            deskUI.SetOwner(playerId);
+            bool isMine = (player == PhotonNetwork.LocalPlayer);
+            deskUI.SetInteractable(isMine);
+
+            deskUIDict[playerId] = deskUI;
+        }
+    }
 }

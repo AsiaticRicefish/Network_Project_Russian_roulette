@@ -27,4 +27,15 @@ public class ItemDatabaseManager : Singleton<ItemDatabaseManager>
         itemDict.TryGetValue(id, out var data);
         return data;
     }
+
+    public List<ItemData> GetRandomItems(int count)
+    {
+        List<ItemData> result = new();
+        for (int i = 0; i < count; i++)
+        {
+            int rand = Random.Range(0, allItems.Count);
+            result.Add(allItems[rand]); // 중복 허용
+        }
+        return result;
+    }
 }
