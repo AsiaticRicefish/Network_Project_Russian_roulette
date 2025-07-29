@@ -35,14 +35,48 @@ public class ItemManager : Singleton<ItemManager>
                 break;
 
             case ItemType.Dial:
-                //user.useDial();
+                GunManager.Instance.PV.RPC("RPC_SwitchNextBullet", RpcTarget.All);
                 Debug.Log("다이얼 사용 → 현재 탄 타입 변환");
                 break;
 
             case ItemType.Cellphone:
-                //user.useCellphone();
-                Debug.Log("휴대폰 사용 → 랜덤 탄 종류 알려줌");
+                if (user.GetComponent<PhotonView>().IsMine)
+                {
+                    Queue<BulletType> magazine = GunManager.Instance.Magazine;
+                    int magCount = magazine.Count;
+
+                    if (magCount == 0)
+                    {
+                        Debug.Log("[휴대폰] 탄창이 비어있음");
+                        break;
+                    }
+
+                    int randomIndex = UnityEngine.Random.Range(0, magCount);
+                    BulletType[] magazineArray = magazine.ToArray();
+                    BulletType randomBullet = magazineArray[randomIndex];
+
+                    Debug.Log($"[휴대폰] ({randomIndex + 1}번째 탄): {randomBullet}");
+
+                }
+                else
+                {
+                    Debug.Log("[휴대폰] 상대가 사용함 (내가 아닌 플레이어)");
+                }
                 break;
+
+            case ItemType.MagnifyingGlass:
+                if (user.GetComponent<PhotonView>().IsMine)
+                {
+                    BulletType loadedBullet = GunManager.Instance.LoadedBullet;
+                    Debug.Log($"[돋보기] 현재 장전된 탄: {loadedBullet}");
+                    // 여기에 UI 표시 붙이고 싶으면 붙이면 됨
+                }
+                else
+                {
+                    Debug.Log("[돋보기] 상대가 사용함");
+                }
+                break;
+
 
             default:
                 Debug.LogWarning("정의되지 않은 아이템 타입");
