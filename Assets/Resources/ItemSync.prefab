@@ -48,6 +48,7 @@ MonoBehaviour:
   itemDataList:
   - {fileID: 11400000, guid: 08e08f2f29e650543842e353fb32c969, type: 2}
   - {fileID: 11400000, guid: 014ae0f5223d0224a8d4fc8d66172057, type: 2}
+  myItemBox: {fileID: 0}
 --- !u!114 &9013990949325408357
 MonoBehaviour:
   m_ObjectHideFlags: 0
