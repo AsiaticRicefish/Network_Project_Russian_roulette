@@ -436,7 +436,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 34dd7d4b94903e9449ad881307522640, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _pv: {fileID: 0}
+  _pv: {fileID: 5041451895918633474}
   _data:
     nickname: 
     playerId: 
@@ -457,7 +457,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _cameraHolder: {fileID: 2361074234634229188}
-  _mouseSensitivity: 2
+  _mouseSensitivity: 0
 --- !u!114 &5013972192999619929
 MonoBehaviour:
   m_ObjectHideFlags: 0
