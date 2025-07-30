@@ -321,16 +321,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &571438986 stripped
+--- !u!114 &571438989 stripped
 MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 2012527330133267120, guid: 2d02eb1d5bd9644d9801bc2e4e7aa2f6,
+  m_CorrespondingSourceObject: {fileID: 4455993558880865355, guid: 2d02eb1d5bd9644d9801bc2e4e7aa2f6,
     type: 3}
   m_PrefabInstance: {fileID: 1318370670301117546}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Script: {fileID: 11500000, guid: 991dd5f2f0034965bdb450f80521bc71, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &701325043
@@ -1683,7 +1683,7 @@ MonoBehaviour:
   createRoomButton: {fileID: 458825644}
   createRoomPanel: {fileID: 4320671180972747578}
   joinRoomPanel: {fileID: 6549234611499731829}
-  joinButton: {fileID: 571438986}
+  joinButton: {fileID: 571438989}
 --- !u!1001 &1318370670301117546
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1789,39 +1789,9 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 680978294135753216, guid: 2d02eb1d5bd9644d9801bc2e4e7aa2f6,
         type: 3}
-      propertyPath: clickEvent.m_PersistentCalls.m_Calls.Array.size
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 680978294135753216, guid: 2d02eb1d5bd9644d9801bc2e4e7aa2f6,
-        type: 3}
-      propertyPath: clickEvent.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 680978294135753216, guid: 2d02eb1d5bd9644d9801bc2e4e7aa2f6,
-        type: 3}
       propertyPath: clickEvent.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 4320671180972747578}
-    - target: {fileID: 680978294135753216, guid: 2d02eb1d5bd9644d9801bc2e4e7aa2f6,
-        type: 3}
-      propertyPath: clickEvent.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 680978294135753216, guid: 2d02eb1d5bd9644d9801bc2e4e7aa2f6,
-        type: 3}
-      propertyPath: clickEvent.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: OpenWindow
-      objectReference: {fileID: 0}
-    - target: {fileID: 680978294135753216, guid: 2d02eb1d5bd9644d9801bc2e4e7aa2f6,
-        type: 3}
-      propertyPath: clickEvent.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: Michsky.UI.ModernUIPack.ModalWindowManager, Assembly-CSharp
-      objectReference: {fileID: 0}
-    - target: {fileID: 680978294135753216, guid: 2d02eb1d5bd9644d9801bc2e4e7aa2f6,
-        type: 3}
-      propertyPath: clickEvent.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
-      value: UnityEngine.Object, UnityEngine
-      objectReference: {fileID: 0}
     - target: {fileID: 683191261419795078, guid: 2d02eb1d5bd9644d9801bc2e4e7aa2f6,
         type: 3}
       propertyPath: m_AnchorMax.x
@@ -1926,11 +1896,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2012527330133267120, guid: 2d02eb1d5bd9644d9801bc2e4e7aa2f6,
-        type: 3}
-      propertyPath: m_Interactable
-      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2130054126504034513, guid: 2d02eb1d5bd9644d9801bc2e4e7aa2f6,
         type: 3}
@@ -3046,7 +3011,7 @@ PrefabInstance:
     - target: {fileID: 195407178480788838, guid: 18780d368d1c54a7e981c1d6d2e9cfda,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 0
+      value: 271.35
       objectReference: {fileID: 0}
     - target: {fileID: 195407178480788838, guid: 18780d368d1c54a7e981c1d6d2e9cfda,
         type: 3}
@@ -3471,7 +3436,7 @@ PrefabInstance:
     - target: {fileID: 1569577622350725786, guid: d1326ed455cd94f1eb620cfa4548e8dd,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 0
+      value: 95.98
       objectReference: {fileID: 0}
     - target: {fileID: 1569577622350725786, guid: d1326ed455cd94f1eb620cfa4548e8dd,
         type: 3}

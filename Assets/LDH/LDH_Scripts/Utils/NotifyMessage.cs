@@ -28,8 +28,8 @@ namespace Utils
             [NotifyMessageType.NicknameError] = new ("Invalid Nickname", "Please enter a valid nickname.", NotifyType.Error),
             
             
-            [NotifyMessageType.CreeateRoomSuccess] = new ("Create Room", "Success", NotifyType.Check),
-            [NotifyMessageType.CreateRoomError] = new ("Invalid Room Name", "Fail", NotifyType.Error),
+            [NotifyMessageType.CreeateRoomSuccess] = new ("Room Created", "Your room has been successfully created.", NotifyType.Check),
+            [NotifyMessageType.CreateRoomError] = new ("Failed to Create Room", "An error occurred while creating the room. Please try again.", NotifyType.Error),
         };
 
     }

@@ -18,14 +18,16 @@ namespace GameUI
         public ModalWindowManager JoinRoomPanel => joinRoomPanel;
         
         
-        [SerializeField] private Button joinButton;
+        [SerializeField] private UI_ObservableButton joinButton;
+        
         private RoomList _selectedRoom;
+        public RoomList SelectedRoom => _selectedRoom;
         
         private void Start()
         {
             _selectedRoom = null;
-            joinButton.interactable = false;
-            joinButton.onClick.AddListener(OnClickJoin);
+            joinButton.SetInteractable(false);
+            joinButton.button.onClick.AddListener(OnClickJoin);
             
             createRoomButton.onClick.AddListener(createRoomPanel.OpenWindow);
         }
@@ -40,7 +42,7 @@ namespace GameUI
                 room.SetSelected(room == selected);
             }
 
-            joinButton.interactable = true;
+            joinButton.SetInteractable(selected != null);
         }
         
         
