@@ -15,7 +15,7 @@ public class PMS_GameManager : MonoBehaviour
             PhotonNetwork.CurrentRoom.CustomProperties.ContainsKey("GameStart") &&
             (bool)PhotonNetwork.CurrentRoom.CustomProperties["GameStart"] == true && !flag)
         { 
-            StartCoroutine(Delay());
+            StartCoroutine(MasterClientSpawnPlayersWithDelay());
             flag = true;  
         }
     }
@@ -26,5 +26,13 @@ public class PMS_GameManager : MonoBehaviour
     {
         yield return new WaitForSeconds(0.1f); 
         //PlayerManager.Instance.AllGamePlayerAdd();
+    }
+
+    //마스터 클라이언트가 Spawn담당 할 때
+    private IEnumerator MasterClientSpawnPlayersWithDelay()
+    {
+        yield return new WaitForSeconds(0.1f); // 씬 로딩 및 초기화가 완료될 시간을 주기 위한 약간의 지연
+        //InGamePlayerManager.Instance.MasterClientSpawnAllPlayers(); // 새로운 메서드 호출
+        InGamePlayerManager.Instance.CreateController();
     }
 }

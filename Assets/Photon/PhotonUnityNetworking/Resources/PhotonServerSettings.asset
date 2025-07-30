@@ -61,6 +61,7 @@ MonoBehaviour:
   - RequestEndTurn
   - RPC_SwitchNextBullet
   - SyncTurn
+  - RPC_RegisterAllPlayer
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1
