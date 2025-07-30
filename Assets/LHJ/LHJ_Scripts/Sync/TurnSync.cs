@@ -17,6 +17,7 @@ public class TurnSync : MonoBehaviourPun
         // InGameManager의 턴 이벤트 구독
         InGameManager.Instance.OnTurnStart += OnTurnStart;
         InGameManager.Instance.OnTurnEnd += OnTurnEnd;
+        InGameManager.Instance.StartGame();
     }
 
     private void OnTurnStart()
@@ -24,7 +25,7 @@ public class TurnSync : MonoBehaviourPun
         // 마스터클라이언트만 턴 결정하고 클라이언트한테 전달
         if (PhotonNetwork.IsMasterClient)
         {
-            string turnId = CurrentTurnPlayerId;
+            string turnId = InGameManager.Instance.CurrentTurn;
             photonView.RPC("SyncTurn", RpcTarget.All, turnId);
         }
     }
@@ -40,7 +41,7 @@ public class TurnSync : MonoBehaviourPun
     private void SyncTurn(string playerId)
     {
         CurrentTurnPlayerId = playerId;
-        Debug.Log($"[TurnSync] 현재 턴 플레이어: {playerId}");
+        Debug.Log($"현재 턴 플레이어: {playerId}");
     }
 
     // 클라이언트에서 호출되는 턴 종료 요청 RPC
@@ -48,11 +49,11 @@ public class TurnSync : MonoBehaviourPun
     private void RequestEndTurn()
     {
         if (!PhotonNetwork.IsMasterClient) return;
-        if (InGameManager.Instance == null)
-        {
-            Debug.LogError("[TurnSync] EndTurn 실패: InGameManager.Instance가 null입니다.");
-            return;
-        }
-        InGameManager.Instance.EndTurn();
+
+        InGameManager.Instance.EndTurn(); // 턴을 마스터가 넘기고
+
+        // 다음 턴 플레이어를 직접 Sync
+        string nextPlayerId = InGameManager.Instance.CurrentTurn;
+        photonView.RPC("SyncTurn", RpcTarget.All, nextPlayerId); // 턴 동기화
     }
 }

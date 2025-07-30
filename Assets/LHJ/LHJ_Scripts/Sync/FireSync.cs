@@ -11,7 +11,7 @@ public class FireSync : MonoBehaviourPun
     private string myId;
     private void Start()
     {
-        myId = PhotonNetwork.IsMasterClient ? "player1" : "player2";
+        myId = PhotonNetwork.NickName;
 
         // 마스터 클라이언트가 게임 시작 시 탄을 장전하고 전체에 동기화
         if (PhotonNetwork.IsMasterClient)
@@ -33,8 +33,14 @@ public class FireSync : MonoBehaviourPun
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
+            if (TurnSync.CurrentTurnPlayerId != myId)
+            {
+                Debug.LogWarning($"[FireSync] 내 턴 아님 → 발사 차단 (myId: {myId}, 현재 턴: {TurnSync.CurrentTurnPlayerId})");
+                return;
+            }
+
+            // 내 턴이면 발사 진행
             BulletType fireBullet = GunManager.Instance.LoadedBullet;
-            // 발사 동기화: 모든 클라이언트에게 발사 정보 전달
             photonView.RPC("Fire", RpcTarget.All, myId, (int)fireBullet);
             turnSync.photonView.RPC("RequestEndTurn", RpcTarget.MasterClient);
         }
@@ -91,7 +97,6 @@ public class FireSync : MonoBehaviourPun
 
             photonView.RPC("ReloadSync", RpcTarget.All, bullets.ToArray(), bullets[0]);
         }
-
     }
 
     // 마스터에서 생성된 탄창을 클라이언트에게 동기화
