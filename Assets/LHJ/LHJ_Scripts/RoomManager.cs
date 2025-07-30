@@ -12,6 +12,7 @@ public class RoomManager : MonoBehaviour
     [SerializeField] private GameObject playerPanelPrefabs;
     [SerializeField] private Transform hostPanel;
     [SerializeField] private Transform clientPanel;
+    [SerializeField] private string gameSceneName;
 
     private GameObject hostInstance;
     private GameObject clientInstance;
@@ -43,7 +44,7 @@ public class RoomManager : MonoBehaviour
     public void GameStart()
     {
         if (PhotonNetwork.IsMasterClient && AllPlayerReadyCheck())
-            PhotonNetwork.LoadLevel("LHJ_GameScene");
+            PhotonNetwork.LoadLevel(gameSceneName);
     }
 
     // 모든플레이어가 준비완료 상태인지
