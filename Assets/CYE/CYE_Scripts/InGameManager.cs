@@ -6,6 +6,7 @@ using DesignPattern;
 using UnityEngine.Events;
 using System;
 using Managers;
+using Photon.Pun;
 
 /// <summary>
 /// 게임 플레이의 흐름을 관리하는 클래스.
@@ -182,7 +183,7 @@ public class InGameManager : Singleton<InGameManager>
         }
 
         // 현재 턴을 다음으로 넘긴다.
-        _currentTurn = _currentTurn.Next;
+        _currentTurn = _currentTurn.Next ?? _turnOrder.First;
         // 턴 시작
         StartTurn();
     }
@@ -208,9 +209,11 @@ public class InGameManager : Singleton<InGameManager>
 
         // 플레이어 승패 수 관리용 변수(List)를 초기화한다.
         _playerPointPair = new();
-        foreach (KeyValuePair<string, GamePlayer> item in Manager.PlayerManager.GetAllPlayers())
+        foreach (Photon.Realtime.Player p in PhotonNetwork.PlayerList)
         {
-            _playerPointPair.Add(new PlayerPointPair(item.Value.PlayerId));
+            string playerId = p.NickName;
+            _playerPointPair.Add(new PlayerPointPair(playerId));
+            _turnOrder.AddLast(playerId);
         }
     }
     private void RoundInit()
