@@ -37,8 +37,10 @@ namespace Utils
         
         public enum NotifyMessageType
         {
-            NickNameError,
-            NickNameSuccess,
+            NicknameError,
+            NicknameSuccess,
+            CreateRoomError,
+            CreeateRoomSuccess,
             
         }
     }

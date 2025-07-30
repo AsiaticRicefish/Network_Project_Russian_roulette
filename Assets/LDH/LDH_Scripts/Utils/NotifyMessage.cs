@@ -24,8 +24,8 @@ namespace Utils
 
         public static readonly Dictionary<NotifyMessageType, MessageEntity> MessageEntities = new Dictionary<NotifyMessageType, MessageEntity>
         {
-            [NotifyMessageType.NickNameSuccess] = new ("Nickname Set", "You're now ready to join the lobby.", NotifyType.Check),
-            [NotifyMessageType.NickNameError] = new ("Invalid Nickname", "Please enter a valid nickname.", NotifyType.Error),
+            [NotifyMessageType.NicknameSuccess] = new ("Nickname Set", "You're now ready to join the lobby.", NotifyType.Check),
+            [NotifyMessageType.NicknameError] = new ("Invalid Nickname", "Please enter a valid nickname.", NotifyType.Error),
             
         };
 

@@ -743,7 +743,7 @@ GameObject:
   - component: {fileID: 592441671061209067}
   - component: {fileID: 2650536539346224159}
   m_Layer: 5
-  m_Name: Got It
+  m_Name: Create Room Button
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1040,7 +1040,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 320.0868, y: -15}
-  m_SizeDelta: {x: 271.35, y: 30}
+  m_SizeDelta: {x: 0, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6867303344641183333
 CanvasRenderer:
@@ -1772,6 +1772,8 @@ GameObject:
   - component: {fileID: 6549234612920387259}
   - component: {fileID: 5119511685618468866}
   - component: {fileID: 3644672460716787581}
+  - component: {fileID: 1663883324966202433}
+  - component: {fileID: 4485758531595996597}
   m_Layer: 5
   m_Name: UI_CreateRoom
   m_TagString: Untagged
@@ -1876,6 +1878,46 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!223 &1663883324966202433
+Canvas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4601028387208386542}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_RenderMode: 2
+  m_Camera: {fileID: 0}
+  m_PlaneDistance: 100
+  m_PixelPerfect: 0
+  m_ReceivesEvents: 1
+  m_OverrideSorting: 1
+  m_OverridePixelPerfect: 0
+  m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
+  m_AdditionalShaderChannelsFlag: 25
+  m_UpdateRectTransformForStandalone: 0
+  m_SortingLayerID: 0
+  m_SortingOrder: 3
+  m_TargetDisplay: 0
+--- !u!114 &4485758531595996597
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4601028387208386542}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dc42784cf147c0c48a680349fa168899, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IgnoreReversedGraphics: 1
+  m_BlockingObjects: 0
+  m_BlockingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
 --- !u!1 &4682425867917606728
 GameObject:
   m_ObjectHideFlags: 0
@@ -2979,7 +3021,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1985611731384436, guid: a77e2c4748edcd5429717838a8f70fb0, type: 3}
       propertyPath: m_Name
-      value: Name_Input Field - Fading (Left)
+      value: RoomName_Input Field - Fading (Left)
       objectReference: {fileID: 0}
     - target: {fileID: 114304000811751932, guid: a77e2c4748edcd5429717838a8f70fb0,
         type: 3}

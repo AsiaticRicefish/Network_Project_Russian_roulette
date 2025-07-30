@@ -5,9 +5,12 @@ using UnityEngine.UI;
 using TMPro;
 using Photon.Pun;
 using Photon.Realtime;
+using ExitGames.Client.Photon;
 using DesignPattern;
 using GameUI;
 using Managers;
+using System;
+using System.Linq;
 using UnityEngine.PlayerLoop;
 using UnityEngine.Rendering.VirtualTexturing;
 using Utils;
@@ -103,13 +106,13 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     {
         if (string.IsNullOrWhiteSpace(nicknameField.text))
         {
-            Manager.UI.ShowNotifyModal(NotifyMessage.MessageEntities[NotifyMessageType.NickNameError]);     // ui modal
+            Manager.UI.ShowNotifyModal(NotifyMessage.MessageEntities[NotifyMessageType.NicknameError]);     // ui modal
             return;
         }
         
         PhotonNetwork.NickName = nicknameField.text.Trim();
         
-        Manager.UI.ShowNotifyModal(NotifyMessage.MessageEntities[NotifyMessageType.NickNameSuccess]);       // ui modal
+        Manager.UI.ShowNotifyModal(NotifyMessage.MessageEntities[NotifyMessageType.NicknameSuccess]);       // ui modal
         
         PhotonNetwork.JoinLobby();
         
@@ -123,19 +126,88 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         userLabel.SetActive(true);                  // activate user label canvas
     }
 
+    #region Create Room Logic
+
     // 방 생성
     public void CreateRoom()
     {
-        if (string.IsNullOrEmpty(roomNameField.text))
+        string userRoomName = roomNameField.text;
+        if (string.IsNullOrEmpty(userRoomName))
         {
+            Manager.UI.ShowNotifyModal(NotifyMessage.MessageEntities[NotifyMessageType.CreateRoomError]);
             return;
         }
-
+        
         roomNameAdmitButton.interactable = false;
-        RoomOptions options = new RoomOptions { MaxPlayers = 2 };
-        PhotonNetwork.CreateRoom(roomNameField.text, options);
+        
+        // 1. 고유 코드 생성 (중복 검사 포함)
+        var (roomCode, roomName) = GenerateRoomCode();
+        if (string.IsNullOrEmpty(roomCode) || string.IsNullOrEmpty(roomName))
+        {
+            Debug.LogError("방 코드 생성 실패. 방 생성 중단.");
+            return;
+        }
+        
+        ExitGames.Client.Photon.Hashtable customProperties = new ExitGames.Client.Photon.Hashtable
+        {
+            { "roomCode", roomCode },
+            { "userRoomName", userRoomName }
+        };
+        
+        RoomOptions options = new RoomOptions
+        {
+            MaxPlayers = 2,
+            CustomRoomProperties = customProperties,
+            CustomRoomPropertiesForLobby = new[] { "roomCode", "userRoomName" }
+        };
+        
+        PhotonNetwork.CreateRoom(roomName, options);
+        
+        Manager.UI.ShowNotifyModal(NotifyMessage.MessageEntities[NotifyMessageType.CreeateRoomSuccess]);
         roomNameField.text = null;
     }
+
+    //GUID 앞부분만 잘라서 고유 코드로 생성
+    private (string roomCode, string guidRoomName) GenerateRoomCode(int length = 6, int retryCount = 0)
+    {
+        
+        if (retryCount >= 5)
+        {
+            Debug.LogError("방 코드 중복으로 인해 방 생성 실패");
+            return (null, null);
+        }
+        
+        // 1. GUID로 고유한 방 이름 생성
+        string guid = Guid.NewGuid().ToString();
+        string roomName = guid.Replace("-", "").ToUpper();
+        
+        // 2. GUID 일부를 6자리 코드로 변환 (중복 방지를 위해 소문자 제거)
+        string roomCode = roomName.Substring(0,length);
+        
+        // 3. 중복 확인
+        if (CheckRoomCodeDuplicate(roomCode))
+        {
+            Debug.LogWarning($"[GenerateRoomIdentifiers] 중복 코드: {roomCode}, 재시도...");
+            GenerateRoomCode(length, retryCount + 1);
+        }
+
+        return (roomCode, roomName); // roomName = guid
+
+    }
+    
+    private bool CheckRoomCodeDuplicate(string code)
+    {
+        return roomList.Values.Any(go =>
+        {
+            RoomList room = go.GetComponent<RoomList>();
+            return room.RoomCode == code;
+        });
+
+    }
+
+    #endregion
+    
+    
 
     // 방 생성 완료
     public override void OnCreatedRoom()
@@ -150,7 +222,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         roomPanel.SetActive(true);
         foreach (Player player in PhotonNetwork.PlayerList)
         {
-            roomManager.PlayerPanelSpawn(player);
+            //roomManager.PlayerPanelSpawn(player);
         }
     }
 
@@ -185,7 +257,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
             {
                 GameObject roomListItem = Instantiate(roomListPrefabs);
                 roomListItem.transform.SetParent(roomListContent, false);
-                //roomListItem.GetComponent<RoomList>().Init(info);
+                roomListItem.GetComponent<RoomList>().Init(info);
                 roomList.Add(info.Name, roomListItem);
             }
         }
