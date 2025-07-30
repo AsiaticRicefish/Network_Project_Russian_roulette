@@ -5,18 +5,33 @@ using Photon.Pun;
 using Photon.Realtime;
 using System.IO;
 using ExitGames.Client.Photon;
-
 /*
  * 테스트용 제거 예정
  */
 
 public class PMS_NetworkManager : MonoBehaviourPunCallbacks
 {
-    
+    private string playerId;
+    private static PMS_NetworkManager Instance;
     private void Awake()
-    {
+    {        
+        // 인스턴스가 없으면 자신을 인스턴스로 지정
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject); // 씬 전환 시 파괴 방지
+        }
+        else
+        {
+            Destroy(gameObject); // 중복된 싱글톤이 생기면 삭제
+        }
+        PhotonNetwork.NickName = "Player_" + Random.Range(0,99).ToString();
+        playerId = "Player_ID_" + Random.Range(0, 99).ToString();
+
+        PhotonNetwork.AutomaticallySyncScene = true;
         PhotonNetwork.ConnectUsingSettings();
     }
+
 
     public override void OnConnectedToMaster()
     {
@@ -26,7 +41,12 @@ public class PMS_NetworkManager : MonoBehaviourPunCallbacks
     //방에 들어왔을 때 호출
     public override void OnJoinedRoom()
     {
-        if(PhotonNetwork.IsMasterClient)
+        //아이디를 받음 룸에 들어올때 플레이어 프로퍼티에 저장
+        ExitGames.Client.Photon.Hashtable props = new ExitGames.Client.Photon.Hashtable { { "uid", playerId } };
+        PhotonNetwork.LocalPlayer.SetCustomProperties(props);
+
+        //마스터 클라이언트일 경우 게임 자동 시작 준비
+        if (PhotonNetwork.IsMasterClient)
         {
             ExitGames.Client.Photon.Hashtable hash = new ExitGames.Client.Photon.Hashtable();
             hash["GameStart"] = false;
@@ -34,32 +54,24 @@ public class PMS_NetworkManager : MonoBehaviourPunCallbacks
         }
 
         Debug.Log("입장완료");
-        Debug.Log("스폰 초기화");
-        SpawnManager.Instance.InitializeAvailableSpawnPoints(); //모든 유저가 초기화시도 -> 어차피 마스터 클라이언트만 가능
 
-        //테스트코드
-        //닉네임 설정
+        StartCoroutine(HeyWait());
+    }
+
+    //너무빨라서 안되나?
+    //특정 플레이어가 플레이어 프로퍼티값을 바꾸면 호출되는 콜백함수 - 모든 클라이언트가 호출하는데 마스터 클라이언트만 등록 할 수 있도록
+    public override void OnPlayerPropertiesUpdate(Player targetPlayer, ExitGames.Client.Photon.Hashtable changedProps)
+    {
         if (PhotonNetwork.IsMasterClient)
         {
-            PhotonNetwork.LocalPlayer.NickName = $"Player_1";
+            string uid = "";
+            if (changedProps.ContainsKey("uid"))
+            {
+                uid = changedProps["uid"].ToString();
+                StartCoroutine(RegisterWhenReady(targetPlayer, uid));
+                Debug.Log($"플레이어 {targetPlayer.NickName} 의 UID: {uid}");
+            }
         }
-        else
-        {
-            PhotonNetwork.LocalPlayer.NickName = $"Player_2";
-        }
-
-        //들어온 유저 플레이어 데이터 생성
-        PlayerData newPlayerData = new PlayerData(PhotonNetwork.LocalPlayer.NickName, PhotonNetwork.LocalPlayer.UserId, 0, 0);
-
-        //게임 플레이어 생성 Manager 소환 - 각자 생성
-        GameObject gamePlayerManager = PhotonNetwork.Instantiate(Path.Combine("Prefabs", "PlayerManager"), Vector3.zero, Quaternion.identity);
-        gamePlayerManager.GetComponent<InGamePlayerManager>()._playerData = newPlayerData;
-
-        /*if (PhotonNetwork.IsMasterClient)
-        {
-            //게임 플레이어 생성 Manager 소환 - 마스터클라이언트만
-            GameObject gamePlayerManager = PhotonNetwork.Instantiate(Path.Combine("Prefabs", "PlayerManager"), Vector3.zero, Quaternion.identity);
-        }*/
     }
 
     //임시 테스트 코드
@@ -70,22 +82,17 @@ public class PMS_NetworkManager : MonoBehaviourPunCallbacks
         yield return new WaitForSeconds(Count);
         hash["GameStart"] = true;
         PhotonNetwork.CurrentRoom.SetCustomProperties(hash); // 변경된 상태를 모든 클라이언트에 동기화
+        PhotonNetwork.LoadLevel("PMS_TestScene");
     }
 
     // 새로운 플레이어가 방에 입장했을 때 (모든 클라이언트에서 호출)
     public override void OnPlayerEnteredRoom(Photon.Realtime.Player newPlayer)
-    {   
+    {
         if (!PhotonNetwork.IsMasterClient) return;
-
-        base.OnPlayerEnteredRoom(newPlayer);
-
-        PlayerData newPlayerData = new PlayerData(PhotonNetwork.LocalPlayer.NickName, PhotonNetwork.LocalPlayer.UserId, 0, 0);
-
-        //플레이어 Data를 마스터 클라이언트가 일단 다들고있자
-        PlayerManager.Instance._playerDataList.Add(newPlayerData);
 
         //여기서는 알고 있는데 각자 생성할 시 해당 객체에 대한 GamePlayer -> _data에 대한 정보가 없음 마스터 클라이언트가 소환하지 않기 때문에 정보가 없다.
         //소환 하면 마스터 클라이언트에게 정보를 넘겨주자
+        Debug.Log($"[PMS_NetworkManager] 새로운 플레이어 {newPlayer.NickName} 입장. 총 플레이어 수: {PhotonNetwork.CurrentRoom.PlayerCount}");
     }
 
     // 플레이어가 방을 나갔을 때 (모든 클라이언트에서 호출)
@@ -93,6 +100,38 @@ public class PMS_NetworkManager : MonoBehaviourPunCallbacks
     {
         base.OnPlayerLeftRoom(otherPlayer);
         Debug.Log($"{otherPlayer.NickName} 님이 방을 나갔습니다.");
+
+    }
+
+    private IEnumerator RegisterWhenReady(Player targetPlayer, string uid)
+    {
+        yield return new WaitUntil(() => PlayerManager.Instance != null);
+
+        PlayerData newPlayerData = new PlayerData(targetPlayer.NickName, uid, 0, 0);
+        PlayerManager.Instance._playerDataList.Add(newPlayerData);
+
+        Debug.Log($"[PMS_NetworkManager] 새로운 플레이어 등록 닉네임 : {newPlayerData.nickname}, ID : {newPlayerData.playerId}");
+    }
+
+    private IEnumerator HeyWait()
+    {
+        yield return new WaitForSeconds(0.1f);
+
+        //들어온 유저는 자기 플레이어 데이터 생성
+        PlayerData localPlayerData = new PlayerData(PhotonNetwork.NickName, playerId, 0, 0);
+
+        if (PhotonNetwork.IsMasterClient)
+        {
+            PlayerManager.Instance._playerDataList.Add(localPlayerData);
+        }
+
+        //게임 플레이어 생성 Manager 소환 - 각자 생성
+        GameObject gamePlayerManager = PhotonNetwork.Instantiate(Path.Combine("Prefabs", "PlayerManager"), Vector3.zero, Quaternion.identity);
+
+        if (InGamePlayerManager.Instance != null)
+        {
+            InGamePlayerManager.Instance._playerData = localPlayerData;
+        }
 
     }
 }

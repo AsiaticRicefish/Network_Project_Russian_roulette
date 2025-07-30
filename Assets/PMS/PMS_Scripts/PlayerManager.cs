@@ -73,6 +73,12 @@ public class PlayerManager : Singleton<PlayerManager>
 
     public void RegisterPlayer(GamePlayer player)
     {
+        if (string.IsNullOrEmpty(player.PlayerId))
+        {
+            Debug.LogError("null값 등록시도.");
+            return;
+        }
+
         if (!_players.ContainsKey(player.PlayerId))
         {
             _players.Add(player.PlayerId, player);
