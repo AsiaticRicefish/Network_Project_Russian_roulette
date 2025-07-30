@@ -53,7 +53,8 @@ public class GunManager : Singleton<GunManager>
             Debug.Log($"{playerId}에 해당하는 플레이어를 찾을 수 없습니다.");
             return;            
         }        
-        FireGunToTarget(target);
+        // FireGunToTarget(target);
+        _pv.RPC("FireGunToTarget", RpcTarget.All, target);
     }
 
     public void Reload()
@@ -102,12 +103,14 @@ public class GunManager : Singleton<GunManager>
     #endregion
 
     #region >> Private Function
-    private void FireGunToTarget(GamePlayer target)
+    [PunRPC]
+    public void FireGunToTarget(GamePlayer target)
     {
         if (_loadedBullet == BulletType.live)
         {
             int damage = _isEnhanced ? BASE_DAMAGE * 2 : BASE_DAMAGE;
             target.DecreaseHp(damage);
+            Debug.Log("target hp 감소");
         }
         // TO DO: 탄피 배출 연출 실행
         _isEnhanced = false;
