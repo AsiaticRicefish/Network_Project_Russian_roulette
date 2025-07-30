@@ -12,33 +12,25 @@ public class GameStarter : MonoBehaviour
         if (PhotonNetwork.IsMasterClient)
         {
             RegisterTurnOrder();
-            Debug.Log("[GameStarter] 마스터 클라이언트 → InGameManager.StartGame 호출");
             StartGame();
-        }
-        else
-        {
-            Debug.Log("[GameStarter] 일반 클라이언트, 게임 시작 대기");
         }
     }
 
     private void RegisterTurnOrder()
     {
-        var players = PlayerManager.Instance.GetAllPlayers(); // UID 기준
+        var players = PlayerManager.Instance.GetAllPlayers();
         var turnOrder = new LinkedList<string>();
 
         foreach (var kvp in players)
         {
-            string id = kvp.Key; // Firebase UID or Photon NickName
-            Debug.Log($"[GameStarter] 턴 순서 등록: {id}");
+            string id = kvp.Key;
             turnOrder.AddLast(id);
         }
 
-        // InGameManager._turnOrder 에 리플렉션으로 접근
         var field = typeof(InGameManager).GetField("_turnOrder", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
         field?.SetValue(InGameManager.Instance, turnOrder);
-
-        Debug.Log("[GameStarter] _turnOrder 강제 등록 완료");
     }
+
 
     private void StartGame()
     {
