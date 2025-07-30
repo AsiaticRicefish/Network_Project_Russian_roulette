@@ -2,21 +2,28 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Managers;
+using Photon.Pun;
+using System;
 
-public class GunController : MonoBehaviour
+public class GunController : MonoBehaviourPun
 {
     private Animator _animator;
+    private bool _isHold = false;
+    public event Action<bool> OnHolded;
+
+    [SerializeField] private GameObject _targetSelectUI;
+
     void Awake()
     {
-        // _animator = GetComponent<Animator>();
-        _animator = GetComponentInChildren<Animator>();
+        _animator = GetComponent<Animator>();
     }
-    void Update()
+    
+    void OnMouseDown()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
-        { 
-            // target 지정을 어떻게 할 것인가? 어디서 저장하여 불러올 것인가?
-            // Manager.Gun.Fire(target);
+        if (!_isHold)
+        {
+            _isHold = true;
+            OnHolded?.Invoke(_isHold);
         }
     }
 }

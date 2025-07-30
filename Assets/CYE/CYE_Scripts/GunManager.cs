@@ -14,20 +14,6 @@ public enum BulletType
 
 public class GunManager : Singleton<GunManager>
 {
-    private PhotonView _pv;
-
-    private void Awake()
-    {
-        SingletonInit();
-        _pv = GetComponent<PhotonView>();
-        _isEnhanced = false;
-        Manager.Game.OnTurnStart += Reload;
-    }
-
-
-    // 다른 곳에서 RPC 호출 가능하게
-    public PhotonView PV => _pv;
-
     #region >> Constants
     private const int BULLET_MIN_COUNT = 1; // 최소 총일 갯수 2개(공포탄 1개, 실탄 1개)
     private const int BULLET_MAX_COUNT = 4; // 최대 총알 갯수 8개(공포탄 4개, 실탄 4개)
@@ -41,31 +27,24 @@ public class GunManager : Singleton<GunManager>
     public BulletType LoadedBullet { get{ return _loadedBullet; } private set { _loadedBullet = value; } }
     private bool _isEnhanced;
     public bool IsEnhanced { get { return _isEnhanced; } set { _isEnhanced = value; } }
+    private PhotonView _pv;
+    // 다른 곳에서 RPC 호출 가능하게
+    public PhotonView PV => _pv;
     #endregion
 
     #region  >> Unity Message Function
-    //private void Awake() => Init();
+    private void Awake() => Init();
 
     private void Init()
     {
         SingletonInit();
+        _pv = GetComponent<PhotonView>();
         _isEnhanced = false;
         Manager.Game.OnTurnStart += Reload;
     }
     #endregion
 
     #region >> Public Function
-    // public void Fire(GamePlayer target) => FireGunToTarget(target);
-    // {
-    //     if (_loadedBullet == BulletType.live)
-    //     {
-    //         int damage = _isEnhanced ? BASE_DAMAGE * 2 : BASE_DAMAGE;
-    //         target.DecreaseHp(damage);
-    //     }
-    //     // TO DO: 탄피 배출 연출 실행
-    //     _isEnhanced = false;
-    //     _magazine.TryDequeue(out _loadedBullet);
-    // }
     public void Fire(string playerId)
     {
         GamePlayer target = Manager.PlayerManager.GetAllPlayers()[playerId];
