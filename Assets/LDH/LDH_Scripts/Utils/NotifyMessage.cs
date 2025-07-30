@@ -27,6 +27,9 @@ namespace Utils
             [NotifyMessageType.NicknameSuccess] = new ("Nickname Set", "You're now ready to join the lobby.", NotifyType.Check),
             [NotifyMessageType.NicknameError] = new ("Invalid Nickname", "Please enter a valid nickname.", NotifyType.Error),
             
+            
+            [NotifyMessageType.CreeateRoomSuccess] = new ("Create Room", "Success", NotifyType.Check),
+            [NotifyMessageType.CreateRoomError] = new ("Invalid Room Name", "Fail", NotifyType.Error),
         };
 
     }

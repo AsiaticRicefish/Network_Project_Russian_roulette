@@ -9,10 +9,10 @@ using ExitGames.Client.Photon;
 using DesignPattern;
 using GameUI;
 using Managers;
+using Michsky.UI.ModernUIPack;
 using System;
 using System.Linq;
 using UnityEngine.PlayerLoop;
-using UnityEngine.Rendering.VirtualTexturing;
 using Utils;
 using static Utils.Define_LDH;
 
@@ -41,11 +41,13 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     [SerializeField] private GameObject roomPanel;
     [SerializeField] private RoomManager roomManager;
     private Dictionary<string, GameObject> roomList = new Dictionary<string, GameObject>();
-
+    public IReadOnlyList<GameObject> RoomList => roomList.Values.ToList();
+    
     
     #region ui scripts reference (private 접근자)
     private UI_Nickname _uiNicknamePanel;
-
+    private UI_Lobby _uiLobby;
+    private ModalWindowManager _createRoomManager;
     #endregion
 
     private void Awake() => Init();
@@ -61,6 +63,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     private void Init()
     {
         _uiNicknamePanel = nicknamePanel.GetComponent<UI_Nickname>();
+        _uiLobby = lobbyPanel.GetComponent<UI_Lobby>();
         
         InitUIVisibiity();
     }
@@ -164,6 +167,10 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         PhotonNetwork.CreateRoom(roomName, options);
         
         Manager.UI.ShowNotifyModal(NotifyMessage.MessageEntities[NotifyMessageType.CreeateRoomSuccess]);
+        
+        //패널 닫기
+        _uiLobby.CreateRoomPanel.CloseWindow();
+        
         roomNameField.text = null;
     }
 
@@ -251,13 +258,13 @@ public class NetworkManager : MonoBehaviourPunCallbacks
             if (roomList.ContainsKey(info.Name))
             {
                 // 방 정보 업데이트
-                roomList[info.Name].GetComponent<RoomList>().Init(info);
+                roomList[info.Name].GetComponent<RoomList>().Init(info, _uiLobby);
             }
             else
             {
                 GameObject roomListItem = Instantiate(roomListPrefabs);
                 roomListItem.transform.SetParent(roomListContent, false);
-                roomListItem.GetComponent<RoomList>().Init(info);
+                roomListItem.GetComponent<RoomList>().Init(info, _uiLobby);
                 roomList.Add(info.Name, roomListItem);
             }
         }
