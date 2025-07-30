@@ -1,18 +1,15 @@
-using System.Collections;
+using ExitGames.Client.Photon;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using Photon.Pun;
 using Photon.Realtime;
-using ExitGames.Client.Photon;
-using DesignPattern;
 using GameUI;
 using Managers;
 using Michsky.UI.ModernUIPack;
 using System;
 using System.Linq;
-using UnityEngine.PlayerLoop;
 using Utils;
 using static Utils.Define_LDH;
 
@@ -59,7 +56,8 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         roomNameAdmitButton.onClick.AddListener(CreateRoom);
     }
 
-
+    #region Init
+    
     private void Init()
     {
         _uiNicknamePanel = nicknamePanel.GetComponent<UI_Nickname>();
@@ -79,10 +77,15 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         //nickname 설정 패널 invisible
         _uiNicknamePanel.SetActive(false);
         //create room 패널 invisible
+        _uiLobby.CreateRoomPanel.CloseWindow();
         //join room by code 패널 invisible
+        _uiLobby.JoinRoomPanel.CloseWindow();
         //room 비활성화
+        roomPanel.SetActive(false);
     }
+    #endregion
 
+    #region Connect
     // 마스터 서버 연결
     public override void OnConnectedToMaster()
     {
@@ -97,12 +100,19 @@ public class NetworkManager : MonoBehaviourPunCallbacks
             Debug.Log("Onconnected to master : loadingpanel active is false");
             PhotonNetwork.JoinLobby();  // 로비로 진입
         }
+
     }
     public override void OnDisconnected(DisconnectCause cause)
     {
         base.OnDisconnected(cause);
         PhotonNetwork.ConnectUsingSettings(); // 재접속
     }
+    
+
+    #endregion
+    
+    
+    #region NickName
 
     // 닉네임 설정 및 로비진입
     public void NicknameAdmit()
@@ -121,14 +131,57 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         
     }
 
+    #endregion
+
+    #region Lobby PunCallbacks
+
     public override void OnJoinedLobby()
     {
         base.OnJoinedLobby();
         _uiNicknamePanel.SetActive(false);          // close window
         lobbyPanel.SetActive(true);
         userLabel.SetActive(true);                  // activate user label canvas
+        
+        //shortcut 활성화
+        UI_Shortcut shortcutUI = Manager.UI.GetGlobalUI(GlobalUI.UI_Shortcut) as UI_Shortcut;
+        if (shortcutUI.gameObject.activeSelf) return;
+        shortcutUI.InitSetting();
+        shortcutUI.Show();
     }
 
+    // 방 리스트 갱신
+    public override void OnRoomListUpdate(List<RoomInfo> updateList)
+    {
+        foreach (RoomInfo info in updateList)
+        {
+            if (info.RemovedFromList)
+            {
+                // 삭제된 방 제거
+                if (roomList.TryGetValue(info.Name, out GameObject obj))
+                {
+                    Destroy(obj);
+                    roomList.Remove(info.Name);
+                }
+                continue;
+            }
+
+            if (roomList.ContainsKey(info.Name))
+            {
+                // 방 정보 업데이트
+                roomList[info.Name].GetComponent<RoomList>().Init(info, _uiLobby);
+            }
+            else
+            {
+                GameObject roomListItem = Instantiate(roomListPrefabs);
+                roomListItem.transform.SetParent(roomListContent, false);
+                roomListItem.GetComponent<RoomList>().Init(info, _uiLobby);
+                roomList.Add(info.Name, roomListItem);
+            }
+        }
+    }
+    #endregion
+
+  
     #region Create Room Logic
 
     // 방 생성
@@ -213,66 +266,58 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     }
 
     #endregion
-    
-    
+
+    #region Room PunCallbacks
 
     // 방 생성 완료
     public override void OnCreatedRoom()
     {
         roomNameAdmitButton.interactable = true; // 버튼 활성화
     }
-
+    
     // 방 입장 완료시 
     public override void OnJoinedRoom()
     {
         lobbyPanel.SetActive(false);
         roomPanel.SetActive(true);
+        roomManager.InitRoom();
         foreach (Player player in PhotonNetwork.PlayerList)
         {
-            //roomManager.PlayerPanelSpawn(player);
+            roomManager.SetPlayerPanel(player);
         }
     }
-
+    
+    
     // 다른 플레이어가 방에 입장했을때 
     public override void OnPlayerEnteredRoom(Player newPlayer)
     {
         if (newPlayer != PhotonNetwork.LocalPlayer)
-            roomManager.PlayerPanelSpawn(newPlayer);
+            roomManager.SetPlayerPanel(newPlayer);
     }
-    // 방 리스트 갱신
-    public override void OnRoomListUpdate(List<RoomInfo> updateList)
-    {
-        foreach (RoomInfo info in updateList)
-        {
-            if (info.RemovedFromList)
-            {
-                // 삭제된 방 제거
-                if (roomList.TryGetValue(info.Name, out GameObject obj))
-                {
-                    Destroy(obj);
-                    roomList.Remove(info.Name);
-                }
-                continue;
-            }
-
-            if (roomList.ContainsKey(info.Name))
-            {
-                // 방 정보 업데이트
-                roomList[info.Name].GetComponent<RoomList>().Init(info, _uiLobby);
-            }
-            else
-            {
-                GameObject roomListItem = Instantiate(roomListPrefabs);
-                roomListItem.transform.SetParent(roomListContent, false);
-                roomListItem.GetComponent<RoomList>().Init(info, _uiLobby);
-                roomList.Add(info.Name, roomListItem);
-            }
-        }
-    }
+    
+    
     // 다른 플레이어가 방에서 나갔을때 
     public override void OnPlayerLeftRoom(Player otherPlayer)
     {
         if (otherPlayer != PhotonNetwork.LocalPlayer)
-            roomManager.PlayerPanelDestroy(otherPlayer);
+            roomManager.ResetPlayerPanel(otherPlayer);
     }
+    
+    
+
+    public override void OnMasterClientSwitched(Player newMasterClient)
+    {
+        roomManager.SwitchMasterClient(newMasterClient);
+    }
+    
+    public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)
+    {
+        if (changedProps.ContainsKey("Ready"))
+        {
+            roomManager.UpdateReadyUI(targetPlayer);
+        }
+    }
+    
+    #endregion
+    
 }

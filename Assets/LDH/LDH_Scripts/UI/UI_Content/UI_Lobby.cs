@@ -10,6 +10,8 @@ namespace GameUI
         [SerializeField] private NetworkManager _networkManager;
 
         [SerializeField] private Button createRoomButton;
+        [SerializeField] private Button joinByCodeButton;
+        
         
         [SerializeField] private ModalWindowManager createRoomPanel;
         [SerializeField] private ModalWindowManager joinRoomPanel;

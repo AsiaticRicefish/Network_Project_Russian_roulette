@@ -35,7 +35,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 179.29076, y: -27.5}
+  m_AnchoredPosition: {x: 179.29077, y: -27.5}
   m_SizeDelta: {x: 91.23, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1844985079169454531
@@ -449,8 +449,9 @@ GameObject:
   - component: {fileID: 6488687027406263974}
   - component: {fileID: 3683787774781339167}
   - component: {fileID: 1649027906967857976}
+  - component: {fileID: 4698344389583113458}
   m_Layer: 5
-  m_Name: UI_ShortCut
+  m_Name: UI_Shortcut
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -539,6 +540,20 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
+--- !u!114 &4698344389583113458
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4788305696875084356}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cb5b71208e7245638747d7aafbcbc32f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  escButton: {fileID: 180081165718107999}
+  escButtonImage: {fileID: 7812285515591329416}
 --- !u!1 &5211438864781267044
 GameObject:
   m_ObjectHideFlags: 0

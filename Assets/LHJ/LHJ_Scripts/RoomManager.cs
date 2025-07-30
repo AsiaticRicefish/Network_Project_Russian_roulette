@@ -1,50 +1,74 @@
+using GameUI;
 using Photon.Pun;
 using Photon.Realtime;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class RoomManager : MonoBehaviour
 {
-    [SerializeField] private Button startButton;
-    [SerializeField] private Button leaveButton;
-    [SerializeField] private GameObject playerPanelPrefabs;
-    [SerializeField] private Transform hostPanel;
-    [SerializeField] private Transform clientPanel;
+    //UI와 컨트롤 로직을 분리 -> 필요없는 변수 제거
+    
+    [SerializeField] private UI_Room _uiRoom;
+    
 
-    private GameObject hostInstance;
-    private GameObject clientInstance;
-
-    private void Start()
+    private void OnDestroy()
     {
-        startButton.onClick.AddListener(GameStart);
-        leaveButton.onClick.AddListener(LeaveRoom);
+        _uiRoom.OnClickStartButton -= GameStart;
+        _uiRoom.OnClickLeaveButton -= LeaveRoom;
     }
 
     // 개별 플레이어 패널 생성
-    public void PlayerPanelSpawn(Player player)
+    public void SetPlayerPanel(Player player)
     {
         PhotonNetwork.AutomaticallySyncScene = true;
-        Transform targetParent = player.IsMasterClient ? hostPanel : clientPanel;
+        _uiRoom.SetPlayerPanel(player);
+    }
 
-        GameObject obj = Instantiate(playerPanelPrefabs);
-        obj.transform.SetParent(targetParent, false);
-        PlayerPanel item = obj.GetComponent<PlayerPanel>();
-        item.Init(player);
-
-        if (player.IsMasterClient)
-            hostInstance = obj;
-        else
-            clientInstance = obj;
+    public void InitRoom()
+    {
+        _uiRoom.Init(GameStart, LeaveRoom);
     }
 
     // 방장 및 모든 플레이어가 준비완료시 시작
     public void GameStart()
     {
-        if (PhotonNetwork.IsMasterClient && AllPlayerReadyCheck())
-            PhotonNetwork.LoadLevel("LHJ_GameScene");
+        // if (PhotonNetwork.IsMasterClient && AllPlayerReadyCheck()) // -> 마스터 클라이언트에게만 Game Start 기능 부여 & 버튼 활성화에서 Ready Check를 진행하는 로직으로 변경함에 따라 주석 처리
+        PhotonNetwork.LoadLevel("LHJ_GameScene"); // todo : 인게임 씬으로 바꾸기
     }
+    
+    public void LeaveRoom()
+    {
+        foreach (var player in PhotonNetwork.PlayerList)
+        {
+            _uiRoom.ResetPanel(player);
+        }
+        
+        _uiRoom.gameObject.SetActive(false); // room panel 비활성화
+        PhotonNetwork.LeaveRoom(); // 방 나가기
+    }
+    
+    // 나간 플레이어의 패널 제거
+    public void ResetPlayerPanel(Player player)
+    {
+        _uiRoom.ResetPanel(player);
+    }
+
+    public void SwitchMasterClient(Player newMaster)
+    {
+        _uiRoom.ResetAllSetting();
+        foreach (Player player in PhotonNetwork.PlayerList)
+        {
+            SetPlayerPanel(player);
+        }
+        
+        _uiRoom.UpdateStartButtonState(AllPlayerReadyCheck());
+    }
+    
+    public void UpdateReadyUI(Player player)
+    {
+        _uiRoom.UpdateReadyState(player);
+        _uiRoom.UpdateStartButtonState(AllPlayerReadyCheck());
+    }
+    
 
     // 모든플레이어가 준비완료 상태인지
     public bool AllPlayerReadyCheck()
@@ -57,36 +81,6 @@ public class RoomManager : MonoBehaviour
         return true;
     }
 
-    // 플레이어가 나갈때 패널 제거
-    public void PlayerPanelDestroy(Player player)
-    {
-        // 나간 사람이 호스트인 경우
-        if (player.IsMasterClient && hostInstance != null)
-        {
-            Destroy(hostInstance);
-            hostInstance = null;
-        }
-        // 나간 사람이 클라이언트인 경우
-        else if (!player.IsMasterClient && clientInstance != null)
-        {
-            Destroy(clientInstance);
-            clientInstance = null;
-        }
-    }
-    public void LeaveRoom()
-    {
-        if (hostInstance != null)
-        {
-            Destroy(hostInstance);
-            hostInstance = null;
-        }
-
-        if (clientInstance != null)
-        {
-            Destroy(clientInstance);
-            clientInstance = null;
-        }
-
-        PhotonNetwork.LeaveRoom(); // 방 나가기
-    }
+   
+ 
 }

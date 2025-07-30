@@ -18,7 +18,6 @@ namespace GameUI
         {
             if (isActive)
             {
-                Debug.Log("nickname panel set actvid true 호출");
                 _modalWindowManager.OpenWindow();
                 
             }

@@ -25,6 +25,7 @@ namespace Utils
         {
             UI_Setting,
             UI_InventoryInfo,
+            UI_Shortcut,
         }
         
         public enum NotifyType

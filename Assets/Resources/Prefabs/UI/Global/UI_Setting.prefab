@@ -1808,7 +1808,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 320.0868, y: -15}
-  m_SizeDelta: {x: 0, y: 30}
+  m_SizeDelta: {x: 134.4, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1606527602501162417
 CanvasRenderer:
@@ -2451,7 +2451,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   settingModal: {fileID: 1594188323797722296}
-  _volumeSetting: {fileID: 0}
+  _volumeSetting: {fileID: 8173245646046208702}
 --- !u!1 &5253993142344934348
 GameObject:
   m_ObjectHideFlags: 0
