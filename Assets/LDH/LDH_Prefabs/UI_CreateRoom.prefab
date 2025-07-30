@@ -1028,7 +1028,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 320.0868, y: -15}
-  m_SizeDelta: {x: 271.35, y: 30}
+  m_SizeDelta: {x: 0, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6867303344641183333
 CanvasRenderer:
@@ -1817,13 +1817,25 @@ MonoBehaviour:
   onCancel:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: GameUI.UI_Title, Assembly-CSharp
-        m_MethodName: CloseLoginPanel
+      - m_Target: {fileID: 6549234612920387259}
+        m_TargetAssemblyTypeName: Michsky.UI.ModernUIPack.ModalWindowManager, Assembly-CSharp
+        m_MethodName: CloseWindow
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 0}
+        m_TargetAssemblyTypeName: GameUI.UI_Lobby, Assembly-CSharp
+        m_MethodName: ClearInputField
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 2455023672089299647}
+          m_ObjectArgumentAssemblyTypeName: TMPro.TMP_InputField, Unity.TextMeshPro
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -3172,3 +3184,15 @@ RectTransform:
     type: 3}
   m_PrefabInstance: {fileID: 2559979876722757017}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &2455023672089299647 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 114594570875668262, guid: a77e2c4748edcd5429717838a8f70fb0,
+    type: 3}
+  m_PrefabInstance: {fileID: 2559979876722757017}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2da0c512f12947e489f739169773d7ca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

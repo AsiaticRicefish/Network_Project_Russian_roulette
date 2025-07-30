@@ -32,7 +32,10 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     [SerializeField] private Button roomNameAdmitButton;
     [SerializeField] private GameObject roomListPrefabs;
     [SerializeField] private Transform roomListContent;
-    
+    [SerializeField] private TMP_InputField codeInputField;
+    [SerializeField] private Button codeJoinButton;
+
+
     
     [Header("Room")]
     [SerializeField] private GameObject roomPanel;
@@ -54,6 +57,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         PhotonNetwork.ConnectUsingSettings();   // 마스터 서버 접속
         nicknameAdmitButton.onClick.AddListener(NicknameAdmit);
         roomNameAdmitButton.onClick.AddListener(CreateRoom);
+        codeJoinButton.onClick.AddListener(JoinRoomByCode);
     }
 
     #region Init
@@ -99,7 +103,10 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         {
             Debug.Log("Onconnected to master : loadingpanel active is false");
             PhotonNetwork.JoinLobby();  // 로비로 진입
+            roomPanel.SetActive(false);
         }
+        
+        
 
     }
     public override void OnDisconnected(DisconnectCause cause)
@@ -264,6 +271,48 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         });
 
     }
+
+    #endregion
+
+    #region Join Room By Code
+
+    public void JoinRoomByCode()
+    {
+        string roomCode = codeInputField.text.Trim().ToUpper();
+        if (string.IsNullOrEmpty(roomCode))
+        {
+            Manager.UI.ShowNotifyModal(NotifyMessage.MessageEntities[NotifyMessageType.RoomCodeError]);
+            return;
+        }
+
+        string matchedRoomName = roomList.Values
+            .Select(go => go.GetComponent<RoomList>())
+            .FirstOrDefault(room => room.RoomCode == roomCode)
+            ?.RoomName;
+        
+        if (string.IsNullOrEmpty(matchedRoomName))
+        {
+            Manager.UI.ShowNotifyModal(NotifyMessage.MessageEntities[NotifyMessageType.RoomCodeError]);
+            return;
+        }
+        
+        if (PhotonNetwork.InLobby)
+        {
+            Manager.UI.ShowNotifyModal(NotifyMessage.MessageEntities[NotifyMessageType.RoomCodeSuccess]);
+            
+            PhotonNetwork.JoinRoom(matchedRoomName);
+            
+            _uiLobby.JoinRoomPanel.CloseWindow();
+        
+            codeInputField.text = null;
+          
+        }
+        
+        
+        roomNameAdmitButton.interactable = false;
+
+    }
+   
 
     #endregion
 

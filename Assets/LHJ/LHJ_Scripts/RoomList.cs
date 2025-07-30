@@ -30,7 +30,8 @@ public class RoomList : MonoBehaviour
     private UI_Lobby _lobby;            // 소속된 로비 UI 참조
 
     public string RoomCode => _roomCode;     // 외부 접근용 프로퍼티
-
+    public string RoomName => _roomName;    // 외부 접근용 프로퍼티
+    
     private void Start()
     {
         _originColor = roomListButton.image.color;

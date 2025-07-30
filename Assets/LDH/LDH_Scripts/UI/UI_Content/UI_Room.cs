@@ -11,12 +11,13 @@ namespace GameUI
 {
     public class UI_Room : MonoBehaviour
     {
-        [Header("UI Elements")] 
+        [Header("UI Elements")]
         //--- 텍스트 ----//
         [SerializeField]
         private TMP_Text _roomNameText;
+
         [SerializeField] private TMP_Text _roomCodeText;
-        
+
         //--- 버튼 ----//
         [SerializeField] private UI_ObservableButton _startButton;
         [SerializeField] private Button _leaveButton;
@@ -26,10 +27,9 @@ namespace GameUI
         [SerializeField] private PlayerPanel _clientPanel;
 
         private ButtonManager _startButtonManager;
-        private PlayerPanel _localPanel;
+       
 
-        [Header("Event")] 
-        public Action OnClickStartButton;
+        [Header("Event")] public Action OnClickStartButton;
         public Action OnClickLeaveButton;
 
         private void Awake()
@@ -45,7 +45,7 @@ namespace GameUI
 
             _leaveButton.onClick.AddListener(() => OnClickLeaveButton?.Invoke());
         }
-        
+
 
         public void Init(Action onStart, Action onLeave)
         {
@@ -53,19 +53,19 @@ namespace GameUI
             ResetAllSetting();
             //버튼 이벤트 설정
             SetStartButton();
-            OnClickStartButton += onStart;
+            if(onStart!=null)
+                OnClickStartButton += onStart;
             OnClickLeaveButton += onLeave;
 
             var roomInfo = PhotonNetwork.CurrentRoom;
-            
+
             //룸 이름, 룸 코드 설정
             _roomNameText.text = roomInfo?.CustomProperties["userRoomName"] as string;
-            _roomCodeText.text = roomInfo?.CustomProperties["roomCode"] as string;
-            
+            _roomCodeText.text = $"#{roomInfo?.CustomProperties["roomCode"] as string}";
         }
-        
+
         #region Button Control
-        
+
         private void SetStartButton()
         {
             if (PhotonNetwork.IsMasterClient)
@@ -78,38 +78,32 @@ namespace GameUI
             {
                 //host 아닌 경우 ready로 기능
                 _startButtonManager.buttonText = "READY";
-                OnClickStartButton += _localPanel.ReadyButtonClick;
+                OnClickStartButton += _clientPanel.ReadyButtonClick;
+                
+                _startButton.SetInteractable(true);
             }
         }
+
         #endregion
 
         #region Player Panel
-        
+
         public void SetPlayerPanel(Player player)
         {
             if (player.IsMasterClient)
             {
                 Debug.Log("master client / ui_room 에서 setpaleyrpanel 호출");
                 _hostPanel.SetData(player);
-                if (player.IsLocal)
-                {
-                    _localPanel = _hostPanel;
-                }
+                
             }
 
             else
             {
                 _clientPanel.SetData(player);
-                if (player.IsLocal)
-                {
-                    _localPanel = _clientPanel;
-                }
-                
+               
             }
-                
-            
         }
-        
+
         #endregion
 
         public void ResetPanel(Player player)
@@ -127,18 +121,19 @@ namespace GameUI
             _startButton.SetInteractable(false);
             _hostPanel.Reset();
             _clientPanel.Reset();
-            
         }
 
 
         public void UpdateStartButtonState(bool isAllReady)
         {
             if (!PhotonNetwork.IsMasterClient) return;
-            _startButton.SetInteractable(isAllReady);
+
+            _startButton.SetInteractable(PhotonNetwork.CountOfPlayersInRooms == 2 && isAllReady);
         }
 
-        public void UpdateReadyState(Player player)
+        public void UpdateReadyUI(Player player)
         {
+            var _localPanel = player.IsMasterClient ? _hostPanel : _clientPanel;
             _localPanel.ReadyCheck(player);
         }
     }

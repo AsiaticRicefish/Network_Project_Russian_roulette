@@ -42,6 +42,9 @@ namespace Utils
             NicknameSuccess,
             CreateRoomError,
             CreeateRoomSuccess,
+            RoomCodeError,
+            RoomCodeSuccess,
+            
             
         }
     }

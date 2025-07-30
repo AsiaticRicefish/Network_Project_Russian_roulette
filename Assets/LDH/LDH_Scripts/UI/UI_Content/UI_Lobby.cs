@@ -7,21 +7,28 @@ namespace GameUI
 {
     public class UI_Lobby : MonoBehaviour
     {
+        [Header("Manager")]
         [SerializeField] private NetworkManager _networkManager;
-
-        [SerializeField] private Button createRoomButton;
-        [SerializeField] private Button joinByCodeButton;
+      
         
         
+        [Header("Create Room")]
         [SerializeField] private ModalWindowManager createRoomPanel;
+        [SerializeField] private Button createRoomButton;
+        
+        [Header("Join By Code")]
         [SerializeField] private ModalWindowManager joinRoomPanel;
+        [SerializeField] private Button joinByCodeButton;
+       
+        [Header("Join")]
+        [SerializeField] private UI_ObservableButton joinButton;
 
+        
+        
         public ModalWindowManager CreateRoomPanel => createRoomPanel;
         public ModalWindowManager JoinRoomPanel => joinRoomPanel;
         
-        
-        [SerializeField] private UI_ObservableButton joinButton;
-        
+       
         private RoomList _selectedRoom;
         public RoomList SelectedRoom => _selectedRoom;
         
@@ -32,6 +39,7 @@ namespace GameUI
             joinButton.button.onClick.AddListener(OnClickJoin);
             
             createRoomButton.onClick.AddListener(createRoomPanel.OpenWindow);
+            joinByCodeButton.onClick.AddListener(joinRoomPanel.OpenWindow);
         }
         
         public void OnRoomSelected(RoomList selected)

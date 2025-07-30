@@ -915,6 +915,7 @@ GameObject:
   - component: {fileID: 3905451462137789929}
   - component: {fileID: 785295999117256024}
   - component: {fileID: 4629904354225536459}
+  - component: {fileID: 5315038583081745449}
   m_Layer: 5
   m_Name: UI_Lobby
   m_TagString: Untagged
@@ -985,6 +986,24 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
+--- !u!114 &5315038583081745449
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7638228819759611332}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f3fec2e3a9f14075987399c3ce3014f5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _networkManager: {fileID: 0}
+  createRoomButton: {fileID: 683898084755507494}
+  joinByCodeButton: {fileID: 0}
+  createRoomPanel: {fileID: 0}
+  joinRoomPanel: {fileID: 0}
+  joinButton: {fileID: 4455993558880865355}
 --- !u!1 &7950250535872174675
 GameObject:
   m_ObjectHideFlags: 0
@@ -1342,6 +1361,18 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5bccc645041cec04a8b3b2d55e4c92e6, type: 3}
+--- !u!114 &683898084755507494 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 114898504271726364, guid: 5bccc645041cec04a8b3b2d55e4c92e6,
+    type: 3}
+  m_PrefabInstance: {fileID: 641061715915247162}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!224 &862809266694852122 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 224285318650003488, guid: 5bccc645041cec04a8b3b2d55e4c92e6,

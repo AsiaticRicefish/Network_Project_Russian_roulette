@@ -25,7 +25,10 @@ public class RoomManager : MonoBehaviour
 
     public void InitRoom()
     {
-        _uiRoom.Init(GameStart, LeaveRoom);
+        if(PhotonNetwork.LocalPlayer.IsMasterClient)
+            _uiRoom.Init(GameStart, LeaveRoom);
+        else
+            _uiRoom.Init(null, LeaveRoom);
     }
 
     // 방장 및 모든 플레이어가 준비완료시 시작
@@ -41,8 +44,6 @@ public class RoomManager : MonoBehaviour
         {
             _uiRoom.ResetPanel(player);
         }
-        
-        _uiRoom.gameObject.SetActive(false); // room panel 비활성화
         PhotonNetwork.LeaveRoom(); // 방 나가기
     }
     
@@ -65,7 +66,7 @@ public class RoomManager : MonoBehaviour
     
     public void UpdateReadyUI(Player player)
     {
-        _uiRoom.UpdateReadyState(player);
+        _uiRoom.UpdateReadyUI(player);
         _uiRoom.UpdateStartButtonState(AllPlayerReadyCheck());
     }
     
@@ -75,7 +76,9 @@ public class RoomManager : MonoBehaviour
     {
         foreach (Player player in PhotonNetwork.PlayerList)
         {
-            if (!player.CustomProperties.TryGetValue("Ready", out object value) || !(bool)value)
+            bool ready = player.CustomProperties.TryGetValue("Ready", out object value) && (bool)value;
+            Debug.Log($"[ReadyCheck] {player.NickName} Ready = {ready}");
+            if (!ready)
                 return false;
         }
         return true;

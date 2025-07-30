@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Rendering.VirtualTexturing;
 using UnityEngine.UI;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 
@@ -21,10 +22,8 @@ public class PlayerPanel : MonoBehaviour
     [SerializeField] private Color _occupiedColor;
     
     
-    
     private bool isReady;
     
-    public void Start() => Init();
     private void Init()
     {
         Debug.Log("Init 호출.....");
@@ -67,7 +66,6 @@ public class PlayerPanel : MonoBehaviour
         // ready 상태 초기화 및 설정
         isReady = player.IsMasterClient;
         
-        
         ReadyPropertyUpdate();
         
     }
@@ -84,6 +82,7 @@ public class PlayerPanel : MonoBehaviour
     //준비상태 저장
     public void ReadyPropertyUpdate()
     {
+       
         ExitGames.Client.Photon.Hashtable playerProperty = new Hashtable();
         playerProperty["Ready"] = isReady;
         PhotonNetwork.LocalPlayer.SetCustomProperties(playerProperty);

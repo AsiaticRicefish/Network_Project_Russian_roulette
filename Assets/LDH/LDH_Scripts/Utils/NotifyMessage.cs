@@ -30,6 +30,9 @@ namespace Utils
             
             [NotifyMessageType.CreeateRoomSuccess] = new ("Room Created", "Your room has been successfully created.", NotifyType.Check),
             [NotifyMessageType.CreateRoomError] = new ("Failed to Create Room", "An error occurred while creating the room. Please try again.", NotifyType.Error),
+            
+            [NotifyMessageType.RoomCodeSuccess] = new ("Room Created", "Your room has been successfully created.", NotifyType.Check),
+            [NotifyMessageType.RoomCodeError] = new ("Failed to Create Room", "An error occurred while creating the room. Please try again.", NotifyType.Error),
         };
 
     }
