@@ -69,7 +69,7 @@ namespace Managers
             manager.AddComponent<SoundManager>();
             //manager.AddComponent<PlayerManager>();
             manager.AddComponent<UIManager>();
-            manager.AddComponent<ItemSyncManager>();
+            // manager.AddComponent<ItemSyncManager>();
         }
     }
 }

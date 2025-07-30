@@ -59,6 +59,7 @@ namespace GameUI
             {
                 Debug.Log($"[{GetType().Name}] 로그인에 성공하여 씬 이동합니다.");
                 SceneManager.LoadSceneAsync("Lobby");
+                
             }
             else
             {

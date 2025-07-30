@@ -34,5 +34,12 @@ namespace Utils
             Notify,
             Check,
         }
+        
+        public enum NotifyMessageType
+        {
+            NickNameError,
+            NickNameSuccess,
+            
+        }
     }
 }
