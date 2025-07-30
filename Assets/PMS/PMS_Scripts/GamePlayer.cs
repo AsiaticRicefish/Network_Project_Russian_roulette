@@ -88,9 +88,6 @@ public class GamePlayer : MonoBehaviour, IComparer<GamePlayer>
     {
         if (_pv.IsMine)
         {
-            // 자신의 GamePlayer 객체를 PlayerManager에 등록
-            PlayerManager.Instance.RegisterPlayer(this);  
-
             //테스트 코드
             //일단 지금 당장 순서 보장해주기 힘드니깐 정렬을 사용해보자
             StartCoroutine(PlayerListPirntDelay());           
