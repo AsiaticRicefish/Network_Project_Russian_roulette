@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -13,6 +14,7 @@ public class SpawnManager : MonoBehaviourPunCallbacks
 
     private Transform[] _allSpawnPoints;
 
+
     //여기까지는 모든 유저가 해도됨.
     private void Awake()
     {
@@ -23,6 +25,7 @@ public class SpawnManager : MonoBehaviourPunCallbacks
             return;
         }
         Instance = this;
+
 
         // 만약 Inspector에서 설정하지 않았다면, 여기에서 자식 Transform들을 스폰 포인트로 초기화
         if (_allSpawnPoints == null || _allSpawnPoints.Length == 0)
@@ -36,6 +39,16 @@ public class SpawnManager : MonoBehaviourPunCallbacks
             }
             _allSpawnPoints = children.ToArray();
             Debug.Log($"SpawnManager : {_allSpawnPoints.Length}개의 스폰포인트를 찾았습니다.");
+        }
+
+        if (PhotonNetwork.IsMasterClient)
+        {
+            Debug.Log("스폰 초기화");
+            InitializeAvailableSpawnPoints(); //마스터클라이언트만 룸 프로퍼티 스폰 초기화 
+        }
+        else
+        {
+            StartCoroutine(InitDelay());
         }
     }
 
@@ -162,5 +175,10 @@ public class SpawnManager : MonoBehaviourPunCallbacks
         props.Add(key, true);
         PhotonNetwork.CurrentRoom.SetCustomProperties(props);
         Debug.Log($"SpawnManager: Master Client returned spawn point index {spawnPointIndex}.");
+    }
+
+    private IEnumerator InitDelay()
+    {
+        yield return new WaitForSeconds(0.1f);
     }
 }
