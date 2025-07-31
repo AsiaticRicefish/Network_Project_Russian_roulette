@@ -3,10 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
-using System.IO;
-using UnityEngine.SceneManagement;
 
-//Player생성 관리 - 싱글톤
+//각자 Player 생성
 public class InGamePlayerManager : MonoBehaviour
 {
     public static InGamePlayerManager Instance;
@@ -33,22 +31,6 @@ public class InGamePlayerManager : MonoBehaviour
         _pv = GetComponent<PhotonView>();
     }
 
-    /*
-    public override void OnRoomPropertiesUpdate(ExitGames.Client.Photon.Hashtable propertiesThatChanged)
-    {
-        if (_pv.IsMine && 
-            propertiesThatChanged.ContainsKey(key) &&
-            (bool)propertiesThatChanged[key] == true)
-    }*/
-
-    private void Update()
-    {
-        /*
-        //스폰매니저가 초기화가 완료 됬고 InGame씬으로 넘어왔을 때
-        if (_pv.IsMine && SceneManager.GetActiveScene().name == "PMS_TestScene") // && SpawnManager.Instance.IsSpawnInitFinished == true)
-            CreateController();
-        */
-    }
 
     #region 마스터 클라이언트 기준 Spawn - 버그있음
     /*public void MasterClientSpawnAllPlayers()
@@ -128,75 +110,34 @@ public class InGamePlayerManager : MonoBehaviour
     #endregion
 
     //TODO - 리펙토링의 필요 - 다인전 할 때 생성 순서를 정해줘서 생성해야한다.
-    //<Before : 마스터 클라이언트 먼저 생성, After : 나머지 사람 생성> 구조 
     public void CreateController()
     {
-        if (!PhotonNetwork.IsMasterClient)
-        {
-            StartCoroutine(HeyWait());
-        }
-
         if (PhotonNetwork.IsMasterClient)
         {
-            (Transform playerSpawnPos, int playerSpawnIndex) = SpawnManager.Instance.GetAndClaimRandomSpawnPoint();
-
-            if (playerSpawnPos == null)
-            {
-                Debug.LogError("playerSpawnPos가 null입니다!");
-                return;
-            }
-
-            GameObject go = PhotonNetwork.Instantiate(Path.Combine("Prefabs", "PlayerConrtoller"), playerSpawnPos.position, Quaternion.identity);
-            GamePlayer player = go.GetComponent<GamePlayer>();
-
-            player._data = _playerData;
-            player._spawnPointindex = playerSpawnIndex;
-            //내가 만들었으니깐 다른 애들은 나에 대한 정보를 모름 알려줘야함.
-            player.SendMyPlayerDataRPC();
+            CreatePlayerNow();
+        }
+        else //마스터 클라이언트 이외 지연생성
+        {
+            StartCoroutine(HeyWait(0.1f));
         }
     }
 
-    private IEnumerator HeyWait()
+    private IEnumerator HeyWait(float delay)
     {
-        Debug.Log("잠시멈춤");
-        yield return new WaitForSeconds(1.0f);
-
-        (Transform playerSpawnPos, int playerSpawnIndex) = SpawnManager.Instance.GetAndClaimRandomSpawnPoint();
-
-        if (playerSpawnPos == null)
-        {
-            Debug.LogError("playerSpawnPos가 null입니다!");
-        }
-
-        GameObject go = PhotonNetwork.Instantiate(Path.Combine("Prefabs", "PlayerConrtoller"), playerSpawnPos.position, Quaternion.identity);
-        GamePlayer player = go.GetComponent<GamePlayer>();
-
-        player._data = _playerData;
-        player._spawnPointindex = playerSpawnIndex;
-        //내가 만들었으니깐 다른 애들은 나에 대한 정보를 모름 알려줘야함.
-        player.SendMyPlayerDataRPC();
+        yield return new WaitForSeconds(delay);
+        PlayerSpawn.CreateGamePlayerWithAutoSpawn(_playerData);
     }
 
-    //마스터 클라이언트 스폰 기준
-    /*private void CreateController()
+    private void CreatePlayerNow()
     {
-        foreach (Photon.Realtime.Player player in PhotonNetwork.PlayerList)
+        GameObject createdPlayer = PlayerSpawn.CreateGamePlayerWithAutoSpawn(_playerData);
+
+        if (createdPlayer == null)
         {
-            GameObject go = PhotonNetwork.Instantiate(Path.Combine("Prefabs", "PlayerConrtoller"), Vector3.zero, Quaternion.identity);
-            GamePlayer gp = go.GetComponent<GamePlayer>();
-            PlayerData pd = PlayerManager.Instance.GetFindPlayerDataFromID(PhotonNetwork.LocalPlayer.UserId);
-            //firebase아이디와,nickname을 가져오게 하는 함수가 필요할 것 같다.
-            if (pd != null)
-            {
-                gp.GetComponent<GamePlayer>()._data = pd;
-            }
-
-            PhotonView photonView = go.GetComponent<PhotonView>();
-            if (photonView != null && photonView.Owner != player)
-            {
-                photonView.TransferOwnership(player); // 생성 후 바로 해당 플레이어에게 소유권 이전
-            }
-
+            Debug.LogError("플레이어 생성에 실패");
+            return;
         }
-    }*/
+
+        Debug.Log($"플레이어 생성 성공 : {_playerData.nickname}");
+    }
 }

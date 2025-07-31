@@ -255,7 +255,24 @@ namespace Managers
         }
 
         #endregion
-        
 
+
+
+        #region API
+
+        public void ShowNotifyModal(Define_LDH.NotifyType notifyType, string title, string description)
+        {
+            var modal = SpawnPopupUI<UI_Modal>("UI_SlidingModal");
+            modal.SetContent(notifyType,title, description);
+            
+            modal.Show();
+        }
+
+        public void ShowNotifyModal(MessageEntity messageEntity)
+        {
+            ShowNotifyModal(messageEntity.NotifyType, messageEntity.Title, messageEntity.Description);
+        }
+
+        #endregion
     }
 }

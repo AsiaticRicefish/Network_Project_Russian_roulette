@@ -168,53 +168,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &216055859
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 216055860}
-  - component: {fileID: 216055861}
-  m_Layer: 0
-  m_Name: BGM
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &216055860
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 216055859}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 823.73505, y: 776.83075, z: -4.2227793}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &216055861
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 216055859}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d34535afa529142039385a855bd5a309, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _bgmList:
-  - {fileID: 8300000, guid: b6c4a4647cf1c42599775146da4c8e88, type: 3}
-  playFirstBgmOnStart: 1
 --- !u!1 &1189196024
 GameObject:
   m_ObjectHideFlags: 0
@@ -333,6 +286,53 @@ MonoBehaviour:
   m_LightCookieSize: {x: 1, y: 1}
   m_LightCookieOffset: {x: 0, y: 0}
   m_SoftShadowQuality: 0
+--- !u!1 &1399499270
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1399499272}
+  - component: {fileID: 1399499271}
+  m_Layer: 0
+  m_Name: BGM
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1399499271
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1399499270}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d34535afa529142039385a855bd5a309, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _bgmList:
+  - {fileID: 8300000, guid: 53e4c7a023fa042d5aaa316da5335ca2, type: 3}
+  playFirstBgmOnStart: 1
+--- !u!4 &1399499272
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1399499270}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 914.073, y: 366.8154, z: -7.879239}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1598758689
 GameObject:
   m_ObjectHideFlags: 0
@@ -566,7 +566,7 @@ PrefabInstance:
     - target: {fileID: 1190372325448884435, guid: d8f01fb388c664d4ab86ae1d31dea128,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 0
+      value: 132.62
       objectReference: {fileID: 0}
     - target: {fileID: 1190372325448884435, guid: d8f01fb388c664d4ab86ae1d31dea128,
         type: 3}
@@ -618,6 +618,36 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1301310405482134585, guid: d8f01fb388c664d4ab86ae1d31dea128,
+        type: 3}
+      propertyPath: clickSound
+      value: 
+      objectReference: {fileID: 8300000, guid: 887e6cd9fcf7d4d3198261cdad22d168, type: 3}
+    - target: {fileID: 1301310405482134585, guid: d8f01fb388c664d4ab86ae1d31dea128,
+        type: 3}
+      propertyPath: hoverSound
+      value: 
+      objectReference: {fileID: 8300000, guid: 1f1adc2dcd6884f8abbddb1e0ce43374, type: 3}
+    - target: {fileID: 1301310405482134585, guid: d8f01fb388c664d4ab86ae1d31dea128,
+        type: 3}
+      propertyPath: enableButtonSounds
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1301401281528557101, guid: d8f01fb388c664d4ab86ae1d31dea128,
+        type: 3}
+      propertyPath: clickSound
+      value: 
+      objectReference: {fileID: 8300000, guid: 887e6cd9fcf7d4d3198261cdad22d168, type: 3}
+    - target: {fileID: 1301401281528557101, guid: d8f01fb388c664d4ab86ae1d31dea128,
+        type: 3}
+      propertyPath: hoverSound
+      value: 
+      objectReference: {fileID: 8300000, guid: 1f1adc2dcd6884f8abbddb1e0ce43374, type: 3}
+    - target: {fileID: 1301401281528557101, guid: d8f01fb388c664d4ab86ae1d31dea128,
+        type: 3}
+      propertyPath: enableButtonSounds
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2036956648386001425, guid: d8f01fb388c664d4ab86ae1d31dea128,
         type: 3}
       propertyPath: m_AnchorMax.y
@@ -651,7 +681,7 @@ PrefabInstance:
     - target: {fileID: 2037104127552172397, guid: d8f01fb388c664d4ab86ae1d31dea128,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 0
+      value: 154.38
       objectReference: {fileID: 0}
     - target: {fileID: 2037104127552172397, guid: d8f01fb388c664d4ab86ae1d31dea128,
         type: 3}
@@ -708,6 +738,36 @@ PrefabInstance:
       propertyPath: _firebaseManager
       value: 
       objectReference: {fileID: 141990738}
+    - target: {fileID: 2220024824227736967, guid: d8f01fb388c664d4ab86ae1d31dea128,
+        type: 3}
+      propertyPath: clickSound
+      value: 
+      objectReference: {fileID: 8300000, guid: 887e6cd9fcf7d4d3198261cdad22d168, type: 3}
+    - target: {fileID: 2220024824227736967, guid: d8f01fb388c664d4ab86ae1d31dea128,
+        type: 3}
+      propertyPath: hoverSound
+      value: 
+      objectReference: {fileID: 8300000, guid: 1f1adc2dcd6884f8abbddb1e0ce43374, type: 3}
+    - target: {fileID: 2220024824227736967, guid: d8f01fb388c664d4ab86ae1d31dea128,
+        type: 3}
+      propertyPath: enableButtonSounds
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2220190682068549523, guid: d8f01fb388c664d4ab86ae1d31dea128,
+        type: 3}
+      propertyPath: clickSound
+      value: 
+      objectReference: {fileID: 8300000, guid: 887e6cd9fcf7d4d3198261cdad22d168, type: 3}
+    - target: {fileID: 2220190682068549523, guid: d8f01fb388c664d4ab86ae1d31dea128,
+        type: 3}
+      propertyPath: hoverSound
+      value: 
+      objectReference: {fileID: 8300000, guid: 1f1adc2dcd6884f8abbddb1e0ce43374, type: 3}
+    - target: {fileID: 2220190682068549523, guid: d8f01fb388c664d4ab86ae1d31dea128,
+        type: 3}
+      propertyPath: enableButtonSounds
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3992242923720794405, guid: d8f01fb388c664d4ab86ae1d31dea128,
         type: 3}
       propertyPath: m_AnchorMax.y
@@ -757,6 +817,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4322800704898096017, guid: d8f01fb388c664d4ab86ae1d31dea128,
+        type: 3}
+      propertyPath: buttonText
+      value: SIGN UP
+      objectReference: {fileID: 0}
+    - target: {fileID: 4322800704898096017, guid: d8f01fb388c664d4ab86ae1d31dea128,
+        type: 3}
+      propertyPath: soundSource
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 4566226641724947443, guid: d8f01fb388c664d4ab86ae1d31dea128,
         type: 3}
@@ -956,4 +1026,4 @@ SceneRoots:
   - {fileID: 1189196026}
   - {fileID: 4742310638212512264}
   - {fileID: 141990739}
-  - {fileID: 216055860}
+  - {fileID: 1399499272}

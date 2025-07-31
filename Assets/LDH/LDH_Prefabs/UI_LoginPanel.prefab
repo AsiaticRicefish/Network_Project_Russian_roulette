@@ -1156,9 +1156,9 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 1801272075633753235}
   - {fileID: 904132753149235811}
   - {fileID: 6359098072352711030}
-  - {fileID: 1801272075633753235}
   m_Father: {fileID: 8617864358940223398}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -2497,7 +2497,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.078431375, g: 0.09803922, b: 0.11764706, a: 0.5019608}
+  m_Color: {r: 0.078431375, g: 0.09803922, b: 0.11764706, a: 0.8509804}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
