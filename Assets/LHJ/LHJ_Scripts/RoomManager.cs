@@ -1,6 +1,8 @@
+using ExitGames.Client.Photon;
 using GameUI;
 using Photon.Pun;
 using Photon.Realtime;
+using System;
 using UnityEngine;
 
 public class RoomManager : MonoBehaviour
@@ -15,11 +17,12 @@ public class RoomManager : MonoBehaviour
         _uiRoom.OnClickStartButton -= GameStart;
         _uiRoom.OnClickLeaveButton -= LeaveRoom;
     }
+    
 
     // 개별 플레이어 패널 생성
     public void SetPlayerPanel(Player player)
     {
-        PhotonNetwork.AutomaticallySyncScene = true;
+       // PhotonNetwork.AutomaticallySyncScene = true;
         _uiRoom.SetPlayerPanel(player);
     }
 
@@ -40,10 +43,17 @@ public class RoomManager : MonoBehaviour
     
     public void LeaveRoom()
     {
-        foreach (var player in PhotonNetwork.PlayerList)
+        // foreach (var player in PhotonNetwork.PlayerList)
+        // {
+        //     _uiRoom.ResetPanel(player);
+        // }
+        ResetPlayerPanel(PhotonNetwork.LocalPlayer);
+        Hashtable playerProperty = new Hashtable
         {
-            _uiRoom.ResetPanel(player);
-        }
+            { "Ready", false }
+        };
+        PhotonNetwork.LocalPlayer.SetCustomProperties(playerProperty);
+        
         PhotonNetwork.LeaveRoom(); // 방 나가기
     }
     
@@ -55,13 +65,11 @@ public class RoomManager : MonoBehaviour
 
     public void SwitchMasterClient(Player newMaster)
     {
-        _uiRoom.ResetAllSetting();
+        InitRoom();
         foreach (Player player in PhotonNetwork.PlayerList)
         {
             SetPlayerPanel(player);
         }
-        
-        _uiRoom.UpdateStartButtonState(AllPlayerReadyCheck());
     }
     
     public void UpdateReadyUI(Player player)

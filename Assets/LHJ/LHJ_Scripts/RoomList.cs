@@ -1,6 +1,7 @@
 using GameUI;
 using Photon.Pun;
 using Photon.Realtime;
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -44,6 +45,7 @@ public class RoomList : MonoBehaviour
     /// <param name="lobby">소속 로비 UI</param>
     public void Init(RoomInfo info, UI_Lobby lobby)
     {
+        Debug.Log("roomlist init 호출 시점");
         //------ data 초기화 -----//
         _info = info;
         _lobby = lobby;
@@ -58,15 +60,17 @@ public class RoomList : MonoBehaviour
         statusText.text = "Waiting"; //todo: status Text (상태값을 동적으로 표시하기 위해서 커스텀 프로퍼티 추가해야 함)
         
         //---- 이벤트 등록 -----//
+        roomListButton.onClick.RemoveListener(SelectRoom);
         roomListButton.onClick.AddListener(SelectRoom);
     }
 
-    private void OnDestroy()
+    private void OnDisable()
     {
-        // 삭제 시 선택 해제 및 이벤트 제거
         _lobby.OnRoomSelected(null);
         roomListButton.onClick.RemoveListener(SelectRoom);
     }
+    
+    
     
     /// <summary>
     /// 해당 방 입장

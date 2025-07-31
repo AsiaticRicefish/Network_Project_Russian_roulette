@@ -22,11 +22,10 @@ public class PlayerPanel : MonoBehaviour
     [SerializeField] private Color _occupiedColor;
     
     
-    private bool isReady;
+    private Player _player;
     
     private void Init()
     {
-        Debug.Log("Init 호출.....");
         nicknameText.text = "Waiting...";
         readyText?.gameObject.SetActive(false);
         
@@ -38,20 +37,19 @@ public class PlayerPanel : MonoBehaviour
         
         _image.color = _emptyColor;
         
-        isReady = false;
     }
 
     public void Reset()
     {
         Init();
-        ReadyPropertyUpdate();
     }
     
 
     // 플레이어 UI 초기화
     public void SetData(Player player)
     {
-        Debug.Log(player.NickName);
+        _player = player;
+        
         // 닉네임 설정
         nicknameText.text = player.NickName;
         
@@ -61,36 +59,45 @@ public class PlayerPanel : MonoBehaviour
             _rawImage.gameObject.SetActive(true);
             _waitingText.SetActive(false);
         }
+        else
+        {
+            if (player.IsLocal)
+            {
+                ReadyPropertyUpdate(true);
+            }
+        }
         _image.color = _occupiedColor;
         
-        // ready 상태 초기화 및 설정
-        isReady = player.IsMasterClient;
         
-        ReadyPropertyUpdate();
+        ReadyCheck(player);
+        
         
     }
 
     // 준비버튼 클릭 함수
     public void ReadyButtonClick()
     {
-        isReady = !isReady;
-        readyText?.gameObject.SetActive(isReady);
-
-       
-        ReadyPropertyUpdate();
+        if (_player != null && _player.IsLocal)
+        {
+            bool isReady = _player.CustomProperties.TryGetValue("Ready", out object value) && (bool)value;
+            ReadyPropertyUpdate(!isReady);
+        }
     }
     //준비상태 저장
-    public void ReadyPropertyUpdate()
+    public void ReadyPropertyUpdate(bool value)
     {
-       
-        ExitGames.Client.Photon.Hashtable playerProperty = new Hashtable();
-        playerProperty["Ready"] = isReady;
+        Hashtable playerProperty = new Hashtable
+        {
+            { "Ready", value }
+        };
         PhotonNetwork.LocalPlayer.SetCustomProperties(playerProperty);
     }
 
     // 다른 플레이어 준비 상태 체크
     public void ReadyCheck(Player player)
     {
+        if (player == null) return;
+
         if (player.CustomProperties.TryGetValue("Ready", out object value))
         {
             readyText?.gameObject.SetActive((bool)value);

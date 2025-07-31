@@ -1,4 +1,5 @@
 using Michsky.UI.ModernUIPack;
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -42,6 +43,7 @@ namespace GameUI
             joinByCodeButton.onClick.AddListener(joinRoomPanel.OpenWindow);
         }
         
+
         public void OnRoomSelected(RoomList selected)
         {
             _selectedRoom = selected;

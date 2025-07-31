@@ -43,6 +43,7 @@ namespace Utils
             CreateRoomError,
             CreeateRoomSuccess,
             RoomCodeError,
+            RoomCodeEmpty,
             RoomCodeSuccess,
             
             

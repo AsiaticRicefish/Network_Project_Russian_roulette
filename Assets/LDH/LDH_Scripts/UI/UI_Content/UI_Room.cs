@@ -71,13 +71,14 @@ namespace GameUI
             if (PhotonNetwork.IsMasterClient)
             {
                 // host인 경우 start button으로 기능
-                _startButtonManager.buttonText = "START";
+                UpdateStartButtonText("START");
+                
             }
 
             else
             {
                 //host 아닌 경우 ready로 기능
-                _startButtonManager.buttonText = "READY";
+                UpdateStartButtonText("READY");
                 OnClickStartButton += _clientPanel.ReadyButtonClick;
                 
                 _startButton.SetInteractable(true);
@@ -92,7 +93,6 @@ namespace GameUI
         {
             if (player.IsMasterClient)
             {
-                Debug.Log("master client / ui_room 에서 setpaleyrpanel 호출");
                 _hostPanel.SetData(player);
                 
             }
@@ -128,13 +128,19 @@ namespace GameUI
         {
             if (!PhotonNetwork.IsMasterClient) return;
 
-            _startButton.SetInteractable(PhotonNetwork.CountOfPlayersInRooms == 2 && isAllReady);
+            _startButton.SetInteractable(PhotonNetwork.CurrentRoom.PlayerCount == 2 && isAllReady);
         }
 
         public void UpdateReadyUI(Player player)
         {
             var _localPanel = player.IsMasterClient ? _hostPanel : _clientPanel;
             _localPanel.ReadyCheck(player);
+        }
+
+        public void UpdateStartButtonText(string text)
+        {
+            _startButtonManager.buttonText = text;
+            _startButtonManager.UpdateUI();
         }
     }
 }

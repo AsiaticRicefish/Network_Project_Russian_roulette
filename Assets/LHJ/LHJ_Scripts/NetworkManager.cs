@@ -95,13 +95,11 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     {
         if (loadingPanel.activeSelf)
         {
-            Debug.Log("Onconnected to master : loadingpanel active is true");
             loadingPanel.SetActive(false);
             _uiNicknamePanel.SetActive(true);     // 닉네임 panel 활성화(open window)
         }
         else
         {
-            Debug.Log("Onconnected to master : loadingpanel active is false");
             PhotonNetwork.JoinLobby();  // 로비로 진입
             roomPanel.SetActive(false);
         }
@@ -124,6 +122,10 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     // 닉네임 설정 및 로비진입
     public void NicknameAdmit()
     {
+        // 닉네임 이미 설정
+        if (!string.IsNullOrEmpty(PhotonNetwork.NickName))
+            return;
+        
         if (string.IsNullOrWhiteSpace(nicknameField.text))
         {
             Manager.UI.ShowNotifyModal(NotifyMessage.MessageEntities[NotifyMessageType.NicknameError]);     // ui modal
@@ -240,7 +242,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         
         if (retryCount >= 5)
         {
-            Debug.LogError("방 코드 중복으로 인해 방 생성 실패");
+            Debug.LogError("[GenerateRoomCode] 방 코드 중복으로 인해 방 생성 실패");
             return (null, null);
         }
         
@@ -254,7 +256,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         // 3. 중복 확인
         if (CheckRoomCodeDuplicate(roomCode))
         {
-            Debug.LogWarning($"[GenerateRoomIdentifiers] 중복 코드: {roomCode}, 재시도...");
+            Debug.LogWarning($"[GenerateRoomCode] 중복 코드: {roomCode}, 재시도...");
             GenerateRoomCode(length, retryCount + 1);
         }
 
@@ -281,7 +283,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         string roomCode = codeInputField.text.Trim().ToUpper();
         if (string.IsNullOrEmpty(roomCode))
         {
-            Manager.UI.ShowNotifyModal(NotifyMessage.MessageEntities[NotifyMessageType.RoomCodeError]);
+            Manager.UI.ShowNotifyModal(NotifyMessage.MessageEntities[NotifyMessageType.RoomCodeEmpty]);
             return;
         }
 
@@ -356,7 +358,11 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
     public override void OnMasterClientSwitched(Player newMasterClient)
     {
-        roomManager.SwitchMasterClient(newMasterClient);
+        if (newMasterClient.IsLocal)
+        {
+            roomManager.SwitchMasterClient(newMasterClient);
+        }
+     
     }
     
     public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)

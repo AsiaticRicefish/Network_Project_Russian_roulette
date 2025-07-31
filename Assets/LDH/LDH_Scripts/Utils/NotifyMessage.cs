@@ -31,8 +31,20 @@ namespace Utils
             [NotifyMessageType.CreeateRoomSuccess] = new ("Room Created", "Your room has been successfully created.", NotifyType.Check),
             [NotifyMessageType.CreateRoomError] = new ("Failed to Create Room", "An error occurred while creating the room. Please try again.", NotifyType.Error),
             
-            [NotifyMessageType.RoomCodeSuccess] = new ("Room Created", "Your room has been successfully created.", NotifyType.Check),
-            [NotifyMessageType.RoomCodeError] = new ("Failed to Create Room", "An error occurred while creating the room. Please try again.", NotifyType.Error),
+            [NotifyMessageType.RoomCodeSuccess] = new MessageEntity(
+                "Room Joined", 
+                "Successfully joined the room using the code.", NotifyType.Check
+            ),
+
+            [NotifyMessageType.RoomCodeError] = new MessageEntity(
+                "Invalid Code", 
+                "No room was found with the entered code. Please check and try again.", NotifyType.Error
+            ),
+
+            [NotifyMessageType.RoomCodeEmpty] = new MessageEntity(
+                "Empty Code", 
+                "Please enter a room code before proceeding.", NotifyType.Error
+            ),
         };
 
     }
