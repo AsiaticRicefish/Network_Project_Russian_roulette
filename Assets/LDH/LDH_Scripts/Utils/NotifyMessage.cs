@@ -20,10 +20,19 @@ namespace Utils
     
     public class NotifyMessage
     {
-       
-
         public static readonly Dictionary<NotifyMessageType, MessageEntity> MessageEntities = new Dictionary<NotifyMessageType, MessageEntity>
         {
+            [NotifyMessageType.SignupSuccess] = new ("Sign Up Successful", "Your account has been created. Welcome!", NotifyType.Check),
+            [NotifyMessageType.SignupError] = new ("Sign Up Failed", "Something went wrong. Please try again.", NotifyType.Error),
+            
+            [NotifyMessageType.EmailCheckSuccess] = new ("Valid Email", "Your email is valid.", NotifyType.Check),
+            [NotifyMessageType.EmailCheckError] = new ("Invalid Email", "Your email is invalid.", NotifyType.Error),
+
+            
+            [NotifyMessageType.LoginSuccess] = new ("Nickname Set", "You're now ready to join the lobby.", NotifyType.Check),
+            [NotifyMessageType.LoginError] = new ("Login Failed", "Invalid email or password.", NotifyType.Error),
+            
+            
             [NotifyMessageType.NicknameSuccess] = new ("Nickname Set", "You're now ready to join the lobby.", NotifyType.Check),
             [NotifyMessageType.NicknameError] = new ("Invalid Nickname", "Please enter a valid nickname.", NotifyType.Error),
             

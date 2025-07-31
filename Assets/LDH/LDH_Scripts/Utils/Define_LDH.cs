@@ -38,6 +38,12 @@ namespace Utils
         
         public enum NotifyMessageType
         {
+            SignupSuccess,
+            SignupError,
+            EmailCheckSuccess,
+            EmailCheckError,
+            LoginSuccess,
+            LoginError,
             NicknameError,
             NicknameSuccess,
             CreateRoomError,
@@ -45,6 +51,7 @@ namespace Utils
             RoomCodeError,
             RoomCodeEmpty,
             RoomCodeSuccess,
+            
             
             
         }

@@ -311,7 +311,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         }
         
         
-        roomNameAdmitButton.interactable = false;
+        codeJoinButton.interactable = false;
 
     }
    

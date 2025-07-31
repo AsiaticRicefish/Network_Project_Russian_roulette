@@ -31,7 +31,7 @@ namespace GameUI
         
         
         private ModalWindowManager _loginModal;
-
+        private bool isLogined = false;
 
         private void Awake() => Init();
         private void Start() => Subscribe();
@@ -54,9 +54,13 @@ namespace GameUI
         public void OnLoginConfirm()
         {
             //todo: 로그인 로직과 연결 필요
-
+            if(isLogined) return;
             if (_isSuccess)
             {
+                isLogined = true;
+                Manager.UI.ShowNotifyModal(NotifyMessage.MessageEntities[Define_LDH.NotifyMessageType.LoginSuccess]);
+                
+                
                 Debug.Log($"[{GetType().Name}] 로그인에 성공하여 씬 이동합니다.");
                 SceneManager.LoadSceneAsync("Lobby");
                 
@@ -64,31 +68,11 @@ namespace GameUI
             else
             {
                 Debug.Log($"[{GetType().Name}] 로그인 실패");
-                ShowModal(failType, _failTitle, _failMessage);
+                Manager.UI.ShowNotifyModal(NotifyMessage.MessageEntities[Define_LDH.NotifyMessageType.LoginError]);
             }
         }
 
 
-        /// <summary>
-        /// 모달 생성 및 표시
-        /// </summary>
-        private void ShowModal(Define_LDH.NotifyType type, string title, string description)
-        {
-            UI_Modal modal = Manager.UI.SpawnPopupUI<UI_Modal>("UI_SlidingModal");
-            
-            //content 데이터 설정
-            modal.SetContent(type, title, description);
-
-            RectTransform modalRect = modal.GetComponent<RectTransform>();
-            
-            //rect transform 설정
-            Util_LDH.SetRightBottom(modalRect, modalRect.rect.size, new Vector2(_offset.x, _offset.y));
-            
-            //모달 보이게
-            modal.Show();
-        }
-        
-        
         /// <summary>
         /// 입력값 초기화
         /// </summary>
@@ -105,6 +89,33 @@ namespace GameUI
             _passwordField.gameObject.SetActive(true);
             
         }
+
+
+        #region Legacy
+
+        
+        // /// <summary>
+        // /// 모달 생성 및 표시
+        // /// </summary>
+        // private void ShowModal(Define_LDH.NotifyType type, string title, string description)
+        // {
+        //     UI_Modal modal = Manager.UI.SpawnPopupUI<UI_Modal>("UI_SlidingModal");
+        //     
+        //     //content 데이터 설정
+        //     modal.SetContent(type, title, description);
+        //
+        //     RectTransform modalRect = modal.GetComponent<RectTransform>();
+        //     
+        //     //rect transform 설정
+        //     Util_LDH.SetRightBottom(modalRect, modalRect.rect.size, new Vector2(_offset.x, _offset.y));
+        //     
+        //     //모달 보이게
+        //     modal.Show();
+        // }
+        //
+        //
+
+        #endregion
         
     }
 }
