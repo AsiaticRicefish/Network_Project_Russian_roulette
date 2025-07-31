@@ -3,10 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
-using System.IO;
-using UnityEngine.SceneManagement;
 
-//Player생성 관리 - 싱글톤
+//각자 Player 생성
 public class InGamePlayerManager : MonoBehaviour
 {
     public static InGamePlayerManager Instance;
@@ -112,52 +110,34 @@ public class InGamePlayerManager : MonoBehaviour
     #endregion
 
     //TODO - 리펙토링의 필요 - 다인전 할 때 생성 순서를 정해줘서 생성해야한다.
-    //<Before : 마스터 클라이언트 먼저 생성, After : 나머지 사람 생성> 구조 
     public void CreateController()
     {
-        if (!PhotonNetwork.IsMasterClient)
-        {
-            StartCoroutine(HeyWait());
-        }
-
         if (PhotonNetwork.IsMasterClient)
         {
-            (Transform playerSpawnPos, int playerSpawnIndex) = SpawnManager.Instance.GetAndClaimRandomSpawnPoint();
-
-            if (playerSpawnPos == null)
-            {
-                Debug.LogError("playerSpawnPos가 null입니다!");
-                return;
-            }
-
-            GameObject go = PhotonNetwork.Instantiate(Path.Combine("Prefabs", "PlayerConrtoller"), playerSpawnPos.position, Quaternion.identity);
-            GamePlayer player = go.GetComponent<GamePlayer>();
-
-            player._data = _playerData;
-            player._spawnPointindex = playerSpawnIndex;
-            //내가 만들었으니깐 다른 애들은 나에 대한 정보를 모름 알려줘야함.
-            player.SendMyPlayerDataRPC();
+            CreatePlayerNow();
+        }
+        else //마스터 클라이언트 이외 지연생성
+        {
+            StartCoroutine(HeyWait(0.1f));
         }
     }
 
-    private IEnumerator HeyWait()
+    private IEnumerator HeyWait(float delay)
     {
-        Debug.Log("잠시멈춤");
-        yield return new WaitForSeconds(1.0f);
+        yield return new WaitForSeconds(delay);
+        PlayerSpawn.CreateGamePlayerWithAutoSpawn(_playerData);
+    }
 
-        (Transform playerSpawnPos, int playerSpawnIndex) = SpawnManager.Instance.GetAndClaimRandomSpawnPoint();
+    private void CreatePlayerNow()
+    {
+        GameObject createdPlayer = PlayerSpawn.CreateGamePlayerWithAutoSpawn(_playerData);
 
-        if (playerSpawnPos == null)
+        if (createdPlayer == null)
         {
-            Debug.LogError("playerSpawnPos가 null입니다!");
+            Debug.LogError("플레이어 생성에 실패");
+            return;
         }
 
-        GameObject go = PhotonNetwork.Instantiate(Path.Combine("Prefabs", "PlayerConrtoller"), playerSpawnPos.position, Quaternion.identity);
-        GamePlayer player = go.GetComponent<GamePlayer>();
-
-        player._data = _playerData;
-        player._spawnPointindex = playerSpawnIndex;
-        //내가 만들었으니깐 다른 애들은 나에 대한 정보를 모름 알려줘야함.
-        player.SendMyPlayerDataRPC();
+        Debug.Log($"플레이어 생성 성공 : {_playerData.nickname}");
     }
 }

@@ -90,26 +90,10 @@ public class GamePlayer : MonoBehaviour, IComparer<GamePlayer>
         {
             //테스트 코드
             //일단 지금 당장 순서 보장해주기 힘드니깐 정렬을 사용해보자
-            StartCoroutine(PlayerListPirntDelay());           
+            StartCoroutine(PlayerListSortDelay());           
             Initialize();
         }
     }
-
-    private void Update()
-    {
-        //테스트 코드
-        if (_pv.IsMine && Input.GetKeyDown(KeyCode.Space))
-        {
-            PlayerManager.Instance.PrintPlayerList();
-            CurrentHp -= 1;
-        }
-        if (_pv.IsMine && Input.GetKeyDown(KeyCode.X))
-        {
-            MaxHp -= 1;
-        }
-    }
-
-    //플레이어 생성 -> 게임 매니저에 있어야할 것같은데
 
     public void Initialize()
     {
@@ -202,7 +186,7 @@ public class GamePlayer : MonoBehaviour, IComparer<GamePlayer>
         return x._spawnPointindex.CompareTo(y._spawnPointindex);
     }
 
-    private IEnumerator PlayerListPirntDelay()
+    private IEnumerator PlayerListSortDelay()
     {
         yield return new WaitForSeconds(0.1f);
         PlayerManager.Instance._playerList.Sort(Compare);
