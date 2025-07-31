@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 
 public class SceneInit : MonoBehaviour
 {
-    [SerializeField] private string playerPrefabName = "PlayerTest";
+    [SerializeField] private string playerPrefabName;
 
     [SerializeField] private Transform[] spawnPoints;
 
@@ -36,19 +36,31 @@ public class SceneInit : MonoBehaviour
         Vector3 spawnPos = spawnPoints.Length > actorIndex ? spawnPoints[actorIndex].position : Vector3.zero;
 
         var obj = PhotonNetwork.Instantiate(playerPrefabName, spawnPos, Quaternion.identity);
-        Debug.Log($"[SceneInit] 플레이어 소환: {obj.name}");
 
         // 회전 적용
         Vector3 dir = (tableCenter.position - obj.transform.position).normalized;
         dir.y = 0f;
         obj.transform.rotation = Quaternion.LookRotation(dir);
-        Debug.Log($"[SceneInit] {obj.name}이 테이블 방향으로 회전됨");
 
-        // 카메라 회전 보정
-        Camera cam = obj.GetComponentInChildren<Camera>();
-        if (cam != null)
+        // GamePlayer 데이터 전달
+        GamePlayer gp = obj.GetComponent<GamePlayer>();
+        if (gp != null && gp.GetComponent<PhotonView>().IsMine)
         {
-            cam.transform.rotation = Quaternion.LookRotation((tableCenter.position - cam.transform.position).normalized);
+            // 여기에 실제 닉네임과 Firebase UID로 교체
+            string nickname = PhotonNetwork.NickName;
+            string playerId = PhotonNetwork.LocalPlayer.UserId;
+            int win = 0;
+            int lose = 0;
+
+            gp._data = new PlayerData(nickname, playerId, win, lose);
+            gp.SendMyPlayerDataRPC();  // 모든 클라이언트에 브로드캐스트
+
+            // 카메라 회전 보정
+            Camera cam = obj.GetComponentInChildren<Camera>();
+            if (cam != null)
+            {
+                cam.transform.rotation = Quaternion.LookRotation((tableCenter.position - cam.transform.position).normalized);
+            }
         }
     }
 }

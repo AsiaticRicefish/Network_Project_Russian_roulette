@@ -25,6 +25,7 @@ namespace Utils
         {
             UI_Setting,
             UI_InventoryInfo,
+            UI_Shortcut,
         }
         
         public enum NotifyType
@@ -33,6 +34,27 @@ namespace Utils
             Help,
             Notify,
             Check,
+        }
+        
+        public enum NotifyMessageType
+        {
+            SignupSuccess,
+            SignupError,
+            EmailCheckSuccess,
+            EmailCheckError,
+            LoginSuccess,
+            LoginError,
+            NicknameError,
+            NicknameSuccess,
+            CreateRoomError,
+            CreeateRoomSuccess,
+            RoomCodeError,
+            RoomCodeEmpty,
+            RoomCodeSuccess,
+            JoinRoomError,
+            
+            
+            
         }
     }
 }

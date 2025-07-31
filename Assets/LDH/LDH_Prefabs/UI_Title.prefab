@@ -888,6 +888,21 @@ PrefabInstance:
       propertyPath: buttonText
       value: LOG IN
       objectReference: {fileID: 0}
+    - target: {fileID: 114057832110388272, guid: 69a688479fbdc954491fe244abdaf6fd,
+        type: 3}
+      propertyPath: clickSound
+      value: 
+      objectReference: {fileID: 8300000, guid: 887e6cd9fcf7d4d3198261cdad22d168, type: 3}
+    - target: {fileID: 114057832110388272, guid: 69a688479fbdc954491fe244abdaf6fd,
+        type: 3}
+      propertyPath: hoverSound
+      value: 
+      objectReference: {fileID: 8300000, guid: 1f1adc2dcd6884f8abbddb1e0ce43374, type: 3}
+    - target: {fileID: 114057832110388272, guid: 69a688479fbdc954491fe244abdaf6fd,
+        type: 3}
+      propertyPath: enableButtonSounds
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 114616423459764524, guid: 69a688479fbdc954491fe244abdaf6fd,
         type: 3}
       propertyPath: m_text
@@ -1232,7 +1247,7 @@ PrefabInstance:
     - target: {fileID: 2595197458621574047, guid: 9b7f58b52b5db463cb00e30020fa7e5d,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 154.38
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2595197458621574047, guid: 9b7f58b52b5db463cb00e30020fa7e5d,
         type: 3}
@@ -1297,11 +1312,6 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1645064954825036, guid: 69a688479fbdc954491fe244abdaf6fd, type: 3}
       propertyPath: m_Name
-      value: SIGN UP
-      objectReference: {fileID: 0}
-    - target: {fileID: 114057832110388272, guid: 69a688479fbdc954491fe244abdaf6fd,
-        type: 3}
-      propertyPath: buttonText
       value: SIGN UP
       objectReference: {fileID: 0}
     - target: {fileID: 114616423459764524, guid: 69a688479fbdc954491fe244abdaf6fd,
@@ -1515,6 +1525,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 9052866765888617946}
     m_Modifications:
+    - target: {fileID: 5981005527872546113, guid: f5070a3a5fdc64c0ba2e2bb9e2417d41,
+        type: 3}
+      propertyPath: _isSuccess
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8395159397545454034, guid: f5070a3a5fdc64c0ba2e2bb9e2417d41,
         type: 3}
       propertyPath: m_Name
@@ -1663,7 +1678,7 @@ PrefabInstance:
     - target: {fileID: 8618620453240633942, guid: f5070a3a5fdc64c0ba2e2bb9e2417d41,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 132.62
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8618620453240633942, guid: f5070a3a5fdc64c0ba2e2bb9e2417d41,
         type: 3}
@@ -1717,6 +1732,21 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 114057832110388272, guid: 69a688479fbdc954491fe244abdaf6fd,
         type: 3}
+      propertyPath: clickSound
+      value: 
+      objectReference: {fileID: 8300000, guid: 887e6cd9fcf7d4d3198261cdad22d168, type: 3}
+    - target: {fileID: 114057832110388272, guid: 69a688479fbdc954491fe244abdaf6fd,
+        type: 3}
+      propertyPath: hoverSound
+      value: 
+      objectReference: {fileID: 8300000, guid: 1f1adc2dcd6884f8abbddb1e0ce43374, type: 3}
+    - target: {fileID: 114057832110388272, guid: 69a688479fbdc954491fe244abdaf6fd,
+        type: 3}
+      propertyPath: enableButtonSounds
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114057832110388272, guid: 69a688479fbdc954491fe244abdaf6fd,
+        type: 3}
       propertyPath: clickEvent.m_PersistentCalls.m_Calls.Array.size
       value: 0
       objectReference: {fileID: 0}
@@ -1733,7 +1763,7 @@ PrefabInstance:
     - target: {fileID: 114616423459764524, guid: 69a688479fbdc954491fe244abdaf6fd,
         type: 3}
       propertyPath: m_text
-      value: LOG IN
+      value: SETTING
       objectReference: {fileID: 0}
     - target: {fileID: 114616423459764524, guid: 69a688479fbdc954491fe244abdaf6fd,
         type: 3}
@@ -1878,7 +1908,7 @@ PrefabInstance:
     - target: {fileID: 6539934887162321517, guid: 69a688479fbdc954491fe244abdaf6fd,
         type: 3}
       propertyPath: m_text
-      value: LOG IN
+      value: SETTING
       objectReference: {fileID: 0}
     - target: {fileID: 6539934887162321517, guid: 69a688479fbdc954491fe244abdaf6fd,
         type: 3}

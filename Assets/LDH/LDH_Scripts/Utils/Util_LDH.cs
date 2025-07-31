@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using Object = UnityEngine.Object;
 
 namespace Utils
@@ -182,6 +183,11 @@ namespace Utils
         }
         
         #endregion
+
+        public static void SetImageRaycastTarget(Image image, bool isOn)
+        {
+            image.raycastTarget = isOn;
+        }
     }
     
 }

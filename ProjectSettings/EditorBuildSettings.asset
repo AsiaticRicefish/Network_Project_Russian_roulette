@@ -15,12 +15,15 @@ EditorBuildSettings:
     path: Assets/CYE/CYE_Scene/Gameflow/CYE_AnteroomScene.unity
     guid: a137d9330af8ead47ae4a51386cf2a3c
   - enabled: 1
-    path: Assets/LTH/LTH_Scenes/LTH_StartScene.unity
-    guid: 664553e4d2586a5419f7d87b1fab00aa
-  - enabled: 1
     path: Assets/LDH/LDH_Scenes/Lobby.unity
-    guid: 4c28858d9fe4d4f3da0b33f6e9c9e890
+    guid: a11e020c7b6104952b62a0a490d7b612
+  - enabled: 1
+    path: Assets/LTH/LTH_Scenes/LTH_LobbyScene.unity
+    guid: 35edf0f295337c94eaa5200ec0ece6aa
   - enabled: 1
     path: Assets/LTH/LTH_Scenes/LTH_GameScene.unity
     guid: ede080dae4fb03b4ba964ec47515be69
+  - enabled: 1
+    path: Assets/LDH/LDH_Scenes/Title.unity
+    guid: 45feb7dd9699f4340977124f734f2e41
   m_configObjects: {}

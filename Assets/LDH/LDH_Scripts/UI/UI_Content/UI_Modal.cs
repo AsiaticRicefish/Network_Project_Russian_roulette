@@ -12,9 +12,25 @@ namespace GameUI
         [Header("Manager")]
          [SerializeField] private NotificationManager _notification;
          [SerializeField] private UIManagerNotification _uiManagerNotification;
+
+
+         [Header("Canvas Order")] [SerializeField]
+         private int canvasOrder = 100;
          
 
-        //모달 ui를 실제로 show하려면 이 메서드 호출
+         protected override void Init()
+         {
+             base.Init();
+             
+             //모달은 가장 상위에 뜨도록 order를 추가 설정
+             
+             Canvas canvas = GetComponent<Canvas>();
+
+             canvas.sortingOrder = canvas.sortingOrder + canvasOrder;
+
+         }
+
+         //모달 ui를 실제로 show하려면 이 메서드 호출
         public override void Show()
         {
             base.Show();

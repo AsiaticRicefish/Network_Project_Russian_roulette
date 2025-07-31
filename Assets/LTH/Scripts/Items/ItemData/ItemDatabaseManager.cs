@@ -17,7 +17,7 @@ public class ItemDatabaseManager : Singleton<ItemDatabaseManager>
 
         foreach (var item in allItems)
         {
-            if (!itemDict.ContainsKey(item.itemId))
+            if (item.itemId!=null && !itemDict.ContainsKey(item.itemId))
                 itemDict.Add(item.itemId, item);
         }
     }
