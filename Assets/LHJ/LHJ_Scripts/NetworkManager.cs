@@ -64,6 +64,8 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     
     private void Init()
     {
+        PhotonNetwork.AutomaticallySyncScene = true; 
+        
         _uiNicknamePanel = nicknamePanel.GetComponent<UI_Nickname>();
         _uiLobby = lobbyPanel.GetComponent<UI_Lobby>();
         
