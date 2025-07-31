@@ -10,15 +10,14 @@ public class SpawnManager : MonoBehaviourPunCallbacks
     public static SpawnManager Instance;
 
     //룸에서 사용되는 룸 프로퍼티 접두사
-    public const string SP_KEY_PREFIX = "SpawnPoint_";      //S
+    public const string SP_KEY_PREFIX = "SpawnPoint_";   
 
+    //모든 스폰 Spawn를 담을 배열
     private Transform[] _allSpawnPoints;
 
-
-    //여기까지는 모든 유저가 해도됨.
     private void Awake()
     {
-        //방마다 존재 + 초반 게임 시작후 자리 배정할 때만 사용
+        //inGame에서만 존재
         if (Instance != null)
         {
             Destroy(gameObject);
@@ -26,13 +25,10 @@ public class SpawnManager : MonoBehaviourPunCallbacks
         }
         Instance = this;
 
-
-        // 만약 Inspector에서 설정하지 않았다면, 여기에서 자식 Transform들을 스폰 포인트로 초기화
+        // 만약 Inspector에서 설정하지 않을시 자식 Transform 자동 추가
         if (_allSpawnPoints == null || _allSpawnPoints.Length == 0)
         {
-            // SpawnManager 자식 객체들을 스폰 포인트로 사용
             List<Transform> children = new List<Transform>();
-            //해당 foreach문은 직계 자식들의 transform만 순회
             foreach (Transform child in transform)
             {
                 children.Add(child);
@@ -43,8 +39,7 @@ public class SpawnManager : MonoBehaviourPunCallbacks
 
         if (PhotonNetwork.IsMasterClient)
         {
-            Debug.Log("스폰 초기화");
-            InitializeAvailableSpawnPoints(); //마스터클라이언트만 룸 프로퍼티 스폰 초기화 
+            InitializeAvailableSpawnPoints(); 
         }
         else
         {
@@ -66,34 +61,24 @@ public class SpawnManager : MonoBehaviourPunCallbacks
 
         for (int i = 0; i < _allSpawnPoints.Length; i++)
         {
-            // 각 스폰 지점의 상태를 "사용 가능" (true)으로 설정하여 Hashtable에 추가       
+            // 각 스폰 지점의 상태를 사용 가능 (true)으로 설정하여 Hashtable에 추가       
             customProperties.Add(SP_KEY_PREFIX + i.ToString(), true);
-            Debug.Log(SP_KEY_PREFIX + i);
+            //Debug.Log(SP_KEY_PREFIX + i);
         }
         // 설정된 프로퍼티를 현재 방에 적용 -> 모든 클라이언트에 동기화
         PhotonNetwork.CurrentRoom.SetCustomProperties(customProperties);
 
-        Debug.Log($"SpawnManager: Initialized {customProperties.Count} spawn point properties in room.");
-
-        /*foreach(var c in customProperties)
-        {
-            Debug.Log($"key : {c.Key}, value : {c.Value} ,");
-        }*/
+        //Debug.Log($"SpawnManager: Initialized {customProperties.Count} spawn point properties in room.");
     }
 
     /// <summary>
-    /// 마스터 클라이언트에서만 호출, 사용 가능한 스폰 지점 중 하나를 선택하고,
-    /// 룸 프로퍼티에서 해당 지점을 사용중 false로 설정
+    /// 모든 클라이언트에서 사용 가능한 함수 
+    /// 스폰 지점 중 하나를 선택하고, 룸 프로퍼티에서 해당 지점을 사용중 false로 설정
     /// 여기 Tuple로 반환 받는 이유는 나중에 index값을 통해 어떤 자리를 들고왔는지 알고 이후 자리를 반납할 때 필요하기 때문에 
     /// </summary>
     /// <returns>선택된 스폰 지점 Transform과 _allSpawnPoints 배열에서의 인덱스. 없으면 (null, -1)</returns>
     public (Transform spawnPoint, int index) GetAndClaimRandomSpawnPoint()
     {
-        /*if (!PhotonNetwork.IsMasterClient) // 마스터 클라이언트가 아니면 오류 로그 출력
-        {
-            Debug.LogError("마스터 클라이언트만 룸 프로퍼티에 대한 부분을 설정할 수 있음.");
-            return (null, -1);
-        }*/
         List<int> availableIndices = new List<int>();
 
         // 모든 스폰 지점을 순회하며 룸 프로퍼티에서 사용 가능 상태(값이 true)인 스폰 지점의 인덱스를 수집
@@ -104,19 +89,11 @@ public class SpawnManager : MonoBehaviourPunCallbacks
             // 룸 프로퍼티에 해당 키가 존재하고, 값이 true(사용 가능)인지 확인
             //(bool)PhotonNetwork.CurrentRoom.CustomProperties[key] 커스텀 프로퍼티에 등록되어 있을 때 object타입으로 들어가 있음
             //하지만 실제 우리는 bool타입이 들어가 있는거 알 기 때문에 명시적 캐스팅이 가능하다.
-            if (PhotonNetwork.CurrentRoom.CustomProperties.ContainsKey(key))
-            {
-                Debug.Log("들어있음");
-            }
-            else
-            {
-                Debug.Log("안들어 있음");
-            }
+            //Debug.Log(PhotonNetwork.CurrentRoom.CustomProperties.ContainsKey(key) ? "들어있음" : "안들어 있음");
 
             if (PhotonNetwork.CurrentRoom.CustomProperties.ContainsKey(key) &&
                 (bool)PhotonNetwork.CurrentRoom.CustomProperties[key] == true)
             {
-                Debug.Log($"반복 호출 횟수 : {i}");
                 availableIndices.Add(i); // 사용 가능한 스폰 지점 인덱스 리스트에 추가
             }
         }
@@ -127,7 +104,7 @@ public class SpawnManager : MonoBehaviourPunCallbacks
             return (null, -1);
         }
 
-        //제일 빠른 위치에 앉게하기
+        //리스트에 가장 먼저 있는, 즉 자리를 제일 먼저 채움 
         int selectedIndex = availableIndices[0];
         Transform selectedSpawnPoint = _allSpawnPoints[selectedIndex];
 
@@ -142,18 +119,11 @@ public class SpawnManager : MonoBehaviourPunCallbacks
     }
 
     /// <summary>
-    /// 마스터 클라이언트만 써야하기는 하는데 유저가 나가면 해당 함수가 호출 되게 해야함. 
     /// 사용이 끝난 스폰 지점을 다시 사용 가능(true) 상태로 되돌리는 함수
     /// </summary>
     /// <param name="spawnPointIndex">반환할 스폰 지점의 _allSpawnPoints 인덱스</param>
     public void ReturnSpawnPoint(int spawnPointIndex)
     {
-        if (!PhotonNetwork.IsMasterClient)
-        {
-            Debug.LogError("마스터 클라이언트만 자리를 되돌려 놓을 수 있다");
-            return;
-        }
-
         //자리 index 유효값 검사
         if (spawnPointIndex < 0 || spawnPointIndex >= _allSpawnPoints.Length)
         {
