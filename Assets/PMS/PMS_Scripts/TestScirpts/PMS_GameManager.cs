@@ -20,7 +20,6 @@ public class PMS_GameManager : MonoBehaviour
         }
     }
 
-
     //개별적으로 플레이어 생성 및 플레이어들이 다른 유저들에게 자기 정보를 보내는 RPC 함수 전송 및 수신 시간 생각해서 만든 코루틴
     private IEnumerator Delay()
     {
@@ -32,7 +31,6 @@ public class PMS_GameManager : MonoBehaviour
     private IEnumerator MasterClientSpawnPlayersWithDelay()
     {
         yield return new WaitForSeconds(0.1f); // 씬 로딩 및 초기화가 완료될 시간을 주기 위한 약간의 지연
-        //InGamePlayerManager.Instance.MasterClientSpawnAllPlayers(); // 새로운 메서드 호출
         InGamePlayerManager.Instance.CreateController();
     }
 }

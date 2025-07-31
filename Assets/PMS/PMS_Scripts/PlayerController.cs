@@ -36,31 +36,7 @@ public class PlayerController : MonoBehaviourPun
     {
         if (!_pv.IsMine) return;
 
-        if(Input.GetKeyDown(KeyCode.Space))
-        {
-            //PlayerManager.Instance.PlayerListPrint();
-            Debug.Log(PlayerManager.Instance.GetAllPlayers().Count);
-        }
-
         PlayerLook();
-        PlayerMove();
-        PlayerJump();
-
-        //TODO - 이후 GameManager에서 턴이 시작되면 만약 해당 턴이 내가 가질 턴이면 아이템 사용 이나 Gun사용 활성화 처리가 필요
-        //bool 값으로 전달 받으면 좋을 것 같다.
-
-        /*if (GameManager.Instance.StartTurn())
-        {
-            photonView.RPC(nameof(Shoot), RpcTarget.All);
-        }*/
-    }
-
-    [PunRPC]
-    private void Shoot()
-    {
-        // 총알 종류에 따라 효과 적용
-        Debug.Log("총 발사!");
-        //GunManager.Instance.Fire(Player player);
     }
 
     // 해당 함수는 내가 작동시키나 RPC함수의 실행은 모든클라이언트에서 이루어져야함 -> RPCTarget.All로 설정
@@ -73,7 +49,6 @@ public class PlayerController : MonoBehaviourPun
             photonView.RPC("RPC_DecreasePlayerHp", RpcTarget.All, targetPlayer.PlayerId, damage);
         }
     }
-
 
     //시점 변경 테스트코드
     private void PlayerLook()
