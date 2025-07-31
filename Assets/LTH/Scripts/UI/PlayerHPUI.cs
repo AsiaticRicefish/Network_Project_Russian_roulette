@@ -65,17 +65,10 @@ public class PlayerHPUI : MonoBehaviour
     private void ShowGameOverUI()
     {
         string winner = FindAlivePlayerName();
-        if (winnerText != null)
+        if (GameOverSync.Instance != null)
         {
-            winnerText.text = $"{winner}님이 우승했습니다!";
+            GameOverSync.Instance.GameOver(winner);
         }
-
-        if (gameOverPanel != null)
-        {
-            gameOverPanel.SetActive(true);
-        }
-
-        Debug.Log($"[PlayerHPUI] 게임 종료 UI 표시됨. 우승자: {winner}");
     }
 
     private string FindAlivePlayerName()
