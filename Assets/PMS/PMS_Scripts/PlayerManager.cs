@@ -156,4 +156,19 @@ public class PlayerManager : Singleton<PlayerManager>
         }
         Debug.Log(str);
     }
+
+    public GamePlayer FindPlayerByNickname(string nickname)
+    {
+        foreach (var player in _players.Values)
+        {
+            if (player.Nickname == nickname)
+            {
+                return player;
+            }
+        }
+
+        Debug.LogWarning($"[PlayerManager] 닉네임 {nickname} 을 가진 플레이어를 찾지 못했습니다.");
+        return null;
+    }
+
 }

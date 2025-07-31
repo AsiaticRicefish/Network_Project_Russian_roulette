@@ -86,12 +86,14 @@ public class GamePlayer : MonoBehaviour, IComparer<GamePlayer>
 
     private void Start()
     {
+        Debug.Log($"[GamePlayer] Start 실행됨! IsMine: {_pv.IsMine}, Nick: {PhotonNetwork.NickName}");
         if (_pv.IsMine)
         {
             //테스트 코드
             //일단 지금 당장 순서 보장해주기 힘드니깐 정렬을 사용해보자
             StartCoroutine(PlayerListPirntDelay());           
             Initialize();
+            SendMyPlayerDataRPC();
         }
     }
 
@@ -144,6 +146,7 @@ public class GamePlayer : MonoBehaviour, IComparer<GamePlayer>
 
         CurrentHp -= amount;
         CurrentHp = Mathf.Min(CurrentHp, MaxHp);
+        Debug.Log($"[GamePlayer] {Nickname} → DecreaseHp({amount}) 호출됨, 현재 HP: {CurrentHp}");
     }
     #endregion
 
