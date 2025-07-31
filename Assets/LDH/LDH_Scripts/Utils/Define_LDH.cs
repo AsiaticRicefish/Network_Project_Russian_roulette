@@ -51,6 +51,7 @@ namespace Utils
             RoomCodeError,
             RoomCodeEmpty,
             RoomCodeSuccess,
+            JoinRoomError,
             
             
             

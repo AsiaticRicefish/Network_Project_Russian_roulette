@@ -1,10 +1,12 @@
 using GameUI;
+using Managers;
 using Photon.Pun;
 using Photon.Realtime;
 using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Utils;
 
 
 /// <summary>
@@ -30,8 +32,10 @@ public class RoomList : MonoBehaviour
     private RoomInfo _info;             // Photon room 정보
     private UI_Lobby _lobby;            // 소속된 로비 UI 참조
 
+    public RoomInfo RoomInfo => _info;        // 외부 접근용 프로퍼티
     public string RoomCode => _roomCode;     // 외부 접근용 프로퍼티
     public string RoomName => _roomName;    // 외부 접근용 프로퍼티
+    
     
     private void Start()
     {
@@ -79,6 +83,12 @@ public class RoomList : MonoBehaviour
     {
         if (PhotonNetwork.InLobby)
         {
+            if (_info.PlayerCount >= _info.MaxPlayers)
+            {
+                Manager.UI.ShowNotifyModal(NotifyMessage.MessageEntities[Define_LDH.NotifyMessageType.JoinRoomError]);
+                return;
+            }
+            
             PhotonNetwork.JoinRoom(_roomName);
             
         }

@@ -287,14 +287,20 @@ public class NetworkManager : MonoBehaviourPunCallbacks
             return;
         }
 
-        string matchedRoomName = roomList.Values
+        RoomList matchedRoom = roomList.Values
             .Select(go => go.GetComponent<RoomList>())
-            .FirstOrDefault(room => room.RoomCode == roomCode)
-            ?.RoomName;
+            .FirstOrDefault(room => room.RoomCode == roomCode);
         
-        if (string.IsNullOrEmpty(matchedRoomName))
+        if (matchedRoom == null)
         {
             Manager.UI.ShowNotifyModal(NotifyMessage.MessageEntities[NotifyMessageType.RoomCodeError]);
+            return;
+        }
+        
+        // 플레이어 수 초과 체크
+        if (matchedRoom.RoomInfo.PlayerCount >= matchedRoom.RoomInfo.MaxPlayers)
+        {
+            Manager.UI.ShowNotifyModal(NotifyMessage.MessageEntities[NotifyMessageType.JoinRoomError]);
             return;
         }
         
@@ -302,7 +308,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         {
             Manager.UI.ShowNotifyModal(NotifyMessage.MessageEntities[NotifyMessageType.RoomCodeSuccess]);
             
-            PhotonNetwork.JoinRoom(matchedRoomName);
+            PhotonNetwork.JoinRoom(matchedRoom.RoomName);
             
             _uiLobby.JoinRoomPanel.CloseWindow();
         

@@ -54,6 +54,12 @@ namespace Utils
                 "Empty Code", 
                 "Please enter a room code before proceeding.", NotifyType.Error
             ),
+            
+            [NotifyMessageType.JoinRoomError] = new MessageEntity(
+                "Room is Full", 
+                "This room is already full. Please try another one.", 
+                NotifyType.Error
+            ),
         };
 
     }
