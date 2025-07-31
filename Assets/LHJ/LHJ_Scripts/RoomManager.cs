@@ -10,7 +10,7 @@ public class RoomManager : MonoBehaviour
     //UI와 컨트롤 로직을 분리 -> 필요없는 변수 제거
     
     [SerializeField] private UI_Room _uiRoom;
-    
+    [SerializeField] private string gameSceneName;
 
     private void OnDestroy()
     {
@@ -38,7 +38,7 @@ public class RoomManager : MonoBehaviour
     public void GameStart()
     {
         // if (PhotonNetwork.IsMasterClient && AllPlayerReadyCheck()) // -> 마스터 클라이언트에게만 Game Start 기능 부여 & 버튼 활성화에서 Ready Check를 진행하는 로직으로 변경함에 따라 주석 처리
-        PhotonNetwork.LoadLevel("LHJ_GameScene"); // todo : 인게임 씬으로 바꾸기
+        PhotonNetwork.LoadLevel(gameSceneName);
     }
     
     public void LeaveRoom()

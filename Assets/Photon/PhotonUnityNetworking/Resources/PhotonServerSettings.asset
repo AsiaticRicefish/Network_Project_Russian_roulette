@@ -53,6 +53,15 @@ MonoBehaviour:
   - ReceivePlayerData
   - RPC_IncreaseHp
   - SetTurnActive
+  - RPC_UpdatePlayerState
+  - RPC_UpdatePlayerCurrentHp
+  - RPC_UpdatePlayerMaxHp
+  - RPC_DecreasePlayerHp
+  - ReloadSync
+  - RequestEndTurn
+  - RPC_SwitchNextBullet
+  - SyncTurn
+  - RPC_RegisterAllPlayer
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

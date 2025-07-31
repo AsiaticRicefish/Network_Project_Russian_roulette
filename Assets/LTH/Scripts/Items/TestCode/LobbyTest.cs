@@ -18,6 +18,8 @@ public class LobbyTest : MonoBehaviourPunCallbacks
     [SerializeField] private string gameSceneName = "LTH_GameScene";
     [SerializeField] private int requiredPlayerCount = 2;
 
+    public static string MyPlayerId { get; private set; }
+
     private bool waiting = false;
 
     private void Start()
@@ -25,7 +27,9 @@ public class LobbyTest : MonoBehaviourPunCallbacks
         Debug.Log("[Lobby] Start 호출됨");
 
         PhotonNetwork.AutomaticallySyncScene = true;
-        PhotonNetwork.NickName = "Tester_" + Random.Range(1000, 9999);
+        string nickname = "Tester_" + Random.Range(1000, 9999);
+        PhotonNetwork.NickName = nickname;
+        MyPlayerId = nickname; // 정적 변수에 저장
         PhotonNetwork.ConnectUsingSettings();
 
         Debug.Log($"[Lobby] 닉네임 설정됨: {PhotonNetwork.NickName}");

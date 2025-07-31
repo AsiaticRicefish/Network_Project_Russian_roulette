@@ -11,6 +11,7 @@ public class PlayerManager : Singleton<PlayerManager>
 {
     //리스트가 아닌 Dictionary로 관리  Key - FirebaseUID Value - PlayData
     public Dictionary<string, PlayerData> _playerData;
+    public List<GamePlayer> _playerList;
 
     //리스트를 딱한번 공유해야하는 상황 -> 모든 유저가 다 등록이 되었을 때 모든 유저가 해당 데이터를 들고 있도록 해야한다.
     public List<PlayerData> _playerDataList;
@@ -26,7 +27,7 @@ public class PlayerManager : Singleton<PlayerManager>
     }
 
     //게임 스타트시 추가
-    public bool AllGamePlayerAdd()
+    /*public bool AllGamePlayerAdd()
     {
         if (!PhotonNetwork.IsMasterClient) return false;
 
@@ -48,21 +49,23 @@ public class PlayerManager : Singleton<PlayerManager>
         //딕셔너리에 다 추가 된 상황이면 해당 Dictionary를 게임매니저 List에게 넣게 해줘야한다.
         //InGameManager.Instance._playerList.Add(players);
         return true;
-    }
+    }*/
 
     private void Init()
     {
         _players = new Dictionary<string, GamePlayer>();
+        _playerList = new List<GamePlayer>();
         _playerDataList = new List<PlayerData>();
     }
 
+    //안씀
     public GamePlayer CreateGamePlayer(Player photonPlayer, PlayerData playerData)
     {
         string uid = photonPlayer.CustomProperties["playerId"]?.ToString() ?? "unknown";        //등록
         string nickname = photonPlayer.NickName;                                                //닉네임으로 설정
 
         GamePlayer gamePlayer = new GamePlayer();
-        gamePlayer.Initialize(playerData);
+        //gamePlayer.Initialize(playerData);
         RegisterPlayer(gamePlayer);
         return gamePlayer;
     }
@@ -70,10 +73,16 @@ public class PlayerManager : Singleton<PlayerManager>
 
     public void RegisterPlayer(GamePlayer player)
     {
+        if (string.IsNullOrEmpty(player.PlayerId))
+        {
+            Debug.LogError("null값 등록시도.");
+            return;
+        }
+
         if (!_players.ContainsKey(player.PlayerId))
         {
             _players.Add(player.PlayerId, player);
-            Debug.Log($"Player added! Player FirebaseUID Number : {player.PlayerId}. Current players: {_players.Count}");
+            Debug.Log($"Player added! Player FirebaseUID Number : {player.PlayerId}, Player NickName : {player.Nickname}. Current players: {_players.Count}");
         }
         else
         {
@@ -137,4 +146,29 @@ public class PlayerManager : Singleton<PlayerManager>
         Debug.Log($"해당ID : {id} 와 일치 하는 ID를 가진 유저가 존재 하지 않습니다.");
         return null;
     }
+
+    public void PrintPlayerList()
+    {
+        string str = "";
+        foreach(var p in _playerList)
+        {
+            str += p.Nickname + " ";
+        }
+        Debug.Log(str);
+    }
+
+    public GamePlayer FindPlayerByNickname(string nickname)
+    {
+        foreach (var player in _players.Values)
+        {
+            if (player.Nickname == nickname)
+            {
+                return player;
+            }
+        }
+
+        Debug.LogWarning($"[PlayerManager] 닉네임 {nickname} 을 가진 플레이어를 찾지 못했습니다.");
+        return null;
+    }
+
 }
