@@ -90,6 +90,8 @@ public class InGameManager : Singleton<InGameManager>
         // 게임 시작시 초기화 진행
         GameInit();
 
+        RegisterPlayerDeathEvents();
+
         // 게임 시작시 이벤트 실행
         OnGameStart?.Invoke();
 
@@ -265,6 +267,20 @@ public class InGameManager : Singleton<InGameManager>
                 _playerPointPair.Find(x => x.PlayerId == item.Value.PlayerId).IncreaseLoseCount();
             }
         }
+    }
+
+    private void RegisterPlayerDeathEvents()
+    {
+        foreach (var player in Manager.PlayerManager.GetAllPlayers().Values)
+        {
+            player.OnPlayerDied += OnPlayerDiedHandler;
+        }
+    }
+
+    private void OnPlayerDiedHandler(GamePlayer deadPlayer)
+    {
+        Debug.Log($"[InGameManager] 사망 감지: {deadPlayer.Nickname}");
+        if (CheckRoundEnd()) EndRound();
     }
     #endregion
 }
