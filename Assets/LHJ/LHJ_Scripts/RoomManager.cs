@@ -22,7 +22,7 @@ public class RoomManager : MonoBehaviour
     // 개별 플레이어 패널 생성
     public void SetPlayerPanel(Player player)
     {
-        PhotonNetwork.AutomaticallySyncScene = true;
+        // PhotonNetwork.AutomaticallySyncScene = true;
         _uiRoom.SetPlayerPanel(player);
     }
 
