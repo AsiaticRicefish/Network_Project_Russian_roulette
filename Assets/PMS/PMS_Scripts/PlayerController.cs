@@ -37,6 +37,8 @@ public class PlayerController : MonoBehaviourPun
         if (!_pv.IsMine) return;
 
         PlayerLook();
+        PlayerMove();
+        PlayerJump();
     }
 
     // 해당 함수는 내가 작동시키나 RPC함수의 실행은 모든클라이언트에서 이루어져야함 -> RPCTarget.All로 설정

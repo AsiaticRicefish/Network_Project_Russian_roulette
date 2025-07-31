@@ -1,22 +1,12 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
-using System.IO;
-
-//나중에
-public enum PlayerType
-{
-    Normal,
-    Spectator,
-}
 
 public class PlayerSpawn
 {
-    private static readonly string PLAYER_PREFAB_PATH = "Prefabs/PlayerConrtoller";
+    [SerializeField]private static string PLAYER_PREFAB_PATH = "Prefabs/Player";
 
     //생성 부분만 빼오기
-    public static GameObject CreateGamePlayer(PlayerData playerData, Vector3 spawnPosition, int spawnIndex)
+    public static GameObject CreateGamePlayer(PlayerData playerData, Transform spawnPosition, int spawnIndex)
     { 
         //플레이어 데이터가 있는지 확인
         if (playerData == null)
@@ -26,7 +16,7 @@ public class PlayerSpawn
         }
 
         //프리팹 생성
-        GameObject playerObject = PhotonNetwork.Instantiate(PLAYER_PREFAB_PATH, spawnPosition, Quaternion.identity);
+        GameObject playerObject = PhotonNetwork.Instantiate(PLAYER_PREFAB_PATH, spawnPosition.position, spawnPosition.localRotation);
 
         if (playerObject == null)
         {
@@ -66,7 +56,7 @@ public class PlayerSpawn
             return null;
         }
 
-        return CreateGamePlayer(playerData, spawnInfo.spawnPoint.position, spawnInfo.index);
+        return CreateGamePlayer(playerData, spawnInfo.spawnPoint, spawnInfo.index);
     }
 
 
