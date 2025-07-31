@@ -5,22 +5,25 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 0
+  - enabled: 1
     path: Assets/CYE/CYE_Scene/Gameflow/CYE_StartScene.unity
     guid: df80dbfdc1b766e408f49ee216962acc
-  - enabled: 0
+  - enabled: 1
     path: Assets/CYE/CYE_Scene/Gameflow/CYE_MainGameScene.unity
     guid: 8c37f491891969c49b2de7480c8634bf
-  - enabled: 0
+  - enabled: 1
     path: Assets/CYE/CYE_Scene/Gameflow/CYE_AnteroomScene.unity
     guid: a137d9330af8ead47ae4a51386cf2a3c
-  - enabled: 0
+  - enabled: 1
     path: Assets/LDH/LDH_Scenes/Lobby.unity
-    guid: 4c28858d9fe4d4f3da0b33f6e9c9e890
+    guid: a11e020c7b6104952b62a0a490d7b612
   - enabled: 1
     path: Assets/LTH/LTH_Scenes/LTH_LobbyScene.unity
     guid: 35edf0f295337c94eaa5200ec0ece6aa
   - enabled: 1
     path: Assets/LTH/LTH_Scenes/LTH_GameScene.unity
     guid: ede080dae4fb03b4ba964ec47515be69
+  - enabled: 1
+    path: Assets/LDH/LDH_Scenes/Title.unity
+    guid: 45feb7dd9699f4340977124f734f2e41
   m_configObjects: {}

@@ -93,6 +93,23 @@ namespace LDH_Animation
             return this;
         }
         
+        public AnimationBuilder MoveToFrom(Vector3 fromPos, Vector3 toPos, float duration = 0.5f)
+        {
+            if (_rectTransformTarget != null)
+            {
+                _rectTransformTarget.anchoredPosition = fromPos;
+                _sequence.Append(_rectTransformTarget.DOAnchorPos((Vector2)toPos, duration).SetEase(Ease.OutCubic));
+            }
+            else if (_transformTarget != null)
+            {
+                _transformTarget.position = fromPos;
+                _sequence.Append(_transformTarget.DOMove(toPos, duration).SetEase(Ease.OutCubic));
+            }
+
+            return this;
+        }
+        
+
         
         public void Play()
         {

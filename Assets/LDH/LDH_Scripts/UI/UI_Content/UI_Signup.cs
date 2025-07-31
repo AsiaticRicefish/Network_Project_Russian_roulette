@@ -25,12 +25,6 @@ namespace GameUI
         [Header("Success Modal (Test)")]
         [SerializeField] private string _successTitle;
         [SerializeField] private string _successMessage;
-
-        [Header("Email Check Message Texts (Test)")]
-        private string emailCheckSucessTitle = "Valid Email";
-        private string emailCheckFailTitle = "Invalid Email";
-        private string emailCheckSuccessMessage = "Your email is valid.";
-        private string emailCheckFailMessage = "Your email is invalid.";
         
         
         [Header("Modal Position Offset")]        
@@ -51,7 +45,7 @@ namespace GameUI
         
         
         private ModalWindowManager _signupModal;
-        
+        private bool isSignedUp;
         
         
         
@@ -85,41 +79,25 @@ namespace GameUI
         /// </summary>
         public void OnSignupConfirm()
         {
+            if (isSignedUp) return;
+            
             //todo: 회원가입 로직과 연결
             switch (_signupSuccess)
             {
                 case true:
                     Debug.Log($"[{GetType().Name}] 회원가입 성공");
-                    ShowModal(Define_LDH.NotifyType.Check, _successTitle, _successMessage);
+
+                    isSignedUp = true;
+                    Manager.UI.ShowNotifyModal(NotifyMessage.MessageEntities[Define_LDH.NotifyMessageType.SignupSuccess]);
                     _signupModal.onCancel?.Invoke();
                     break;
                 case false:
                     Debug.Log($"[{GetType().Name}] 회원가입 실패");
-                    ShowModal(failType, _failTitle, _failMessage);
+                    Manager.UI.ShowNotifyModal(NotifyMessage.MessageEntities[Define_LDH.NotifyMessageType.SignupError]);
                     break;
             }
         }
         
-
-        /// <summary>
-        /// 모달 생성 및 표시
-        /// </summary>
-        private void ShowModal(Define_LDH.NotifyType type, string title, string description)
-        {
-            UI_Modal modal = Manager.UI.SpawnPopupUI<UI_Modal>("UI_SlidingModal");
-            
-            //content 데이터 설정
-            modal.SetContent(type, title, description);
-
-            RectTransform modalRect = modal.GetComponent<RectTransform>();
-            
-            //rect transform 설정
-            Util_LDH.SetRightBottom(modalRect, modalRect.rect.size, new Vector2(_offset.x, _offset.y));
-            
-            //모달 보이게
-            modal.Show();
-        }
-
 
         #region Email Check
 
@@ -128,7 +106,7 @@ namespace GameUI
         /// </summary>
         public void ShowEmailCheckSuccess()
         {
-            ShowModal(Define_LDH.NotifyType.Check, emailCheckSucessTitle, emailCheckSuccessMessage );
+            Manager.UI.ShowNotifyModal(NotifyMessage.MessageEntities[Define_LDH.NotifyMessageType.EmailCheckSuccess]);
         }
 
         /// <summary>
@@ -136,7 +114,7 @@ namespace GameUI
         /// </summary>
         public void ShowEmailCheckFail()
         {
-            ShowModal(Define_LDH.NotifyType.Error, emailCheckFailTitle, emailCheckFailTitle );
+            Manager.UI.ShowNotifyModal(NotifyMessage.MessageEntities[Define_LDH.NotifyMessageType.EmailCheckError]);
         }
         
         #endregion
@@ -168,6 +146,10 @@ namespace GameUI
             
             // feedback button 초기화
             _emailCheckButton.Clear();
+            
+            
+            //flag 초기화
+            isSignedUp = false;
         }
     }
 }

@@ -15,22 +15,18 @@ namespace GameUI
     {
         public ModalWindowManager settingModal;
         [SerializeField] private UI_VolumeSetting _volumeSetting;
+
+        public bool isInitialized = false;
         
         protected override void Init()
         {
             base.Init();
-            //InitSubscribe();
         }
         
 
         private void OnEnable()
         {
            Show();
-        }
-
-        public void InitSubscribe()
-        {
-            settingModal.onCancel.AddListener(Close);
         }
         
 
@@ -41,7 +37,16 @@ namespace GameUI
 
         public override void Close()
         {
+            StartCoroutine(CloseWithDelay());
+        }
+
+        private IEnumerator CloseWithDelay()
+        {
             settingModal.CloseWindow();
+            
+            if(isInitialized)
+                yield return new WaitForSeconds(0.5f);
+            
             Manager.UI.CloseGlobalUI(Define_LDH.GlobalUI.UI_Setting);
         }
     }

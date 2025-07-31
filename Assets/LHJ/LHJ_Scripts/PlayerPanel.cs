@@ -4,62 +4,103 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Rendering.VirtualTexturing;
 using UnityEngine.UI;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 
 public class PlayerPanel : MonoBehaviour
 {
+    [Header("UI Elements")] 
     [SerializeField] private TextMeshProUGUI nicknameText;
     [SerializeField] private TextMeshProUGUI readyText;
-    [SerializeField] private Image readyButtonImage;
-    [SerializeField] private Button readyButton;
+    
+    [Header("PlayerImage")]
+    [SerializeField] private Image _image;
+    [SerializeField] private GameObject _rawImage;
+    [SerializeField] private GameObject _waitingText;
+    [SerializeField] private Color _emptyColor;
+    [SerializeField] private Color _occupiedColor;
+    
+    
+    private Player _player;
+    
+    private void Init()
+    {
+        nicknameText.text = "Waiting...";
+        readyText?.gameObject.SetActive(false);
+        
+        
+        if (_rawImage != null)
+            _rawImage.gameObject.SetActive(false);
+        if (_waitingText != null)
+            _waitingText.SetActive(true);
+        
+        _image.color = _emptyColor;
+        
+    }
 
-    private bool isReady;
+    public void Reset()
+    {
+        Init();
+    }
+    
 
     // 플레이어 UI 초기화
-    public void Init(Player player)
+    public void SetData(Player player)
     {
+        _player = player;
+        
+        // 닉네임 설정
         nicknameText.text = player.NickName;
-        if (player.IsMasterClient)
-            nicknameText.color = Color.yellow;
+        
+        // waiting 표시 제거 및 이미지 적용
+        if (!player.IsMasterClient)
+        {
+            _rawImage.gameObject.SetActive(true);
+            _waitingText.SetActive(false);
+        }
         else
-            nicknameText.color = Color.black;
-        readyButton.interactable = player.IsLocal;
-
-        if (!player.IsLocal)
-            return;
-
-        isReady = false;
-        ReadyPropertyUpdate();
-
-        readyButton.onClick.RemoveListener(ReadyButtonClick);
-        readyButton.onClick.AddListener(ReadyButtonClick);
+        {
+            if (player.IsLocal)
+            {
+                ReadyPropertyUpdate(true);
+            }
+        }
+        _image.color = _occupiedColor;
+        
+        
+        ReadyCheck(player);
+        
+        
     }
 
     // 준비버튼 클릭 함수
     public void ReadyButtonClick()
     {
-        isReady = !isReady;
-
-        readyText.text = isReady ? "Ready" : "Click Ready";
-        readyButtonImage.color = isReady ? Color.yellow : Color.grey;
-        ReadyPropertyUpdate();
+        if (_player != null && _player.IsLocal)
+        {
+            bool isReady = _player.CustomProperties.TryGetValue("Ready", out object value) && (bool)value;
+            ReadyPropertyUpdate(!isReady);
+        }
     }
     //준비상태 저장
-    public void ReadyPropertyUpdate()
+    public void ReadyPropertyUpdate(bool value)
     {
-        ExitGames.Client.Photon.Hashtable playerProperty = new Hashtable();
-        playerProperty["Ready"] = isReady;
+        Hashtable playerProperty = new Hashtable
+        {
+            { "Ready", value }
+        };
         PhotonNetwork.LocalPlayer.SetCustomProperties(playerProperty);
     }
 
     // 다른 플레이어 준비 상태 체크
     public void ReadyCheck(Player player)
     {
+        if (player == null) return;
+
         if (player.CustomProperties.TryGetValue("Ready", out object value))
         {
-            readyText.text = (bool)value ? "Ready" : "Click Ready";
-            readyButtonImage.color = (bool)value ? Color.yellow : Color.grey;
+            readyText?.gameObject.SetActive((bool)value);
         }
     }
 }

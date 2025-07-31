@@ -91,7 +91,6 @@ namespace GameUI
         {
             //setting modal 구독 해제
             _settingPanel.onCancel.RemoveAllListeners();
-            _settingUI.InitSubscribe();
         }
 
         #region Video
