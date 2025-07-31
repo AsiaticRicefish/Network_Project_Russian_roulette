@@ -808,8 +808,8 @@ MonoBehaviour:
   hoverEvent:
     m_PersistentCalls:
       m_Calls: []
-  hoverSound: {fileID: 0}
-  clickSound: {fileID: 0}
+  hoverSound: {fileID: 8300000, guid: 1f1adc2dcd6884f8abbddb1e0ce43374, type: 3}
+  clickSound: {fileID: 8300000, guid: 887e6cd9fcf7d4d3198261cdad22d168, type: 3}
   buttonVar: {fileID: 0}
   normalText: {fileID: 8293975750063931615}
   highlightedText: {fileID: 496473163849414240}
@@ -818,7 +818,7 @@ MonoBehaviour:
   animationSolution: 1
   fadingMultiplier: 8
   useCustomContent: 0
-  enableButtonSounds: 0
+  enableButtonSounds: 1
   useHoverSound: 1
   useClickSound: 1
   useRipple: 1

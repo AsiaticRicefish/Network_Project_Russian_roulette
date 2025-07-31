@@ -570,7 +570,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 320.0868, y: -15}
-  m_SizeDelta: {x: 0, y: 30}
+  m_SizeDelta: {x: 217.6, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6462778841589137034
 CanvasRenderer:
@@ -999,8 +999,8 @@ MonoBehaviour:
   hoverEvent:
     m_PersistentCalls:
       m_Calls: []
-  hoverSound: {fileID: 0}
-  clickSound: {fileID: 0}
+  hoverSound: {fileID: 8300000, guid: 1f1adc2dcd6884f8abbddb1e0ce43374, type: 3}
+  clickSound: {fileID: 8300000, guid: 887e6cd9fcf7d4d3198261cdad22d168, type: 3}
   buttonVar: {fileID: 0}
   normalIcon: {fileID: 3810538434268074842}
   highlightedIcon: {fileID: 9115028575533688829}
@@ -1011,7 +1011,7 @@ MonoBehaviour:
   animationSolution: 1
   fadingMultiplier: 8
   useCustomContent: 0
-  enableButtonSounds: 0
+  enableButtonSounds: 1
   useHoverSound: 1
   useClickSound: 1
   useRipple: 1
@@ -2177,8 +2177,8 @@ MonoBehaviour:
   hoverEvent:
     m_PersistentCalls:
       m_Calls: []
-  hoverSound: {fileID: 0}
-  clickSound: {fileID: 0}
+  hoverSound: {fileID: 8300000, guid: 1f1adc2dcd6884f8abbddb1e0ce43374, type: 3}
+  clickSound: {fileID: 8300000, guid: 887e6cd9fcf7d4d3198261cdad22d168, type: 3}
   buttonVar: {fileID: 0}
   normalIcon: {fileID: 2334526636148944868}
   highlightedIcon: {fileID: 4807640835923707872}
@@ -2189,7 +2189,7 @@ MonoBehaviour:
   animationSolution: 1
   fadingMultiplier: 8
   useCustomContent: 0
-  enableButtonSounds: 0
+  enableButtonSounds: 1
   useHoverSound: 1
   useClickSound: 1
   useRipple: 1

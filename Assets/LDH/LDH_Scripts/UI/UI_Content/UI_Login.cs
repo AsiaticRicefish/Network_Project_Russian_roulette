@@ -1,6 +1,7 @@
 using Managers;
 using Michsky.UI.ModernUIPack;
 using System;
+using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -62,7 +63,7 @@ namespace GameUI
                 
                 
                 Debug.Log($"[{GetType().Name}] 로그인에 성공하여 씬 이동합니다.");
-                SceneManager.LoadSceneAsync("Lobby");
+                StartCoroutine(LoadSceneWithDelay("Lobby"));
                 
             }
             else
@@ -71,7 +72,7 @@ namespace GameUI
                 Manager.UI.ShowNotifyModal(NotifyMessage.MessageEntities[Define_LDH.NotifyMessageType.LoginError]);
             }
         }
-
+        
 
         /// <summary>
         /// 입력값 초기화
@@ -88,6 +89,23 @@ namespace GameUI
             _emailField.gameObject.SetActive(true);
             _passwordField.gameObject.SetActive(true);
             
+        }
+        
+        
+        
+        /// <summary>
+        /// 로그인 성공 후 씬 전환 코루틴
+        /// </summary>
+        private IEnumerator LoadSceneWithDelay(string sceneName)
+        {
+            AsyncOperation op = SceneManager.LoadSceneAsync("Lobby");
+            op.allowSceneActivation = false;
+            
+            // 모달 보여지는 시간 확보
+            yield return new WaitForSeconds(1f);
+            
+            // 씬 전환
+            op.allowSceneActivation = true;
         }
 
 
@@ -117,5 +135,7 @@ namespace GameUI
 
         #endregion
         
+        
+     
     }
 }

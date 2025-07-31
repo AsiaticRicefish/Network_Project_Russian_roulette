@@ -29,7 +29,7 @@ namespace Utils
             [NotifyMessageType.EmailCheckError] = new ("Invalid Email", "Your email is invalid.", NotifyType.Error),
 
             
-            [NotifyMessageType.LoginSuccess] = new ("Nickname Set", "You're now ready to join the lobby.", NotifyType.Check),
+            [NotifyMessageType.LoginSuccess] = new ("Login Success", "You're now ready to join the lobby.", NotifyType.Check),
             [NotifyMessageType.LoginError] = new ("Login Failed", "Invalid email or password.", NotifyType.Error),
             
             
