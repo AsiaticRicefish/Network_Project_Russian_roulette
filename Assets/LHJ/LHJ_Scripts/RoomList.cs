@@ -49,7 +49,6 @@ public class RoomList : MonoBehaviour
     /// <param name="lobby">소속 로비 UI</param>
     public void Init(RoomInfo info, UI_Lobby lobby)
     {
-        Debug.Log("roomlist init 호출 시점");
         //------ data 초기화 -----//
         _info = info;
         _lobby = lobby;
