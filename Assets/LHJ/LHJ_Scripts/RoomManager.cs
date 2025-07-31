@@ -26,6 +26,12 @@ public class RoomManager : MonoBehaviour
         _uiRoom.OnClickLeaveButton -= LeaveRoom;
     }
 
+    // 개별 플레이어 패널 생성
+    public void SetPlayerPanel(Player player)
+    {
+        // PhotonNetwork.AutomaticallySyncScene = true;
+        _uiRoom.SetPlayerPanel(player);
+    }
 
     #region 초기화
 

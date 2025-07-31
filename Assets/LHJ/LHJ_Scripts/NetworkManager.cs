@@ -108,7 +108,15 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         if (loadingPanel.activeSelf)
         {
             loadingPanel.SetActive(false);
-            _uiNicknamePanel.SetActive(true);     // 닉네임 panel 활성화(open window)
+            //_uiNicknamePanel.SetActive(true);     // 닉네임 panel 활성화(open window)
+            if (string.IsNullOrEmpty(PhotonNetwork.NickName))
+            {
+                _uiNicknamePanel.SetActive(true);
+            }
+            else
+            {
+                PhotonNetwork.JoinLobby(); // 이미 닉네임 있으면 바로 로비 입장
+            }
         }
         else
         {
