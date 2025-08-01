@@ -204,6 +204,7 @@ public class InGameManager : Singleton<InGameManager>
     #endregion
 
     #region >> Private Function
+    [PunRPC]
     private void GameInit()
     {
         // 현재 라운드를 초기화한다.
@@ -218,6 +219,7 @@ public class InGameManager : Singleton<InGameManager>
             _turnOrder.AddLast(playerId);
         }
     }
+    [PunRPC]
     private void RoundInit()
     {
         // 현재 라운드 카운트 증가시킨다.
@@ -227,12 +229,13 @@ public class InGameManager : Singleton<InGameManager>
         // 현재 턴을 턴 순서 맨 처음 사람으로 지정한다.
         _currentTurn = _turnOrder.First;
     }
-
+    [PunRPC]
     private void TurnInit()
     {
         OnTurnChange?.Invoke();
     }
-
+    
+    // ================================================= //
     private bool CheckRoundEnd()
     {
         // CurrentHp가 0이 아닌 플레이어, 즉 생존자의 수를 확인한다.

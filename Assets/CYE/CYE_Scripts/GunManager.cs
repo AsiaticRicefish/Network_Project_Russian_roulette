@@ -52,30 +52,42 @@ public class GunManager : Singleton<GunManager>
         {
             Debug.Log($"{playerId}에 해당하는 플레이어를 찾을 수 없습니다.");
             return;            
-        }        
-        // FireGunToTarget(target);
-        _pv.RPC("FireGunToTarget", RpcTarget.All, target);
+        }
+        _pv.RPC(nameof(RPC_Fire), RpcTarget.All, target);
+    }
+    public void Fire(string firedId, string shotId)
+    {
+        GamePlayer firedPlayer = Manager.PlayerManager.GetAllPlayers()[firedId];
+        if (!firedPlayer)
+        {
+            Debug.Log($"{firedId}에 해당하는 플레이어를 찾을 수 없습니다.");
+            return;
+        }
+
+        GamePlayer shotPlayer = Manager.PlayerManager.GetAllPlayers()[shotId];
+        if (!shotPlayer)
+        {
+            Debug.Log($"{shotId}에 해당하는 플레이어를 찾을 수 없습니다.");
+            return;
+        }
+        _pv.RPC(nameof(RPC_Fire), RpcTarget.All, firedPlayer, shotPlayer);
     }
 
     public void Reload()
     {
-        // TO DO: 해당 함수 사용처에서 충분히 테스트가 진행되었다면 다시 하단의 조건을 주석 해제하여야한다.
         if (_magazine.Count <= 0 && _loadedBullet == default)
         {
-            BulletType[] bulletTypeCountPreSet = ConvertCountDictToArray(GetRandomBulletCount());
-            // TO DO: 재장전 연출 실행(반드시 ShuffleBullets 호출 전에 실행하여야 한다.)
-            foreach (BulletType bullet in ShuffleBullets(bulletTypeCountPreSet))
-            {
-                Debug.Log($"장전 >> {bullet}");
-                _magazine.Enqueue(bullet);
-            }
-            if (!_magazine.TryDequeue(out _loadedBullet))
-            {
-                Debug.Log("장전 실패.");
-                _loadedBullet = default;
-                return;
-            }
+            _pv.RPC(nameof(RPC_Reload), RpcTarget.All);
         }
+    }
+
+    /// <summary>
+    /// 총을 선택했을때 호출할 함수 => 타겟 선정 UI 호출을 위함
+    /// </summary>
+    public void PickUp()
+    {
+        // targetSelectUI를 표시함
+        // 개인용
     }
 
     public void SwitchNextBullet()
@@ -104,7 +116,7 @@ public class GunManager : Singleton<GunManager>
 
     #region >> Private Function
     [PunRPC]
-    public void FireGunToTarget(GamePlayer target)
+    public void RPC_Fire(GamePlayer target)
     {
         if (_loadedBullet == BulletType.live)
         {
@@ -118,8 +130,43 @@ public class GunManager : Singleton<GunManager>
         {
             _loadedBullet = default;
         }
+        // 턴 종료
+        Manager.Game.EndTurn();
     }
-
+    public void RPC_Fire(GamePlayer fired, GamePlayer shot)
+    {
+        if (_loadedBullet == BulletType.live)
+        {
+            int damage = _isEnhanced ? BASE_DAMAGE * 2 : BASE_DAMAGE;
+            target.DecreaseHp(damage);
+            Debug.Log("target hp 감소");
+        }
+        // TO DO: 탄피 배출 연출 실행
+        _isEnhanced = false;
+        if (!_magazine.TryDequeue(out _loadedBullet))
+        {
+            _loadedBullet = default;
+        }
+        // 턴 종료
+        Manager.Game.EndTurn();
+    }
+    [PunRPC]
+    private void RPC_Reload()
+    { 
+        BulletType[] bulletTypeCountPreSet = ConvertCountDictToArray(GetRandomBulletCount());
+        // TO DO: 재장전 연출 실행(반드시 ShuffleBullets 호출 전에 실행하여야 한다.)
+        foreach (BulletType bullet in ShuffleBullets(bulletTypeCountPreSet))
+        {
+            Debug.Log($"장전 >> {bullet}");
+            _magazine.Enqueue(bullet);
+        }
+        if (!_magazine.TryDequeue(out _loadedBullet))
+        {
+            Debug.Log("장전 실패.");
+            _loadedBullet = default;
+            return;
+        }
+    }
     private BulletType[] ShuffleBullets(BulletType[] bulletSet)
     {
         for (int cnt = 0; cnt < bulletSet.Length; cnt++)
