@@ -5,153 +5,213 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+
+/// <summary>
+/// 각 플레이어의 아이템 상태를 동기화하고, 상자와 연결하는 컴포넌트
+/// 기준 식별자는 Photon Nickname
+/// </summary>
 public class ItemSync : MonoBehaviourPun
 {
-    [SerializeField] private List<ItemData> itemDataList;  // 아이템 데이터 리스트
+    [SerializeField] private List<ItemData> itemDataList;
+
     [HideInInspector] public ItemBoxManager myItemBox;
 
-    private string myId; // 임시 플레이어 식별 ID
-
-    public void Init(string playerId, ItemBoxManager box)
-    {
-        myId = playerId;
-        myItemBox = box;
-
-        Debug.Log($"[ItemSync] Init 완료 → playerId: {playerId}, box: {box.name}");
-    }
+    public string MyNickname => photonView.Owner.NickName;
+    public bool IsMine() => photonView.IsMine;
 
     private void Start()
     {
-        if (myItemBox == null)
-        {
-            Debug.LogWarning($"[ItemSync] myItemBox 자동 연결 실패! Init 호출이 누락된 것 같습니다.");
-        }
-
-        StartCoroutine(DelayedInit());
+        StartCoroutine(OnNetworkReady());
     }
 
-    private IEnumerator DelayedInit()
+    /// <summary>
+    /// PhotonNetwork, SpawnerManager 초기화 기다린 뒤 InitPlayerItems 실행
+    /// </summary>
+    private IEnumerator OnNetworkReady()
     {
-        // 닉네임이 세팅될 때까지 대기
-        while (string.IsNullOrEmpty(PhotonNetwork.LocalPlayer.NickName)) yield return null;
-        myId = PhotonNetwork.LocalPlayer.NickName;
+        yield return new WaitUntil(() =>
+           PhotonNetwork.IsConnected &&
+           DeskUIManager.Instance != null &&
+           ItemBoxSpawnerManager.Instance != null);
 
-        // ItemBoxSpawnerManager가 생성되었는지 대기
-        yield return new WaitUntil(() => ItemBoxSpawnerManager.Instance != null);
-
-        // 자동 연결 시도 (반드시 필요)
-        if (myItemBox == null)
+        if (IsMine())
         {
-            var candidates = FindObjectsOfType<ItemBoxManager>();
-            foreach (var box in candidates)
+            Debug.Log($"[ItemSync] 내 박스 생성 시도 시작 → {MyNickname}");
+            // 내 DeskUI 생성
+            DeskUIManager.Instance.CreateMyDeskUI();
+
+            // DeskUI 객체 가져옴
+            var myDeskUI = DeskUIManager.Instance.GetDeskUI(MyNickname);
+            if (myDeskUI == null)
             {
-                if (box.OwnerId == myId)
-                {
-                    myItemBox = box;
-                    Debug.Log($"[ItemSync] 내 상자 연결 완료 → {myItemBox.name}");
-                    break;
-                }
+                Debug.LogError($"[ItemSync] 내 DeskUI를 찾을 수 없음 → {MyNickname}");
+                yield break;
             }
 
-            // 실제 상자 존재하는지 체크 후 Init 시도
-            if (ItemBoxSpawnerManager.Instance.TryGetItemBox(myId, out var myBox))
+            // 내 ItemBox 생성 및 등록
+            int spawnIndex = GetMySpawnIndex();
+            var spawnPoints = ItemBoxSpawnerManager.Instance.GetComponentsInChildren<Transform>()
+                .Where(t => t.CompareTag("ItemBoxSpawnPoint")).ToArray();
+
+            if (spawnIndex >= spawnPoints.Length)
             {
-                Init(myId, myBox);
-                Debug.Log($"[ItemSync] {myId} 상자 연결 완료");
+                Debug.LogError($"[ItemSync] ItemBox 생성 위치 부족 → index: {spawnIndex}");
+                yield break;
             }
-            else
+
+            Transform spawnPos = spawnPoints[spawnIndex];
+            Debug.Log($"[ItemSync] 박스 생성 위치: {spawnPos.position}");
+            GameObject obj = PhotonNetwork.Instantiate("ItemBox", spawnPos.position, spawnPos.rotation);
+            Debug.Log($"[ItemSync] PhotonNetwork.Instantiate 성공 → {obj.name}");
+            var box = obj.GetComponent<ItemBoxManager>();
+            if (box == null)
             {
-                Debug.LogError($"[ItemSync] 내 상자를 찾을 수 없음! → myId: {myId}");
+                Debug.LogError("[ItemSync] ItemBoxManager 컴포넌트 없음!");
+                yield break;
             }
+            box.Init(myDeskUI);
+
+            myItemBox = box;
+
+            ItemBoxSpawnerManager.Instance.RegisterItemBox(MyNickname, box);
+            Debug.Log($"[ItemSync] 내 박스 생성 및 등록 완료 → {MyNickname}");
         }
 
-        photonView.RPC("InitPlayerItems", RpcTarget.AllBuffered, myId);
+        // 아이템 초기화 RPC
+        photonView.RPC(nameof(InitPlayerItems), RpcTarget.AllBuffered, MyNickname);
+
+        // 마지막에 인터랙션 설정
+        if (IsMine())
+        {
+            var myDeskUI = DeskUIManager.Instance.GetDeskUI(MyNickname);
+            if (myDeskUI != null)
+            {
+                myDeskUI.SetInteractable(true);
+                Debug.Log($"[ItemSync] 내 DeskUI 클릭 활성화 → {MyNickname}");
+            }
+
+            foreach (var player in PhotonNetwork.PlayerList)
+            {
+                if (player.NickName == MyNickname) continue;
+
+                var otherDeskUI = DeskUIManager.Instance.GetDeskUI(player.NickName);
+                if (otherDeskUI != null)
+                {
+                    otherDeskUI.SetInteractable(false);
+                    Debug.Log($"[ItemSync] 상대 DeskUI 클릭 비활성화 → {player.NickName}");
+                }
+            }
+        }
+    }
+
+    [PunRPC]
+    private void InitPlayerItems(string nickname)
+    {
+        var myItems = new List<ItemData>(itemDataList);
+        ItemSyncManager.Instance.OnSyncReceived(nickname, myItems);
+        Debug.Log($"[ItemSync] 아이템 동기화 완료 → {nickname}");
     }
 
     public void UseItemRequest(string itemId)
     {
-        photonView.RPC("UseItem", RpcTarget.AllViaServer, myId, itemId);
-    }
-    
-    // 아이템 초기화
-    [PunRPC]
-    private void InitPlayerItems(string playerId)
-    {
-        Player player = FindLTHPlayer(playerId);
-        var myItems = new List<ItemData>(itemDataList);
-        ItemSyncManager.Instance.OnSyncReceived(playerId, myItems);
-        Debug.Log($"[{playerId}] 아이템 생성 및 동기화 완료");
+        photonView.RPC(nameof(UseItem), RpcTarget.AllViaServer, MyNickname, itemId);
     }
 
-    // 아이템 사용 처리
     [PunRPC]
-    private void UseItem(string playerId, string itemId)
+    private void UseItem(string nickname, string itemId)
     {
-        var items = ItemSyncManager.Instance.GetSyncedItems(playerId);
-        var targetItem = items.Find(i => i.itemId == itemId);
+        var items = ItemSyncManager.Instance.GetSyncedItems(nickname);
+        var targetItem = items.FirstOrDefault(i => i.itemId == itemId);
 
         if (targetItem == null)
         {
-            Debug.Log($"{playerId}에게 {itemId} 아이템 없음");
+            Debug.LogWarning($"[UseItem] {nickname}에게 {itemId} 아이템 없음");
             return;
         }
 
-        Debug.Log($"[UseItem] {playerId} → {itemId} 사용됨");
+        Debug.Log($"[UseItem] {nickname} → {itemId} 사용");
 
-        switch (targetItem.itemType)
-        {
-            case ItemType.Cigarette:
-                Debug.Log("체력 +1");
-                break;
-            case ItemType.Saw:
-                Debug.Log("총 데미지 2배!");
-                break;
-        }
+        var user = FindPlayerByNickname(nickname);
+        var target = FindTargetPlayer(user);
+
+        ItemManager.Instance.UseItem(targetItem, user, target);
+
+        photonView.RPC(nameof(ClearSlot), RpcTarget.All, nickname, itemId);
     }
-    
-    // 아이템 상자 열기
+
+    [PunRPC]
+    private void ClearSlot(string nickname, string itemId)
+    {
+        var deskUI = DeskUIManager.Instance.GetDeskUI(nickname);
+        if (deskUI == null)
+        {
+            Debug.LogWarning($"[ClearSlot] {nickname}의 DeskUI 없음");
+            return;
+        }
+
+        deskUI.ClearItemSlotById(itemId);
+    }
+
     public void BoxOpen()
     {
         if (myItemBox == null)
         {
-            var candidates = FindObjectsOfType<ItemBoxManager>();
-            foreach (var box in candidates)
-            {
-                if (box.OwnerId == myId)
-                {
-                    myItemBox = box;
-                    break;
-                }
-            }
-
-            if (myItemBox == null)
-            {
-                Debug.LogError($"[ItemSync] myItemBox를 찾을 수 없습니다. → {myId}");
-                return;
-            }
-        }
-
-        photonView.RPC("OpenBox", RpcTarget.AllBuffered, myId);
-    }
-
-    // 아이템 상자 동기화
-    [PunRPC]
-    private void OpenBox(string playerId)
-    {
-        if (myItemBox == null)
-        {
-            Debug.LogError($"[ItemSync] myItemBox가 연결되지 않았습니다. → playerId: {playerId}");
+            Debug.LogError($"[ItemSync] 내 상자 찾기 실패: {MyNickname}");
             return;
         }
 
-        if (myItemBox.OwnerId == playerId)
+        if (myItemBox.IsOpened)
+        {
+            Debug.Log($"[ItemSync] 이미 열린 상자 → RPC 생략: {MyNickname}");
+            return;
+        }
+
+        photonView.RPC(nameof(OpenBox), RpcTarget.AllBuffered, MyNickname);
+    }
+
+    [PunRPC]
+    private void OpenBox(string nickname)
+    {
+        if (myItemBox == null)
+        {
+            Debug.LogError($"[ItemSync] ItemBox 여전히 null → nickname: {nickname}");
+            return;
+        }
+
+        if (myItemBox.OwnerNickname == nickname)
         {
             myItemBox.OnBoxClicked();
         }
+        else
+        {
+            Debug.LogWarning($"[ItemSync] {nickname}는 이 상자의 주인이 아닙니다");
+        }
     }
 
-    private Player FindLTHPlayer(string playerId)
+    private GamePlayer FindPlayerByNickname(string nickname)
     {
-        return FindObjectsOfType<Player>().FirstOrDefault(p => p.FirebaseUID == playerId);
+        return PlayerManager.Instance.FindPlayerByNickname(nickname);
+    }
+
+    private GamePlayer FindTargetPlayer(GamePlayer user)
+    {
+        return PlayerManager.Instance.GetAllPlayers()
+        .Where(kvp => kvp.Key != user.PlayerId && kvp.Value.IsAlive)
+        .Select(kvp => kvp.Value)
+        .FirstOrDefault();
+    }
+
+    /// <summary>
+    /// 현재 로컬 플레이어의 Photon Index 반환
+    /// </summary>
+    private int GetMySpawnIndex()
+    {
+        var list = PhotonNetwork.PlayerList;
+        for (int i = 0; i < list.Length; i++)
+        {
+            if (list[i].NickName == PhotonNetwork.NickName)
+                return i;
+        }
+        return -1;
     }
 }

@@ -62,7 +62,11 @@ MonoBehaviour:
   - RPC_SwitchNextBullet
   - SyncTurn
   - RPC_RegisterAllPlayer
-  - FireGunToTarget
+  - GoToLobbyScene
+  - ShowGameOverPanel
+  - RequestFire
+  - RPC_Init
+  - ClearSlot
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

@@ -12,11 +12,11 @@ public class DeskUI : UI_Base
 {
     [SerializeField] private List<ItemSlot> itemSlots; // 아이템 슬롯 리스트
 
-    private string ownerPlayerId;
-    private bool isInteractable = true;
-
-    public string OwnerPlayerId => ownerPlayerId;
-    public bool IsInteractable => isInteractable;
+    /// <summary>
+    /// Photon Nickname 기준으로 설정
+    /// </summary>
+    public string OwnerNickname { get; private set; }
+    public bool IsInteractable { get; private set; } = true;
 
     /// <summary>
     /// UI 초기화 시  null일 경우 슬롯 자동 등록
@@ -31,9 +31,18 @@ public class DeskUI : UI_Base
     /// DeskUI가 어느 플레이어의 UI인지 식별
     /// 네트워크 기반 시스템에서 각 DeskUI를 playerId로 매핑 가능가능하도록 하기 위함
     /// </summary>
-    public void SetOwner(string playerId)
+    public void SetOwner(string photonNickname)
     {
-        ownerPlayerId = playerId;
+        OwnerNickname = photonNickname;
+        Debug.Log($"[DeskUI] SetOwner 호출 → {photonNickname}");
+
+        if (itemSlots == null || itemSlots.Count == 0)
+            itemSlots = new List<ItemSlot>(GetComponentsInChildren<ItemSlot>(includeInactive: true));
+
+        foreach (var slot in itemSlots)
+        {
+            slot.SetOwner(photonNickname);
+        }
     }
 
     /// <summary>
@@ -41,9 +50,10 @@ public class DeskUI : UI_Base
     /// </summary>
     public void ClearAllSlots()
     {
+        if (itemSlots == null) return;
         foreach (var slot in itemSlots)
         {
-            if (slot != null) slot.Clear();
+            slot?.ClearSlot();
         }
     }
 
@@ -52,7 +62,7 @@ public class DeskUI : UI_Base
     /// </summary>
     public List<ItemSlot> GetEmptySlots()
     {
-        return itemSlots.FindAll(slot => slot != null && slot.IsEmpty());
+        return itemSlots?.FindAll(slot => slot != null && slot.IsEmpty);
     }
 
     /// <summary>
@@ -60,10 +70,36 @@ public class DeskUI : UI_Base
     /// </summary>
     public void SetInteractable(bool interactable)
     {
-        isInteractable = interactable;
+        IsInteractable = interactable;
+        Debug.Log($"[DeskUI] SetInteractable: {interactable} → {OwnerNickname}");
+
+        if (itemSlots == null || itemSlots.Count == 0)
+            itemSlots = new List<ItemSlot>(GetComponentsInChildren<ItemSlot>(includeInactive: true));
+
         foreach (var slot in itemSlots)
         {
-            if (slot != null) slot.SetInteractable(interactable);
+            slot?.SetInteractable(interactable);
+        }
+    }
+
+    public void PlaceItems(List<string> itemIds)
+    {
+        var emptySlots = GetEmptySlots();
+        for (int i = 0; i < itemIds.Count && i < emptySlots.Count; i++)
+        {
+            emptySlots[i].PlaceItemById(itemIds[i]);
+        }
+    }
+
+    public void ClearItemSlotById(string itemId)
+    {
+        foreach (var slot in itemSlots)
+        {
+            if (!slot.IsEmpty && slot.HasItemId(itemId))
+            {
+                slot.ClearSlot();
+                break;
+            }
         }
     }
 }

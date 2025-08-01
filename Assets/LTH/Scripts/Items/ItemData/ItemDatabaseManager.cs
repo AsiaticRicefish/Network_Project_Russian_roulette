@@ -17,8 +17,15 @@ public class ItemDatabaseManager : Singleton<ItemDatabaseManager>
 
         foreach (var item in allItems)
         {
-            if (item.itemId!=null && !itemDict.ContainsKey(item.itemId))
-                itemDict.Add(item.itemId, item);
+            if (item != null && !string.IsNullOrEmpty(item.itemId) && item.itemPrefab != null)
+            {
+                if (!itemDict.ContainsKey(item.itemId))
+                    itemDict.Add(item.itemId, item);
+            }
+            else
+            {
+                Debug.LogWarning("[ItemDatabaseManager] 유효하지 않은 아이템 발견 (null, itemId 없음 또는 프리팹 없음)");
+            }
         }
     }
 
@@ -30,11 +37,14 @@ public class ItemDatabaseManager : Singleton<ItemDatabaseManager>
 
     public List<ItemData> GetRandomItems(int count)
     {
+        List<ItemData> validItems = allItems.FindAll(item =>
+       item != null && !string.IsNullOrEmpty(item.itemId) && item.itemPrefab != null);
+
         List<ItemData> result = new();
         for (int i = 0; i < count; i++)
         {
-            int rand = Random.Range(0, allItems.Count);
-            result.Add(allItems[rand]); // 중복 허용
+            int rand = Random.Range(0, validItems.Count);
+            result.Add(validItems[rand]); // 중복 허용
         }
         return result;
     }

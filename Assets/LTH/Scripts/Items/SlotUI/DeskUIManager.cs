@@ -1,119 +1,101 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using DesignPattern;
 using Photon.Pun;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
 
 /// <summary>
 /// 각 플레이어의 DeskUI를 관리하는 매니저 클래스
-/// playerId(Firebase UID)를 기준으로 등록 및 조회 가능
+/// 기준 식별자는 Photon Nickname
 /// </summary>
 
 public class DeskUIManager : Singleton<DeskUIManager>
 {
     [Header("UI 프리팹 및 배치 위치")]
-    [SerializeField] private GameObject deskUIPrefab;
+    [SerializeField] private string deskUIPrefabPath = "ItemSlot/DeskCanvas";
     [SerializeField] private Transform[] spawnPoints; // UI 배치 위치들
 
-    private Dictionary<string, DeskUI> deskUIDict = new(); // playerId -> DeskUI 매핑
+    private Dictionary<string, DeskUI> deskUIDict = new(); // nickname → DeskUI
 
     private void Awake() => SingletonInit();
 
     /// <summary>
-    /// 플레이어 수 만큼 DeskUI 생성 및 할당
+    /// 외부에서 생성된 DeskUI를 등록
     /// </summary>
-    public void CreateDeskUIs(List<GamePlayer> players)
+    public void RegisterDeskUI(string nickname, DeskUI deskUI)
     {
-        for (int i = 0; i < players.Count; i++) // 각 플레이어마다 반복 처리
+        if (!deskUIDict.ContainsKey(nickname))
         {
-            var player = players[i];
-            string playerId = player.PlayerId; // 플레이어 객체와 Firebase UID 획득하여 UID 기준으로 UI를 매핑
-
-            Transform spawnPoint = spawnPoints.Length > i ? spawnPoints[i] : null; // UI가 생성될 위치 확보
-            
-            if (spawnPoint == null) // 스폰 위치가 없으면 에러 출력 후 해당 플레이어는 스킵
-            {
-                Debug.LogError($"[DeskUIManager] SpawnPoint 부족: Index {i} 없음");
-                continue;
-            }
-
-            var deskObj = Instantiate(deskUIPrefab, spawnPoint.position, spawnPoint.rotation);
-            var deskUI = deskObj.GetComponent<DeskUI>();
-
-            if (deskUI == null)
-            {
-                Debug.LogError("[DeskUIManager] DeskUI 컴포넌트 없음"); // 생성한 오브젝트에 DeskUI 컴포넌트가 없으면 에러 출력
-                continue;
-            }
-
-            deskUI.SetOwner(playerId); // 이 UI가 어떤 플레이어의 것인지 설정
-
-            // 내 UI만 상호작용 허용
-            bool isMine = player.GetComponent<PhotonView>().IsMine;
-            deskUI.SetInteractable(isMine); // 내 책상 UI만 상호작용 가능하게 설정
-
-            deskUIDict[playerId] = deskUI; // UID를 키로 하여 Dictionary에 DeskUI 등록
+            deskUIDict[nickname] = deskUI;
+            Debug.Log($"[DeskUIManager] 등록됨 → {nickname}");
+        }
+        else
+        {
+            Debug.LogWarning($"[DeskUIManager] 이미 등록된 닉네임: {nickname}");
         }
     }
 
     /// <summary>
-    /// 특정 플레이어의 DeskUI 가져오기
+    /// 현재 클라이언트의 DeskUI를 직접 생성하고 등록
     /// </summary>
-    public DeskUI GetDeskUI(string playerId)
+    public void CreateMyDeskUI()
     {
-        if (deskUIDict.TryGetValue(playerId, out var deskUI))
+        int index = GetMyActorNumberIndex();
+        if (index < 0 || index >= spawnPoints.Length)
+        {
+            Debug.LogError($"[DeskUIManager] 생성 위치 인덱스 오류 → index: {index}");
+            return;
+        }
+
+        Transform spawnPoint = spawnPoints[index];
+        GameObject deskObj = PhotonNetwork.Instantiate(deskUIPrefabPath, spawnPoint.position, spawnPoint.rotation);
+
+        if (!deskObj.TryGetComponent(out DeskUI deskUI))
+        {
+            Debug.LogError("[DeskUIManager] DeskUI 컴포넌트 없음");
+            return;
+        }
+
+        string myNickname = PhotonNetwork.NickName;
+        deskUI.SetOwner(myNickname);
+        deskUI.SetInteractable(true);
+        RegisterDeskUI(myNickname, deskUI);
+
+        Debug.Log($"[DeskUIManager] 내 DeskUI 생성 완료 → {myNickname} @ {index}");
+    }
+
+    /// <summary>
+    /// Photon.ActorNumber를 기준으로 안정적인 인덱스 반환
+    /// </summary>
+    private int GetMyActorNumberIndex()
+    {
+        var sorted = PhotonNetwork.PlayerList.OrderBy(p => p.ActorNumber).ToList();
+        return sorted.IndexOf(PhotonNetwork.LocalPlayer);
+    }
+
+    /// <summary>
+    /// 닉네임으로 DeskUI 조회
+    /// </summary>
+    public DeskUI GetDeskUI(string nickname)
+    {
+        if (deskUIDict.TryGetValue(nickname, out var deskUI))
             return deskUI;
 
-        Debug.LogWarning($"[DeskUIManager] DeskUI 찾을 수 없음: {playerId}");
+        Debug.LogWarning($"[DeskUIManager] DeskUI 찾을 수 없음 → {nickname}");
         return null;
     }
 
     /// <summary>
-    /// 모든 DeskUI 제거 (씬 전환 등에서 호출)
+    /// 전체 DeskUI 제거
     /// </summary>
     public void ClearAll()
     {
         foreach (var kv in deskUIDict)
         {
-            Destroy(kv.Value.gameObject);
+            if (kv.Value != null)
+                Destroy(kv.Value.gameObject);
         }
         deskUIDict.Clear();
-    }
-
-    /// <summary>
-    /// GamePlayer 없이 Photon 플레이어만으로 DeskUI 생성 (테스트 함수)
-    /// </summary>
-    public void CreateDeskUIsForPhotonPlayers()
-    {
-        var photonPlayers = PhotonNetwork.PlayerList;
-        Debug.Log($"[DeskUIManager] Photon 플레이어 수: {photonPlayers.Length}");
-
-        for (int i = 0; i < photonPlayers.Length; i++)
-        {
-            var player = photonPlayers[i];
-            string playerId = player.NickName;
-
-            Transform spawnPoint = spawnPoints.Length > i ? spawnPoints[i] : null;
-            if (spawnPoint == null)
-            {
-                Debug.LogError($"[DeskUIManager] SpawnPoint 부족: Index {i} 없음");
-                continue;
-            }
-
-            var deskObj = Instantiate(deskUIPrefab, spawnPoint.position, spawnPoint.rotation);
-            var deskUI = deskObj.GetComponent<DeskUI>();
-
-            if (deskUI == null)
-            {
-                Debug.LogError("[DeskUIManager] DeskUI 컴포넌트 없음");
-                continue;
-            }
-
-            deskUI.SetOwner(playerId);
-            bool isMine = (player == PhotonNetwork.LocalPlayer);
-            deskUI.SetInteractable(isMine);
-
-            deskUIDict[playerId] = deskUI;
-        }
     }
 }

@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2001ace5265a8b148baa9b4e9fcbd50a, type: 3}
   m_Name: MagnifyingGlass
   m_EditorClassIdentifier: 
+  itemId: MagnifyingGlass
   itemType: 2
   displayName: "\uB3CB\uBCF4\uAE30"
   description: "\uD604\uC7AC \uC7A5\uC804\uB41C \uD0C4\uC774 \uC2E4\uD0C4\uC778\uC9C0

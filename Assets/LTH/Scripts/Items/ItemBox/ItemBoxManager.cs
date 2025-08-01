@@ -1,9 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using LTH; // 임시 Playerm ItemData 정의용 네임스페이스
+using LTH;
 using Photon.Pun;
-using DesignPattern; 
 using DG.Tweening;
 
 /// <summary>
@@ -23,23 +22,41 @@ public class ItemBoxManager : MonoBehaviourPun
 
     [Header("Connect Slot")]
     [SerializeField] private DeskUI deskUI;
-    
-    private string ownerId; // 각 플레이어의 DeskUI와 연결하기 위한 소유자 ID
-    public string OwnerId => ownerId;
+
+    private string ownerNickname;
+    public string OwnerNickname => ownerNickname;
+
+    public bool IsMine => ownerNickname == PhotonNetwork.NickName;
+    public int NewItemCount => newItemCount;
 
     private bool isOpened = false;
-    public bool IsMine => ownerId == PhotonNetwork.LocalPlayer.NickName;
-    public int NewItemCount => newItemCount;
+    public bool IsOpened => isOpened;
+
+    private void Awake()
+    {
+        if (photonView != null && photonView.Owner != null)
+        {
+            ownerNickname = photonView.Owner.NickName;
+            Debug.Log($"[ItemBoxManager] 자동 OwnerNickname 설정됨: {ownerNickname}");
+        }
+    }
 
     /// <summary>
     /// 각 플레이어에 대한 초기화
     /// </summary>
-    public void Init(string playerId, DeskUI deskUI)
+    public void Init(DeskUI deskUI)
     {
-        ownerId = playerId;
         this.deskUI = deskUI;
-        CloseBoxImmediately(); // 시작 시 닫힌 상태로 초기화
+        photonView.RPC(nameof(RPC_Init), RpcTarget.AllBuffered);
     }
+
+    [PunRPC]
+    private void RPC_Init()
+    {
+        Debug.Log($"[ItemBoxManager] Init 완료 → Owner: {ownerNickname}, Local: {PhotonNetwork.NickName}");
+        CloseBoxImmediately();
+    }
+
 
     /// <summary>
     /// 상자 등장 (게임 매니저에서 호출)
@@ -67,20 +84,43 @@ public class ItemBoxManager : MonoBehaviourPun
     /// </summary>
     public void OnBoxClicked()
     {
-        if (isOpened || !IsMine) return;
+        Debug.Log($"[BoxClicked] 호출됨 → {PhotonNetwork.NickName}, isOpened: {isOpened}, IsMine: {IsMine}");
 
-        isOpened = true;
+        if (isOpened)
+        {
+            Debug.LogWarning("[BoxClicked] 이미 열린 상자입니다.");
+            return;
+        }
+
+        if (!IsMine)
+        {
+            Debug.LogWarning("[BoxClicked] 상자 주인이 아닙니다.");
+            return;
+        }
+
+        isOpened = true;;
+
         var rewards = ItemDatabaseManager.Instance.GetRandomItems(newItemCount);
         var rewardIds = new List<string>();
-        foreach (var item in rewards)
-            rewardIds.Add(item.itemId);
 
-        photonView.RPC(nameof(RPC_DistributeRewards), RpcTarget.All, rewardIds.ToArray());
+        foreach (var item in rewards)
+        {
+            if (item == null || string.IsNullOrEmpty(item.itemId))
+            {
+                Debug.LogError("[ItemBoxManager] 잘못된 아이템 감지됨");
+                continue;
+            }
+
+            rewardIds.Add(item.itemId);
+        }
+
+        photonView.RPC(nameof(RPC_DistributeRewards), RpcTarget.All, string.Join(",", rewardIds));
     }
 
     [PunRPC]
-    private void RPC_DistributeRewards(string[] itemIds)
+    private void RPC_DistributeRewards(string joinedIds)
     {
+        string[] itemIds = joinedIds.Split(',');
         isOpened = true;
 
         lidTransform.DOLocalRotate(openRotation, 0.7f)
@@ -129,6 +169,6 @@ public class ItemBoxManager : MonoBehaviourPun
         foreach (var item in customList)
             rewardIds.Add(item.itemId);
 
-        photonView.RPC(nameof(RPC_DistributeRewards), RpcTarget.All, rewardIds.ToArray());
+        photonView.RPC(nameof(RPC_DistributeRewards), RpcTarget.All, string.Join(",", rewardIds));
     }
 }
