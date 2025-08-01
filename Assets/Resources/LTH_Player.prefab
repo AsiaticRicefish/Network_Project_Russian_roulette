@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 3213463950529984845}
   - component: {fileID: 7118450801839375927}
   - component: {fileID: 7667450879551523682}
+  - component: {fileID: 6859760181715907942}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -137,6 +138,22 @@ MonoBehaviour:
     m_MipBias: 0
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
+--- !u!114 &6859760181715907942
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2361074234634229188}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c49b4cc203aa6414fae5c798d1d0e7d6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_EventMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_MaxRayIntersections: 0
 --- !u!1 &2678309651922650174
 GameObject:
   m_ObjectHideFlags: 0
@@ -261,6 +278,7 @@ GameObject:
   - component: {fileID: 606653789671651936}
   - component: {fileID: 5617500031614397930}
   - component: {fileID: 5013972192999619929}
+  - component: {fileID: -3369636611304640253}
   m_Layer: 0
   m_Name: LTH_Player
   m_TagString: Player
@@ -402,7 +420,8 @@ MonoBehaviour:
   Synchronization: 3
   OwnershipTransfer: 0
   observableSearch: 2
-  ObservedComponents: []
+  ObservedComponents:
+  - {fileID: -3369636611304640253}
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
@@ -470,3 +489,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 534d782efacc44b47969c14d4e03b49d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &-3369636611304640253
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5578550799413524171}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 627855c7f81362d41938ffe0b1475957, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SynchronizePosition: 0
+  m_SynchronizeRotation: 1
+  m_SynchronizeScale: 0
+  m_UseLocal: 1

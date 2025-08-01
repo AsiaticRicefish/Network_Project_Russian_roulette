@@ -1,35 +1,44 @@
 using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
+/// <summary>
+/// 상자 클릭 시 해당 주인의 아이템 싱크에게 요청하도록 변경
+/// </summary>
 public class BoxClickTrigger : MonoBehaviour
 {
+    private ItemBoxManager _box;
+
+    private void Awake()
+    {
+        _box = GetComponent<ItemBoxManager>();
+    }
+
     private void OnMouseDown()
     {
-        var itemSync = FindObjectOfType<ItemSync>();
-
-        // 혹시 myItemBox가 null이라면 즉석에서 연결
-        if (itemSync != null && itemSync.myItemBox == null)
+        if (_box == null)
         {
-            var boxes = FindObjectsOfType<ItemBoxManager>();
-            foreach (var box in boxes)
-            {
-                if (box.OwnerId == PhotonNetwork.LocalPlayer.NickName)
-                {
-                    itemSync.Init(box.OwnerId, box);
-                    Debug.Log("[BoxClickTrigger] myItemBox 즉시 연결 완료");
-                    break;
-                }
-            }
-
-            if (itemSync.myItemBox == null)
-            {
-                Debug.LogError("[BoxClickTrigger] Init 실패! 상자 연결에 실패했습니다.");
-                return;
-            }
+            Debug.LogWarning("[BoxClickTrigger] ItemBoxManager 없음");
+            return;
         }
 
-        itemSync?.BoxOpen(); // null 체크
+        string ownerNickname = _box.OwnerNickname;
+        Debug.Log($"[BoxClickTrigger] 클릭된 상자 Owner: {ownerNickname}");
+
+        // 모든 ItemSync 중, ownerNickname과 일치하는 주인을 찾음
+        var sync = FindObjectsOfType<ItemSync>()
+            .FirstOrDefault(s => s.MyNickname == ownerNickname);
+
+        if (sync != null)
+        {
+            Debug.Log($"[BoxClickTrigger] ItemSync 찾음 → MyNickname: {sync.MyNickname}, IsMine: {sync.IsMine()}");
+            sync.BoxOpen();
+        }
+        else
+        {
+            Debug.LogWarning($"[BoxClickTrigger] ItemSync 찾을 수 없음: {ownerNickname}");
+        }
     }
 }
