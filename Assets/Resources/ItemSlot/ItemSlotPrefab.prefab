@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 864005848176766341}
   - component: {fileID: 7542897283128170509}
   - component: {fileID: 7919363705534979265}
+  - component: {fileID: -1551481704562017810}
   m_Layer: 5
   m_Name: ItemSlotPrefab
   m_TagString: Untagged
@@ -136,8 +137,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   anchorPoint: {fileID: 8723189457005248799}
-  itemCollider: {fileID: 0}
-  uiEventHandler: {fileID: 0}
+  itemCollider: {fileID: 7542897283128170509}
+  uiEventHandler: {fileID: -1551481704562017810}
 --- !u!65 &7542897283128170509
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -181,3 +182,15 @@ MonoBehaviour:
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
+--- !u!114 &-1551481704562017810
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 323995532312893411}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ba70642b31d4f359b68311842cc06bb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

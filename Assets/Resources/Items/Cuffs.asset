@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2001ace5265a8b148baa9b4e9fcbd50a, type: 3}
   m_Name: Cuffs
   m_EditorClassIdentifier: 
+  itemId: Cuffs
   itemType: 1
   displayName: "\uC218\uAC11"
   description: "\uC0C1\uB300 \uD50C\uB808\uC774\uC5B4 \uD134 \uAC74\uB108\uB6F0\uAE30"
