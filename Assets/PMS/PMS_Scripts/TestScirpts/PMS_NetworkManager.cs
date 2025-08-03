@@ -5,6 +5,7 @@ using Photon.Pun;
 using Photon.Realtime;
 using System.IO;
 using ExitGames.Client.Photon;
+using UnityEngine.SceneManagement;
 /*
  * 테스트용 제거 예정
  */
@@ -13,6 +14,7 @@ public class PMS_NetworkManager : MonoBehaviourPunCallbacks
 {
     private string playerId;
     private static PMS_NetworkManager Instance;
+    [SerializeField] private string _sceneName;
     private void Awake()
     {        
         // 인스턴스가 없으면 자신을 인스턴스로 지정
@@ -82,6 +84,7 @@ public class PMS_NetworkManager : MonoBehaviourPunCallbacks
         hash["GameStart"] = true;
         PhotonNetwork.CurrentRoom.SetCustomProperties(hash); // 변경된 상태를 모든 클라이언트에 동기화
         PhotonNetwork.LoadLevel("PMS_TestScene");
+        //SceneManager.LoadScene("PMS_InGame", LoadSceneMode.Additive);
     }
 
     // 새로운 플레이어가 방에 입장했을 때 (모든 클라이언트에서 호출)
@@ -133,6 +136,15 @@ public class PMS_NetworkManager : MonoBehaviourPunCallbacks
         }
 
     }
+
+    [PunRPC]
+    void LoadAdditiveSceneRPC(string sceneName)
+    {
+        SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
+    }
+
+    // 마스터 클라이언트에서 호출
+    //photonView.RPC("LoadAdditiveSceneRPC", RpcTarget.All, "SubSceneName");
 }
 /*
         클라이언트 측에서 서버쪽으로 요청이 필요한 경우, PhotonNetwork 클래스를 사용하여 요청을 처리
