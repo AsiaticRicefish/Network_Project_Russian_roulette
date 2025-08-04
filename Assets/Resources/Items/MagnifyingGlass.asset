@@ -14,9 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemId: MagnifyingGlass
   itemType: 2
-  displayName: "\uB3CB\uBCF4\uAE30"
-  description: "\uD604\uC7AC \uC7A5\uC804\uB41C \uD0C4\uC774 \uC2E4\uD0C4\uC778\uC9C0
-    \uACF5\uD3EC\uD0C4\uC778\uC9C0 \uAD6C\uBD84"
+  displayName: MagnifyingGlass
+  description: Check Loaded Bullet Type
   icon: {fileID: 0}
   isUsed: 0
   itemPrefab: {fileID: 9138742753409025537, guid: 39b59c1796e51764892ada4ed8f065e7,
