@@ -84,7 +84,16 @@ public class GamePlayer : MonoBehaviour, IComparer<GamePlayer>
         _pv = GetComponent<PhotonView>();
     }
 
-    private void OnEnable()
+    private void Start()
+    {
+        if (_pv.IsMine)
+        {
+            Initialize();
+            StartCoroutine(PlayerListSortDelay());
+        }
+    }
+
+    /*private void OnEnable()
     {
         //게임 시작 호출을 못받았다.
         if (_pv.IsMine)
@@ -100,7 +109,7 @@ public class GamePlayer : MonoBehaviour, IComparer<GamePlayer>
         {
             InGameManager.Instance.OnGameStart -= Initialize;
         }
-    }
+    }*/
 
     public void Initialize()
     {
