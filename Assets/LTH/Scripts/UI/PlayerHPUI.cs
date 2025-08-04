@@ -71,12 +71,6 @@ public class PlayerHPUI : MonoBehaviour
 
     private void UpdateHpUIForAll()
     {
-        foreach (var p in players.Values)
-        {
-            if (p.MaxHp <= 0)
-                return;
-        }
-
         foreach (var player in players.Values)
         {
             bool isMine = player.Nickname == myId;
