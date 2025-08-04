@@ -28,11 +28,6 @@ public class DeskUIManager : Singleton<DeskUIManager>
         if (!deskUIDict.ContainsKey(nickname))
         {
             deskUIDict[nickname] = deskUI;
-            Debug.Log($"[DeskUIManager] 등록됨 → {nickname}");
-        }
-        else
-        {
-            Debug.LogWarning($"[DeskUIManager] 이미 등록된 닉네임: {nickname}");
         }
     }
 
@@ -44,7 +39,6 @@ public class DeskUIManager : Singleton<DeskUIManager>
         int index = GetMyActorNumberIndex();
         if (index < 0 || index >= spawnPoints.Length)
         {
-            Debug.LogError($"[DeskUIManager] 생성 위치 인덱스 오류 → index: {index}");
             return;
         }
 
@@ -53,7 +47,6 @@ public class DeskUIManager : Singleton<DeskUIManager>
 
         if (!deskObj.TryGetComponent(out DeskUI deskUI))
         {
-            Debug.LogError("[DeskUIManager] DeskUI 컴포넌트 없음");
             return;
         }
 
@@ -61,8 +54,6 @@ public class DeskUIManager : Singleton<DeskUIManager>
         deskUI.SetOwner(myNickname);
         deskUI.SetInteractable(true);
         RegisterDeskUI(myNickname, deskUI);
-
-        Debug.Log($"[DeskUIManager] 내 DeskUI 생성 완료 → {myNickname} @ {index}");
     }
 
     /// <summary>
@@ -82,7 +73,6 @@ public class DeskUIManager : Singleton<DeskUIManager>
         if (deskUIDict.TryGetValue(nickname, out var deskUI))
             return deskUI;
 
-        Debug.LogWarning($"[DeskUIManager] DeskUI 찾을 수 없음 → {nickname}");
         return null;
     }
 

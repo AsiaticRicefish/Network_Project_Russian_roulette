@@ -30,25 +30,23 @@ public class ItemSync : MonoBehaviourPun
     private IEnumerator OnNetworkReady()
     {
         yield return new WaitUntil(() =>
-           PhotonNetwork.IsConnected &&
-           DeskUIManager.Instance != null &&
-           ItemBoxSpawnerManager.Instance != null);
+       PhotonNetwork.IsConnected &&
+       DeskUIManager.Instance != null &&
+       ItemBoxSpawnerManager.Instance != null);
 
         if (IsMine())
         {
-            Debug.Log($"[ItemSync] 내 박스 생성 시도 시작 → {MyNickname}");
-            // 내 DeskUI 생성
             DeskUIManager.Instance.CreateMyDeskUI();
+        }    
+        var myDeskUI = DeskUIManager.Instance.GetDeskUI(MyNickname);
+        if (myDeskUI == null)
+        {
+            Debug.LogError($"[ItemSync] 내 DeskUI를 찾을 수 없음 → {MyNickname}");
+            yield break;
+        }
 
-            // DeskUI 객체 가져옴
-            var myDeskUI = DeskUIManager.Instance.GetDeskUI(MyNickname);
-            if (myDeskUI == null)
-            {
-                Debug.LogError($"[ItemSync] 내 DeskUI를 찾을 수 없음 → {MyNickname}");
-                yield break;
-            }
-
-            // 내 ItemBox 생성 및 등록
+        if (IsMine())
+        {
             int spawnIndex = GetMySpawnIndex();
             var spawnPoints = ItemBoxSpawnerManager.Instance.GetComponentsInChildren<Transform>()
                 .Where(t => t.CompareTag("ItemBoxSpawnPoint")).ToArray();
@@ -60,35 +58,48 @@ public class ItemSync : MonoBehaviourPun
             }
 
             Transform spawnPos = spawnPoints[spawnIndex];
-            Debug.Log($"[ItemSync] 박스 생성 위치: {spawnPos.position}");
             GameObject obj = PhotonNetwork.Instantiate("ItemBox", spawnPos.position, spawnPos.rotation);
-            Debug.Log($"[ItemSync] PhotonNetwork.Instantiate 성공 → {obj.name}");
+
             var box = obj.GetComponent<ItemBoxManager>();
             if (box == null)
             {
                 Debug.LogError("[ItemSync] ItemBoxManager 컴포넌트 없음!");
                 yield break;
             }
+
             box.Init(myDeskUI);
+            box.photonView.RPC("SetOwnerNickname", RpcTarget.AllBuffered, MyNickname);
 
             myItemBox = box;
-
             ItemBoxSpawnerManager.Instance.RegisterItemBox(MyNickname, box);
-            Debug.Log($"[ItemSync] 내 박스 생성 및 등록 완료 → {MyNickname}");
+
+            Debug.Log($"[ItemSync] 내 ItemBox 생성 완료 → {MyNickname}");
+        }
+        else
+        {
+            // 내 박스를 이미 생성한 마스터의 것을 가져와 Init만
+            yield return new WaitUntil(() => ItemBoxSpawnerManager.Instance.TryGetItemBox(MyNickname, out _));
+
+            if (ItemBoxSpawnerManager.Instance.TryGetItemBox(MyNickname, out var foundBox))
+            {
+                foundBox.Init(myDeskUI);
+                myItemBox = foundBox;
+                Debug.Log($"[ItemSync] 박스 연결 완료 → {MyNickname}");
+            }
+            else
+            {
+                Debug.LogError($"[ItemSync] 박스 연결 실패 → {MyNickname}");
+            }
         }
 
-        // 아이템 초기화 RPC
+        // 아이템 초기화 동기화
         photonView.RPC(nameof(InitPlayerItems), RpcTarget.AllBuffered, MyNickname);
 
-        // 마지막에 인터랙션 설정
+        // 상호작용 설정은 본인만
         if (IsMine())
         {
-            var myDeskUI = DeskUIManager.Instance.GetDeskUI(MyNickname);
-            if (myDeskUI != null)
-            {
-                myDeskUI.SetInteractable(true);
-                Debug.Log($"[ItemSync] 내 DeskUI 클릭 활성화 → {MyNickname}");
-            }
+            myDeskUI.SetInteractable(true);
+            Debug.Log($"[ItemSync] 내 DeskUI 클릭 활성화 → {MyNickname}");
 
             foreach (var player in PhotonNetwork.PlayerList)
             {
@@ -102,6 +113,79 @@ public class ItemSync : MonoBehaviourPun
                 }
             }
         }
+        //yield return new WaitUntil(() =>
+        //   PhotonNetwork.IsConnected &&
+        //   DeskUIManager.Instance != null &&
+        //   ItemBoxSpawnerManager.Instance != null);
+
+        //if (IsMine())
+        //{
+        //    Debug.Log($"[ItemSync] 내 박스 생성 시도 시작 → {MyNickname}");
+        //    // 내 DeskUI 생성
+        //    DeskUIManager.Instance.CreateMyDeskUI();
+
+        //    // DeskUI 객체 가져옴
+        //    var myDeskUI = DeskUIManager.Instance.GetDeskUI(MyNickname);
+        //    if (myDeskUI == null)
+        //    {
+        //        Debug.LogError($"[ItemSync] 내 DeskUI를 찾을 수 없음 → {MyNickname}");
+        //        yield break;
+        //    }
+
+        //    // 내 ItemBox 생성 및 등록
+        //    int spawnIndex = GetMySpawnIndex();
+        //    var spawnPoints = ItemBoxSpawnerManager.Instance.GetComponentsInChildren<Transform>()
+        //        .Where(t => t.CompareTag("ItemBoxSpawnPoint")).ToArray();
+
+        //    if (spawnIndex >= spawnPoints.Length)
+        //    {
+        //        Debug.LogError($"[ItemSync] ItemBox 생성 위치 부족 → index: {spawnIndex}");
+        //        yield break;
+        //    }
+
+        //    Transform spawnPos = spawnPoints[spawnIndex];
+        //    Debug.Log($"[ItemSync] 박스 생성 위치: {spawnPos.position}");
+        //    GameObject obj = PhotonNetwork.Instantiate("ItemBox", spawnPos.position, spawnPos.rotation);
+        //    Debug.Log($"[ItemSync] PhotonNetwork.Instantiate 성공 → {obj.name}");
+        //    var box = obj.GetComponent<ItemBoxManager>();
+        //    if (box == null)
+        //    {
+        //        Debug.LogError("[ItemSync] ItemBoxManager 컴포넌트 없음!");
+        //        yield break;
+        //    }
+        //    box.Init(myDeskUI);
+
+        //    myItemBox = box;
+
+        //    ItemBoxSpawnerManager.Instance.RegisterItemBox(MyNickname, box);
+        //    Debug.Log($"[ItemSync] 내 박스 생성 및 등록 완료 → {MyNickname}");
+        //}
+
+        //// 아이템 초기화 RPC
+        //photonView.RPC(nameof(InitPlayerItems), RpcTarget.AllBuffered, MyNickname);
+
+        //// 마지막에 인터랙션 설정
+        //if (IsMine())
+        //{
+        //    var myDeskUI = DeskUIManager.Instance.GetDeskUI(MyNickname);
+        //    if (myDeskUI != null)
+        //    {
+        //        myDeskUI.SetInteractable(true);
+        //        Debug.Log($"[ItemSync] 내 DeskUI 클릭 활성화 → {MyNickname}");
+        //    }
+
+        //    foreach (var player in PhotonNetwork.PlayerList)
+        //    {
+        //        if (player.NickName == MyNickname) continue;
+
+        //        var otherDeskUI = DeskUIManager.Instance.GetDeskUI(player.NickName);
+        //        if (otherDeskUI != null)
+        //        {
+        //            otherDeskUI.SetInteractable(false);
+        //            Debug.Log($"[ItemSync] 상대 DeskUI 클릭 비활성화 → {player.NickName}");
+        //        }
+        //    }
+        //}
     }
 
     [PunRPC]

@@ -25,28 +25,9 @@ public class ItemBoxSpawnerManager : Singleton<ItemBoxSpawnerManager>
 
     private IEnumerator Start()
     {
-        yield return new WaitUntil(() => Manager.Game != null);
+        yield return new WaitUntil(() => PhotonNetwork.IsConnected && PhotonNetwork.InRoom);
 
-        Manager.Game.OnTurnEnd += HandleTurnEnd;
         Manager.Game.OnGameStart += () => IsInitialized = true;
-    }
-
-    /// <summary>
-    ///  Try - catch 구문을 사용하여 예외 처리 (Manager.Game이 null일 수 있는 상황인데도 접근되는 경우)
-    /// </summary>
-    private void OnDestroy()
-    {
-        try // 여기 안의 코드에서 오류가 나더라도 프로그램이 멈추지 않고 catch로 넘어감
-        {
-            if (Manager.Game != null)
-            {
-                Manager.Game.OnTurnEnd -= HandleTurnEnd;
-            }
-        }
-        catch (Exception e)
-        {
-            Debug.LogWarning($"[ItemBoxSpawnerManager] OnDestroy 예외 발생: {e.Message}");
-        }
     }
 
     /// <summary>
@@ -57,24 +38,6 @@ public class ItemBoxSpawnerManager : Singleton<ItemBoxSpawnerManager>
         if (!itemBoxDict.ContainsKey(nickname))
         {
             itemBoxDict[nickname] = box;
-            Debug.Log($"[ItemBoxSpawnerManager] 등록됨 → {nickname}, ViewID: {box.GetComponent<PhotonView>()?.ViewID}");
-        }
-        else
-        {
-            Debug.LogWarning($"[ItemBoxSpawnerManager] 이미 등록된 플레이어: {nickname}");
-        }
-    }
-
-    /// <summary>
-    /// 턴 종료 시 각 상자 등장만 처리
-    /// </summary>
-    private void HandleTurnEnd()
-    {
-        Debug.Log("[ItemBoxSpawnerManager] 턴 종료 → 모든 상자 등장");
-
-        foreach (var (_, box) in itemBoxDict)
-        {
-            box?.ShowBox();
         }
     }
 
@@ -83,8 +46,6 @@ public class ItemBoxSpawnerManager : Singleton<ItemBoxSpawnerManager>
     /// </summary>
     public void ShowAllBoxes()
     {
-        Debug.Log("[Spawner] 수동 호출: ShowAllBoxes() → 상자 등장");
-
         foreach (var (_, box) in itemBoxDict)
         {
             box?.ShowBox();
@@ -94,14 +55,23 @@ public class ItemBoxSpawnerManager : Singleton<ItemBoxSpawnerManager>
     /// <summary>
     /// 외부에서 ItemBox 접근 시 사용
     /// </summary>
-    public bool TryGetItemBox(string playerId, out ItemBoxManager itemBox)
+    public bool TryGetItemBox(string nickname, out ItemBoxManager itemBox)
     {
-        return itemBoxDict.TryGetValue(playerId, out itemBox);
+        return itemBoxDict.TryGetValue(nickname, out itemBox);
     }
 
     public void Clear()
     {
         itemBoxDict.Clear();
         IsInitialized = false;
+    }
+
+    /// <summary>
+    /// 각 플레이어가 자신의 인덱스에 맞는 스폰 포인트를 가져오기 위한 유틸리티
+    /// </summary>
+    public Transform GetSpawnPoint(int index)
+    {
+        if (index < 0 || index >= spawnPoints.Length) return null;
+        return spawnPoints[index];
     }
 }
