@@ -40,6 +40,36 @@ public class PlayerSpawn
         return playerObject;
     }
 
+    //FireBase를 사용할 때 
+    public static GameObject CreateGamePlayer(Transform spawnPosition, int spawnIndex)
+    {
+        // 1.유저 확인 
+        string userId = "TestCode"; // FirebaseAuth.DefaultInstance.CurrentUser?.UserId;
+        // 2.플레이어 데이터가 있는지 확인
+        if (!PlayerManager.Instance._playerData.TryGetValue(userId,out PlayerData outputPlayerData))
+        {
+            return null;
+        }
+
+        // 3.플레이어 생성
+        GameObject playerObject = PhotonNetwork.Instantiate(PLAYER_PREFAB_PATH, spawnPosition.position, spawnPosition.localRotation);
+
+        // 4.초기화
+        GamePlayer gamePlayer = playerObject.GetComponent<GamePlayer>();
+        if (gamePlayer == null)
+        {
+            Debug.LogError("GamePlayer 컴포넌트를 찾을 수 없습니다!");
+            PhotonNetwork.Destroy(playerObject);
+            return null;
+        }
+
+        InitializePlayer(gamePlayer, outputPlayerData, spawnIndex);
+
+        gamePlayer.SendMyPlayerDataRPC(); //네트워크 동기화
+
+        return playerObject;
+    }
+
     private static void InitializePlayer(GamePlayer gamePlayer, PlayerData playerData, int spawnIndex)
     {
         gamePlayer._data = playerData;
