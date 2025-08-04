@@ -17,13 +17,19 @@ public class GunController : MonoBehaviourPun
     {
         _animator = GetComponent<Animator>();
     }
-    
+
     void OnMouseDown()
     {
+        Debug.Log("pick up");
         if (!_isHold)
         {
-            _isHold = true;
+            photonView.RPC(nameof(SyncHold), RpcTarget.All, true);
             OnHolded?.Invoke(_isHold);
         }
+    }
+    [PunRPC]
+    public void SyncHold(bool isHold)
+    {
+        _isHold = isHold;
     }
 }
