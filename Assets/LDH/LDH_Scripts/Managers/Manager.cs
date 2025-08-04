@@ -37,15 +37,16 @@ namespace Managers
         
         
         //---- 접근용 프로퍼티 등록 ----- //
+        //예시) TestManager
+        public static TestManager Test => TestManager.Instance;
+        
         public static InGameManager Game => InGameManager.Instance;         // 게임 매니저
 
-        public static SoundManager Sound => SoundManager.Instance;          // 사운드
-
-        public static CameraManager Camera => CameraManager.Instance;       // 카메라
+        public static SoundManager Sound => SoundManager.Instance;      // 사운드
       
-        public static UIManager UI => UIManager.Instance;                   //  UI
+        public static UIManager UI => UIManager.Instance;               //  UI
 
-        public static GunManager Gun => GunManager.Instance;                // 총 매니저
+        public static GunManager Gun => GunManager.Instance;            // 총 매니저
 
         public static PlayerManager PlayerManager => PlayerManager.Instance;   // 플레이어 매니저
 
@@ -58,7 +59,6 @@ namespace Managers
         public static DeskUIManager DeskUI => DeskUIManager.Instance; // 아이템 슬롯 UI 매니저
 
         public static ItemSyncManager ItemSync => ItemSyncManager.Instance; // 아이템 싱크 매니저
-        
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void Initialize()
@@ -76,7 +76,6 @@ namespace Managers
             manager.AddComponent<UIManager>();
             manager.AddComponent<GunManager>();
             manager.AddComponent<ItemSyncManager>();
-            manager.AddComponent<CameraManager>();
         }
     }
 }
