@@ -239,6 +239,14 @@ namespace Managers
                 }
             }
         }
+        
+        /// <summary>
+        /// 사운드 타입(BGM 또는 SFX)에 해당하는 AudioSource를 반환
+        /// </summary>
+        public AudioSource GetAudioSource(Define_LDH.Sound soundType)
+        {
+            return _audioSources[(int)soundType];
+        }
 
         #endregion
 

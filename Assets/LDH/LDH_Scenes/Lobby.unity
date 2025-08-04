@@ -364,7 +364,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _uiRoom: {fileID: 7638228818053424113}
-  gameSceneName: LTH_GameScene
+  gameSceneName: PMS_InGame
+  cutSceneName: LDH_CutScene
+  _skipCutScene: 0
 --- !u!4 &434020709
 Transform:
   m_ObjectHideFlags: 0
@@ -1513,7 +1515,7 @@ PrefabInstance:
     - target: {fileID: 2940185959135385265, guid: 7a3bb046137d141a49ec32d2dd646018,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 217.6
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2940185959135385265, guid: 7a3bb046137d141a49ec32d2dd646018,
         type: 3}
@@ -1740,7 +1742,7 @@ PrefabInstance:
     - target: {fileID: 195407178480788838, guid: 18780d368d1c54a7e981c1d6d2e9cfda,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 271.35
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 195407178480788838, guid: 18780d368d1c54a7e981c1d6d2e9cfda,
         type: 3}
@@ -2080,7 +2082,7 @@ PrefabInstance:
     - target: {fileID: 1569577622350725786, guid: d1326ed455cd94f1eb620cfa4548e8dd,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 95.98
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1569577622350725786, guid: d1326ed455cd94f1eb620cfa4548e8dd,
         type: 3}

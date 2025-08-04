@@ -17,7 +17,12 @@ public class RoomManager : MonoBehaviour
     
     [SerializeField] private UI_Room _uiRoom;
     [SerializeField] private string gameSceneName;
+    [SerializeField] private string cutSceneName;
 
+    
+    //---- develop 용 ---- //
+    [SerializeField] private bool _skipCutScene = false;
+    
     
     private void OnDestroy()
     {
@@ -56,7 +61,10 @@ public class RoomManager : MonoBehaviour
         // if (PhotonNetwork.IsMasterClient && AllPlayerReadyCheck()) 
         // -> 마스터 클라이언트에게만 Game Start 기능 부여 & 버튼 활성화에서 Ready Check를 진행하는 로직으로 변경함에 따라 주석 처리
         
-        PhotonNetwork.LoadLevel(gameSceneName);
+        if(_skipCutScene)
+            PhotonNetwork.LoadLevel(gameSceneName);
+        else
+            PhotonNetwork.LoadLevel(cutSceneName);
     }
     
     /// <summary>

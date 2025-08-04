@@ -2,7 +2,7 @@ using Cinemachine;
 using Managers;
 using UnityEngine;
 
-namespace LDH.LDH_Scripts.Camera
+namespace GameCamera
 {
     [RequireComponent(typeof(CinemachineVirtualCamera))]
     public class VirtualCam_Base : MonoBehaviour
