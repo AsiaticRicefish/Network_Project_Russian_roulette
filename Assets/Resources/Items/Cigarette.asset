@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemId: Cigarette
   itemType: 0
-  displayName: "\uB2F4\uBC30"
-  description: "\uD50C\uB808\uC774\uC5B4 \uCCB4\uB825\uC744 1 \uD68C\uBCF5\uD569\uB2C8\uB2E4."
+  displayName: Cigarette
+  description: Player HP + 1
   icon: {fileID: 0}
   isUsed: 0
   itemPrefab: {fileID: 4544354102750969279, guid: b7bc9abaf8605364abfe3a6a9076008a,

@@ -1,11 +1,14 @@
+using DG.Tweening;
 using GameUI;
 using LTH; // 임시 Playerm ItemData 정의용 네임스페이스
+using Managers;
+using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using Photon.Pun;
+using Utils;
 
 
 /// <summary>
@@ -17,6 +20,7 @@ public class ItemSlot : MonoBehaviourPun
     [SerializeField] private Transform anchorPoint; // 아이템이 놓일 위치
     [SerializeField] private Collider itemCollider; // 상호작용 차단용
     [SerializeField] private UI_EventHandler uiEventHandler;  // 클릭/호버 이벤트 처리용
+    [SerializeField] private SlotEffectController slotEffectController;
 
     private GameObject currentItem;
     private ItemData itemData; // 호버 및 클릭 시 아이템 정보를 활용할 수 있도록
@@ -40,7 +44,6 @@ public class ItemSlot : MonoBehaviourPun
             if (uiEventHandler == null)
             {
                 uiEventHandler = gameObject.AddComponent<UI_EventHandler>();
-                Debug.LogWarning("[ItemSlot] UI_EventHandler가 없어서 자동 추가됨");
             }
         }
 
@@ -56,7 +59,6 @@ public class ItemSlot : MonoBehaviourPun
             if (itemCollider == null)
             {
                 itemCollider = gameObject.AddComponent<BoxCollider>();
-                Debug.LogWarning("[ItemSlot] Collider가 없어서 BoxCollider 자동 추가됨");
             }
         }
 
@@ -67,12 +69,12 @@ public class ItemSlot : MonoBehaviourPun
             if (anchor != null)
             {
                 anchorPoint = anchor;
-                Debug.Log("[ItemSlot] AnchorPoint 자동 연결 완료");
             }
-            else
-            {
-                Debug.LogWarning("[ItemSlot] AnchorPoint(자식에 'Anchor' 이름) 자동 연결 실패");
-            }
+        }
+
+        if (slotEffectController == null)
+        {
+            slotEffectController = GetComponent<SlotEffectController>();
         }
     }
 
@@ -111,7 +113,6 @@ public class ItemSlot : MonoBehaviourPun
     {
         if (string.IsNullOrEmpty(itemId))
         {
-            Debug.LogWarning("[ItemSlot] itemId가 유효하지 않음");
             return;
         }
 
@@ -126,15 +127,24 @@ public class ItemSlot : MonoBehaviourPun
         itemData = ItemDatabaseManager.Instance.GetItemById(itemId);
         if (itemData != null && itemData.itemPrefab != null)
         {
-            Debug.Log($"[ItemSlot] 아이템 생성 시도: {itemData.itemPrefab.name}");
             string path = "Items/" + itemData.itemPrefab.name;
-            currentItem = PhotonNetwork.Instantiate(path, anchorPoint.position, anchorPoint.rotation);
+
+            // 살짝 띄워서 자연스럽게 보이게
+            Vector3 offset = anchorPoint.forward * -0.05f;
+            Vector3 spawnPos = anchorPoint.position + offset;
+
+            currentItem = PhotonNetwork.Instantiate(path, spawnPos, anchorPoint.rotation);
             currentItem.transform.SetParent(anchorPoint);
+
+            // 이펙트 시점은 동기화, 이펙트 자체는 로컬 생성
+            photonView.RPC(nameof(RPC_PlayItemAppearEffect), RpcTarget.All);
         }
-        else
-        {
-            Debug.LogWarning($"[ItemSlot] ItemData 또는 프리팹 없음: {itemId}");
-        }
+    }
+
+    [PunRPC]
+    private void RPC_PlayItemAppearEffect()
+    {
+        slotEffectController?.PlayItemAppearEffect(anchorPoint.position);
     }
 
     /// <summary>
@@ -171,6 +181,7 @@ public class ItemSlot : MonoBehaviourPun
         }
 
         Debug.Log($"[ItemSlot] 아이템 사용 요청: {itemData.itemId}");
+        slotEffectController?.PlayUseEffect(currentItem);
         itemSync.UseItemRequest(itemData.itemId);
 
         // 슬롯 비우기 동기화
@@ -187,7 +198,12 @@ public class ItemSlot : MonoBehaviourPun
     {
         if (currentItem != null)
         {
-            Destroy(currentItem);
+            var view = currentItem.GetComponent<PhotonView>();
+            if (PhotonNetwork.IsConnected && view != null)
+                PhotonNetwork.Destroy(currentItem);
+            else
+                Destroy(currentItem);
+
             currentItem = null;
         }
 
@@ -210,12 +226,20 @@ public class ItemSlot : MonoBehaviourPun
     {
         if (!IsEmpty && itemData != null)
         {
-            Debug.Log($"[ItemSlot] Hover → {itemData.displayName}");
+            // 툴팁 UI 인스턴스 가져오기
+            UI_InventoryInfo tooltip = Manager.UI.GetGlobalUI<UI_InventoryInfo>();
+
+            // 데이터 세팅 (보여주기 전에)
+            tooltip.SetData(itemData.displayName, itemData.description);
+
+            // 툴팁 띄우기
+            Manager.UI.ShowGlobalUI(Define_LDH.GlobalUI.UI_InventoryInfo);
         }
     }
 
     private void OnHoverExit(PointerEventData eventData)
     {
-        Debug.Log($"[ItemSlot] Hover Exit");
+        // 툴팁 닫기
+        Manager.UI.CloseGlobalUI(Define_LDH.GlobalUI.UI_InventoryInfo);
     }
 }
