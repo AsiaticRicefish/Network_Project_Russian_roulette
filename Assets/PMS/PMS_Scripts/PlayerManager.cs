@@ -10,11 +10,13 @@ using ExitGames.Client.Photon;
 //인게임 플레이어 매니저를 만드는게 빠를것같다.
 public class PlayerManager : Singleton<PlayerManager>
 {
-    //리스트가 아닌 Dictionary로 관리  Key - FirebaseUID Value - PlayData
+    //리스트가 아닌 Dictionary로 관리  Key - FirebaseUID , Value - GamePlayer
+    //리스트를 딱한번 공유해야하는 상황 -> 모든 유저가 다 등록이 되었을 때 모든 유저가 해당 데이터를 들고 있도록 해야한다.
     [SerializeField] public List<GamePlayer> _playerList;
     [SerializeField] private Dictionary<string, GamePlayer> _players;
 
-    //리스트를 딱한번 공유해야하는 상황 -> 모든 유저가 다 등록이 되었을 때 모든 유저가 해당 데이터를 들고 있도록 해야한다.
+    //플레이어 생성전 플레이어의 데이터를 firebase들고와서 key:firebaseId Value:PlayerData로 저장해놓는다.
+    //지금 당장 필요할 것 같지는 않다.
     [SerializeField] public Dictionary<string, PlayerData> _playerData;
     [SerializeField] public List<PlayerData> _playerDataList;
 
@@ -26,7 +28,7 @@ public class PlayerManager : Singleton<PlayerManager>
         Init();
     }
 
-    /*private void OnEnable()
+    private void OnEnable()
     {
         InGameManager.Instance.OnGameStart += AllGamePlayerAdd;
     }
@@ -34,8 +36,11 @@ public class PlayerManager : Singleton<PlayerManager>
     // TODO - 해제를 해주는 곳이 애매하다.
     private void OnDisable()
     {
+        _players.Clear();
+        _playerList.Clear();
         InGameManager.Instance.OnGameStart -= AllGamePlayerAdd; 
-    }*/
+    }
+
     //게임 스타트시 사용해야하는부분
     public void AllGamePlayerAdd()
     {
@@ -59,7 +64,7 @@ public class PlayerManager : Singleton<PlayerManager>
     {
         _players = new Dictionary<string, GamePlayer>();
         _playerList = new List<GamePlayer>();
-        _playerDataList = new List<PlayerData>();
+        //_playerDataList = new List<PlayerData>();
     }
 
     //안씀
@@ -74,7 +79,7 @@ public class PlayerManager : Singleton<PlayerManager>
         return gamePlayer;
     }
 
-
+    #region 플레이어 Dictionary 관련 함수 - 추가,제거,검색(ID기반,닉네임기반)
     public void RegisterPlayer(GamePlayer player)
     {
         if (string.IsNullOrEmpty(player.PlayerId))
@@ -96,7 +101,7 @@ public class PlayerManager : Singleton<PlayerManager>
 
     public void RemovePlayer(GamePlayer player)
     {
-        if (_players.ContainsKey(player.PlayerId))
+        if (RemovePlayerByUID(player.PlayerId))
         {
             _players.Remove(player.PlayerId);
         }
@@ -107,7 +112,7 @@ public class PlayerManager : Singleton<PlayerManager>
     }
 
     //Player 고유값인 uid로 리스트에서 삭제하기 
-    public bool RemovePlayerByUID(string uid)
+    private bool RemovePlayerByUID(string uid)
     {
         GamePlayer player = FindPlayerByUID(uid);
         if (player != null)
@@ -131,6 +136,21 @@ public class PlayerManager : Singleton<PlayerManager>
         return null;
     }
 
+    public GamePlayer FindPlayerByNickname(string nickname)
+    {
+        foreach (var player in _players.Values)
+        {
+            if (player.Nickname == nickname)
+            {
+                return player;
+            }
+        }
+
+        Debug.LogWarning($"[PlayerManager] 닉네임 {nickname} 을 가진 플레이어를 찾지 못했습니다.");
+        return null;
+    }
+
+    //Dictionary에 추가되어 있는 유저들 확인(디버깅용)
     public void PlayerListPrint()
     {
         foreach (var player in _players)
@@ -138,7 +158,9 @@ public class PlayerManager : Singleton<PlayerManager>
             Debug.Log(player.Value.Nickname);
         }
     }
+    #endregion
 
+    /*
     public PlayerData GetFindPlayerDataFromID(string id)
     {
         foreach(var playerData in _playerDataList) 
@@ -159,20 +181,5 @@ public class PlayerManager : Singleton<PlayerManager>
             str += p.Nickname + " ";
         }
         Debug.Log(str);
-    }
-
-    public GamePlayer FindPlayerByNickname(string nickname)
-    {
-        foreach (var player in _players.Values)
-        {
-            if (player.Nickname == nickname)
-            {
-                return player;
-            }
-        }
-
-        Debug.LogWarning($"[PlayerManager] 닉네임 {nickname} 을 가진 플레이어를 찾지 못했습니다.");
-        return null;
-    }
-
+    }*/
 }
