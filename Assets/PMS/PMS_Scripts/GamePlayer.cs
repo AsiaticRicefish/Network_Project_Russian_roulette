@@ -84,16 +84,21 @@ public class GamePlayer : MonoBehaviour, IComparer<GamePlayer>
         _pv = GetComponent<PhotonView>();
     }
 
-    private void Start()
+    private void OnEnable()
     {
-        Debug.Log($"[GamePlayer] Start 실행됨! IsMine: {_pv.IsMine}, Nick: {PhotonNetwork.NickName}");
+        //게임 시작 호출을 못받았다.
         if (_pv.IsMine)
         {
-            //테스트 코드
-            //일단 지금 당장 순서 보장해주기 힘드니깐 정렬을 사용해보자
-            StartCoroutine(PlayerListSortDelay());           
-            Initialize();
-            SendMyPlayerDataRPC();
+            InGameManager.Instance.OnGameStart += Initialize;
+            StartCoroutine(PlayerListSortDelay());
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (_pv.IsMine)
+        {
+            InGameManager.Instance.OnGameStart -= Initialize;
         }
     }
 
@@ -103,6 +108,7 @@ public class GamePlayer : MonoBehaviour, IComparer<GamePlayer>
         MaxHp = 3;
         CurrentHp = MaxHp;
         IsAlive = true;
+        SendMyPlayerDataRPC();
     }
 
     public void SetMaxHp(int newHp)

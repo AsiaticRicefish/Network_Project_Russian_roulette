@@ -20,10 +20,21 @@ public class PlayerCameraController : MonoBehaviourPun
     public float OffsetY { get; private set; }
     public bool CameraMove { get; private set; }
 
+
     private void Awake()
     {
         CameraMove = true;
         Init();
+    }
+
+    private void Start()
+    {
+        if (!photonView.IsMine)
+        {
+            //자기 카메라가 아니면 다 비활성화 처리
+            //추후 게임이 종료되도 관전 모드를 만들게 되면 다른 유저의 시야를 봐야 할 수도 있기 때문에
+            GetComponentInChildren<Camera>().gameObject.SetActive(false);
+        }
     }
 
     private void Init()

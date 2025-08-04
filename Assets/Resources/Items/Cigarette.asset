@@ -18,5 +18,5 @@ MonoBehaviour:
   description: Player HP + 1
   icon: {fileID: 0}
   isUsed: 0
-  itemPrefab: {fileID: 4544354102750969279, guid: b7bc9abaf8605364abfe3a6a9076008a,
+  itemPrefab: {fileID: 4544354102750969279, guid: edbc5306c76b5f64196bf70db2c0d535,
     type: 3}
