@@ -9,14 +9,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2001ace5265a8b148baa9b4e9fcbd50a, type: 3}
-  m_Name: Saw
+  m_Script: {fileID: 11500000, guid: bfda56da833e2384a9677cd3c976a436, type: 3}
+  m_Name: Intro Timeline
   m_EditorClassIdentifier: 
-  itemId: Saw
-  itemType: 3
-  displayName: Saw
-  description: Damage x2
-  icon: {fileID: 0}
-  isUsed: 0
-  itemPrefab: {fileID: 8628007245104406807, guid: b4f70f891c49cfa4484995228a79f628,
-    type: 3}
+  m_Version: 0
+  m_Tracks: []
+  m_FixedDuration: 0
+  m_EditorSettings:
+    m_Framerate: 60
+    m_ScenePreview: 1
+  m_DurationMode: 0
+  m_MarkerTrack: {fileID: 0}

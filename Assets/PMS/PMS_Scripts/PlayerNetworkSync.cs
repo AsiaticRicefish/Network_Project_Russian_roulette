@@ -100,18 +100,26 @@ public class PlayerNetworkSync : MonoBehaviourPun
         _gamePlayer.CurrentHp = newHp;
         _gamePlayer.IsAlive = newIsAlive; // 체력이 0이 되어 IsAlive가 false로 바뀌는 것도 동기화
 
-        Debug.Log($"[PlayerNetworkSync] RPC 수신: {info.Sender.NickName} ({_gamePlayer.PlayerId})의 상태 업데이트: CurrentHP : {_gamePlayer.CurrentHp}, Alive : {_gamePlayer.IsAlive}");
+        Debug.Log($"[PlayerNetworkSync] RPC 수신: {info.Sender.NickName}, ({_gamePlayer.PlayerId})의 상태 업데이트: CurrentHP : {_gamePlayer.CurrentHp}, Alive : {_gamePlayer.IsAlive}");
     }
 
+    // 모든 클라이언트에서 실행될 로직
     [PunRPC]
-    public void RPC_DecreasePlayerHp(string targetPlayerId, int amount)
+    public void RPC_DecreasePlayerHp(string targetPlayerId, int amount, PhotonMessageInfo info)
     {
         // 모든 클라이언트에서 실행될 로직
         // 매개변수로 받은 targetPlayerId를 사용하여 해당Id를 들고있는 GamePlayer를 찾고 HP를 감소시켜야함.
         GamePlayer targetPlayer = PlayerManager.Instance.FindPlayerByUID(targetPlayerId); 
-        if (targetPlayer != null)
+        if (targetPlayer == null)
         {
-            targetPlayer.CurrentHp -= amount; 
+            Debug.LogError($"타겟 ID : {targetPlayerId} 의 유저가 존재하지 않습니다.");
+        }
+
+        targetPlayer.CurrentHp -= amount;
+
+        //송신자한테만 로그 정보
+        if (info.Sender.ActorNumber == photonView.Owner.ActorNumber)
+        {
             Debug.Log($"[PlayerNetworkSync] {_gamePlayer.Nickname}이 공격하여 {targetPlayer.Nickname}의 HP가 {amount}만큼 감소했습니다. 현재 HP: {targetPlayer.CurrentHp}");
         }
     }
