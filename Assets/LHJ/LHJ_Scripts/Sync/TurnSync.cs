@@ -17,7 +17,7 @@ public class TurnSync : MonoBehaviourPun
         // InGameManager의 턴 이벤트 구독
         InGameManager.Instance.OnTurnStart += OnTurnStart;
         InGameManager.Instance.OnTurnEnd += OnTurnEnd;
-        InGameManager.Instance.StartGame();
+        // InGameManager.Instance.StartGame();
     }
 
     private void OnTurnStart()

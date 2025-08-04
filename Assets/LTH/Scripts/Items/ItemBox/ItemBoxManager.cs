@@ -53,6 +53,14 @@ public class ItemBoxManager : MonoBehaviourPun
     {
         OwnerNickname = nickname;
     }
+    
+    
+    [PunRPC]
+    private void RegisterItemBox()
+    {
+        Debug.Log($"[ItemBoxManager] {PhotonNetwork.LocalPlayer.NickName} 의 ItemBoxSpawnerManager에 {ownerNickname}의 ItemBoxManager를 등록합니다.");
+        ItemBoxSpawnerManager.Instance.RegisterItemBox(ownerNickname, this);
+    }
 
     /// <summary>
     /// 각 플레이어에 대한 초기화

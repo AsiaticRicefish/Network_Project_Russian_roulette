@@ -116,6 +116,7 @@ public class ItemSlot : MonoBehaviourPun
             return;
         }
 
+        Debug.Log(photonView.ViewID); 
         photonView.RPC(nameof(RPC_PlaceItem), RpcTarget.All, itemId);
     }
 

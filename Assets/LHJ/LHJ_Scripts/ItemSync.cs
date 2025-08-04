@@ -3,6 +3,7 @@ using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using GameUI;
 using UnityEngine;
 
 
@@ -16,9 +17,13 @@ public class ItemSync : MonoBehaviourPun
 
     [HideInInspector] public ItemBoxManager myItemBox;
 
+    
     public string MyNickname => photonView.Owner.NickName;
     public bool IsMine() => photonView.IsMine;
 
+
+    private DeskUI myDeskUI;
+    
     private void Start()
     {
         StartCoroutine(OnNetworkReady());
@@ -29,24 +34,39 @@ public class ItemSync : MonoBehaviourPun
     /// </summary>
     private IEnumerator OnNetworkReady()
     {
-        yield return new WaitUntil(() =>
-       PhotonNetwork.IsConnected &&
-       DeskUIManager.Instance != null &&
-       ItemBoxSpawnerManager.Instance != null);
+        Debug.Log(PhotonNetwork.IsConnected);
+        Debug.Log(DeskUIManager.Instance == null);
+        Debug.Log(ItemBoxSpawnerManager.Instance==null);
 
+        
+        yield return new WaitUntil(() =>
+            PhotonNetwork.IsConnected &&
+            DeskUIManager.Instance != null &&
+            ItemBoxSpawnerManager.Instance != null);
+
+        Debug.Log("[ItemSync] GameStart 호출 -> OnNetworkReady() 호출");
+
+        // 로컬에서만 데스크 Ui 생성 & deskuimanager에 등록
         if (IsMine())
         {
             DeskUIManager.Instance.CreateMyDeskUI();
-        }    
-        var myDeskUI = DeskUIManager.Instance.GetDeskUI(MyNickname);
-        if (myDeskUI == null)
-        {
-            Debug.LogError($"[ItemSync] 내 DeskUI를 찾을 수 없음 → {MyNickname}");
-            yield break;
-        }
+            myDeskUI = DeskUIManager.Instance.GetDeskUI(MyNickname);
 
-        if (IsMine())
-        {
+            #region Legacy
+
+            //}
+            // var myDeskUI = DeskUIManager.Instance.GetDeskUI(MyNickname);
+            //
+            // if (myDeskUI == null)
+            // {
+            //     Debug.LogWarningFormat($"[ItemSync] 내 DeskUI를 찾을 수 없음 → {MyNickname}");
+            //     yield break;
+            // }
+            // if (IsMine())
+            // {
+
+            #endregion
+            
             int spawnIndex = GetMySpawnIndex();
             var spawnPoints = ItemBoxSpawnerManager.Instance.GetComponentsInChildren<Transform>()
                 .Where(t => t.CompareTag("ItemBoxSpawnPoint")).ToArray();
@@ -69,28 +89,31 @@ public class ItemSync : MonoBehaviourPun
 
             box.Init(myDeskUI);
             box.photonView.RPC("SetOwnerNickname", RpcTarget.AllBuffered, MyNickname);
-
+            
+            //박스가 모든 user한테 등록되게 처리
+            box.photonView.RPC("RegisterItemBox", RpcTarget.AllBuffered);
             myItemBox = box;
-            ItemBoxSpawnerManager.Instance.RegisterItemBox(MyNickname, box);
+           
 
             Debug.Log($"[ItemSync] 내 ItemBox 생성 완료 → {MyNickname}");
+            
         }
-        else
-        {
-            // 내 박스를 이미 생성한 마스터의 것을 가져와 Init만
-            yield return new WaitUntil(() => ItemBoxSpawnerManager.Instance.TryGetItemBox(MyNickname, out _));
-
-            if (ItemBoxSpawnerManager.Instance.TryGetItemBox(MyNickname, out var foundBox))
-            {
-                foundBox.Init(myDeskUI);
-                myItemBox = foundBox;
-                Debug.Log($"[ItemSync] 박스 연결 완료 → {MyNickname}");
-            }
-            else
-            {
-                Debug.LogError($"[ItemSync] 박스 연결 실패 → {MyNickname}");
-            }
-        }
+        // else
+        // {
+            // // 내 박스를 이미 생성한 마스터의 것을 가져와 Init만 (x) 각자 자기 박스 생성(마스터에서 생성하는게 아니라)
+            // yield return new WaitUntil(() => ItemBoxSpawnerManager.Instance.TryGetItemBox(MyNickname, out _));
+            //
+            // if (ItemBoxSpawnerManager.Instance.TryGetItemBox(MyNickname, out var foundBox))
+            // {
+            //     foundBox.Init(myDeskUI);
+            //     myItemBox = foundBox;
+            //     Debug.Log($"[ItemSync] 박스 연결 완료 → {MyNickname}");
+            // }
+            // else
+            // {
+            //     Debug.LogError($"[ItemSync] 박스 연결 실패 → {MyNickname}");
+            // }
+        // }
 
         // 아이템 초기화 동기화
         photonView.RPC(nameof(InitPlayerItems), RpcTarget.AllBuffered, MyNickname);
@@ -188,6 +211,8 @@ public class ItemSync : MonoBehaviourPun
         //}
     }
 
+    
+
     [PunRPC]
     private void InitPlayerItems(string nickname)
     {
@@ -258,7 +283,7 @@ public class ItemSync : MonoBehaviourPun
     {
         if (myItemBox == null)
         {
-            Debug.LogError($"[ItemSync] ItemBox 여전히 null → nickname: {nickname}");
+            Debug.Log($"[ItemSync] ItemBox 여전히 null → nickname: {nickname}");
             return;
         }
 
@@ -280,9 +305,9 @@ public class ItemSync : MonoBehaviourPun
     private GamePlayer FindTargetPlayer(GamePlayer user)
     {
         return PlayerManager.Instance.GetAllPlayers()
-        .Where(kvp => kvp.Key != user.PlayerId && kvp.Value.IsAlive)
-        .Select(kvp => kvp.Value)
-        .FirstOrDefault();
+            .Where(kvp => kvp.Key != user.PlayerId && kvp.Value.IsAlive)
+            .Select(kvp => kvp.Value)
+            .FirstOrDefault();
     }
 
     /// <summary>
@@ -296,6 +321,7 @@ public class ItemSync : MonoBehaviourPun
             if (list[i].NickName == PhotonNetwork.NickName)
                 return i;
         }
+
         return -1;
     }
 }
