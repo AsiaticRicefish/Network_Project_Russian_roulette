@@ -40,11 +40,18 @@ public class PlayerSpawn
         return playerObject;
     }
 
-    //FireBase를 사용할 때 
+    /// <summary>
+    /// FireBase를 사용시 Player객체 생성 함수
+    /// </summary>
+    /// <param name="spawnPosition"></param>
+    /// <param name="spawnIndex"></param>
+    /// <returns></returns>
+    //인증이 된 상태에서 사용되야하는데 예외 상황에 대한 방어 로직이 있어야하나 ?
     public static GameObject CreateGamePlayer(Transform spawnPosition, int spawnIndex)
     {
         // 1.유저 확인 
         string userId = "TestCode"; // FirebaseAuth.DefaultInstance.CurrentUser?.UserId;
+
         // 2.플레이어 데이터가 있는지 확인
         if (!PlayerManager.Instance._playerData.TryGetValue(userId,out PlayerData outputPlayerData))
         {

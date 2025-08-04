@@ -40,6 +40,7 @@ public class PlayerManager : Singleton<PlayerManager>
         _playerList.Clear();
         InGameManager.Instance.OnGameStart -= AllGamePlayerAdd; 
     }
+
     //게임 스타트시 사용해야하는부분
     public void AllGamePlayerAdd()
     {
