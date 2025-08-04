@@ -51,9 +51,9 @@ public class DeskUIManager : Singleton<DeskUIManager>
         }
 
         string myNickname = PhotonNetwork.NickName;
-        deskUI.SetOwner(myNickname);
+        //deskUI.SetOwner(myNickname);
         deskUI.SetInteractable(true);
-        RegisterDeskUI(myNickname, deskUI);
+        //RegisterDeskUI(myNickname, deskUI);
     }
 
     /// <summary>

@@ -34,18 +34,12 @@ public class ItemSync : MonoBehaviourPun
     /// </summary>
     private IEnumerator OnNetworkReady()
     {
-        Debug.Log(PhotonNetwork.IsConnected);
-        Debug.Log(DeskUIManager.Instance == null);
-        Debug.Log(ItemBoxSpawnerManager.Instance==null);
-
         
         yield return new WaitUntil(() =>
             PhotonNetwork.IsConnected &&
             DeskUIManager.Instance != null &&
             ItemBoxSpawnerManager.Instance != null);
-
-        Debug.Log("[ItemSync] GameStart 호출 -> OnNetworkReady() 호출");
-
+        
         // 로컬에서만 데스크 Ui 생성 & deskuimanager에 등록
         if (IsMine())
         {
@@ -87,13 +81,12 @@ public class ItemSync : MonoBehaviourPun
                 yield break;
             }
 
-            box.Init(myDeskUI);
+            //box.Init(myDeskUI);  //rpc에서 호출하므로 주석처리
             box.photonView.RPC("SetOwnerNickname", RpcTarget.AllBuffered, MyNickname);
             
             //박스가 모든 user한테 등록되게 처리
-            box.photonView.RPC("RegisterItemBox", RpcTarget.AllBuffered);
-            myItemBox = box;
-           
+            box.photonView.RPC("RegisterItemBox", RpcTarget.AllBuffered, PhotonNetwork.LocalPlayer.UserId);
+            // myItemBox = box;
 
             Debug.Log($"[ItemSync] 내 ItemBox 생성 완료 → {MyNickname}");
             
@@ -265,7 +258,7 @@ public class ItemSync : MonoBehaviourPun
     {
         if (myItemBox == null)
         {
-            Debug.LogError($"[ItemSync] 내 상자 찾기 실패: {MyNickname}");
+            Debug.Log($"[ItemSync] 내 상자 찾기 실패: {MyNickname}");
             return;
         }
 

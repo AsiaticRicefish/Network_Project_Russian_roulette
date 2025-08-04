@@ -53,7 +53,7 @@ public class SceneInit : MonoBehaviourPunCallbacks
 
     private void InitGame()
     {
-        if(Manager.PlayerManager.playerCount == 2)
+        if(Manager.PlayerManager.GetAllPlayers().Count == 2)
             InGameManager.Instance.StartGame();
         // // 마스터만 게임 시작 진행
         // if (PhotonNetwork.IsMasterClient)

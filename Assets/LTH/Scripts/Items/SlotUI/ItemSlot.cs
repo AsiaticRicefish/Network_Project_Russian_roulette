@@ -3,6 +3,7 @@ using GameUI;
 using LTH; // 임시 Playerm ItemData 정의용 네임스페이스
 using Managers;
 using Photon.Pun;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -115,17 +116,17 @@ public class ItemSlot : MonoBehaviourPun
         {
             return;
         }
-
-        Debug.Log(photonView.ViewID); 
+        
         photonView.RPC(nameof(RPC_PlaceItem), RpcTarget.All, itemId);
     }
 
     [PunRPC]
-    private void RPC_PlaceItem(string itemId)
+    private void RPC_PlaceItem(string itemId, PhotonMessageInfo messageInfo)
     {
         ClearSlot();
 
         itemData = ItemDatabaseManager.Instance.GetItemById(itemId);
+
         if (itemData != null && itemData.itemPrefab != null)
         {
             string path = "Items/" + itemData.itemPrefab.name;
@@ -134,8 +135,11 @@ public class ItemSlot : MonoBehaviourPun
             Vector3 offset = anchorPoint.forward * -0.05f;
             Vector3 spawnPos = anchorPoint.position + offset;
 
-            currentItem = PhotonNetwork.Instantiate(path, spawnPos, anchorPoint.rotation);
-            currentItem.transform.SetParent(anchorPoint);
+            if (photonView.IsMine)
+            {
+                currentItem = PhotonNetwork.Instantiate(path, spawnPos, anchorPoint.rotation);
+                currentItem.transform.SetParent(anchorPoint);
+            }
 
             // 이펙트 시점은 동기화, 이펙트 자체는 로컬 생성
             photonView.RPC(nameof(RPC_PlayItemAppearEffect), RpcTarget.All);
@@ -200,7 +204,7 @@ public class ItemSlot : MonoBehaviourPun
         if (currentItem != null)
         {
             var view = currentItem.GetComponent<PhotonView>();
-            if (PhotonNetwork.IsConnected && view != null)
+            if (PhotonNetwork.IsConnected && view != null && view.IsMine)
                 PhotonNetwork.Destroy(currentItem);
             else
                 Destroy(currentItem);

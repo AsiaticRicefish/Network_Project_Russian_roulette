@@ -15,7 +15,7 @@ public class PlayerManager : Singleton<PlayerManager>
     //리스트를 딱한번 공유해야하는 상황 -> 모든 유저가 다 등록이 되었을 때 모든 유저가 해당 데이터를 들고 있도록 해야한다.
     [SerializeField] public List<GamePlayer> _playerList;
     [SerializeField] private Dictionary<string, GamePlayer> _players;
-    public int playerCount => _players.Count;
+    
 
     //플레이어 생성전 플레이어의 데이터를 firebase들고와서 key:firebaseId Value:PlayerData로 저장해놓는다.
     //지금 당장 필요할 것 같지는 않다.

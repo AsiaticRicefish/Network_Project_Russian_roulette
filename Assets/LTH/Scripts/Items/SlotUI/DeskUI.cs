@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using LTH; // 임시 Playerm ItemData 정의용 네임스페이스
 using GameUI;
+using Photon.Pun;
 
 /// <summary>
 /// 특정 플레이어의 아이템 슬롯(책상)을 UI로 표현하는 클래스
@@ -11,12 +12,14 @@ using GameUI;
 public class DeskUI : UI_Base
 {
     [SerializeField] private List<ItemSlot> itemSlots; // 아이템 슬롯 리스트
-
+    [SerializeField] private PhotonView _photonView;
+    
     /// <summary>
     /// Photon Nickname 기준으로 설정
     /// </summary>
-    public string OwnerNickname { get; private set; }
-    public bool IsInteractable { get; private set; } = true;
+    [field: SerializeField] public string OwnerNickname { get; private set; }
+
+    public bool IsInteractable { get; private set; } = false;   
 
     /// <summary>
     /// UI 초기화 시  null일 경우 슬롯 자동 등록
@@ -25,6 +28,8 @@ public class DeskUI : UI_Base
     {
         if (itemSlots == null || itemSlots.Count == 0)
             itemSlots = new List<ItemSlot>(GetComponentsInChildren<ItemSlot>(includeInactive: true));
+ 
+        SetOwner(_photonView.Owner.NickName);
     }
 
     /// <summary>
@@ -38,6 +43,8 @@ public class DeskUI : UI_Base
         if (itemSlots == null || itemSlots.Count == 0)
             itemSlots = new List<ItemSlot>(GetComponentsInChildren<ItemSlot>(includeInactive: true));
 
+        DeskUIManager.Instance.RegisterDeskUI(OwnerNickname ,this);
+        
         foreach (var slot in itemSlots)
         {
             slot.SetOwner(photonNickname);
