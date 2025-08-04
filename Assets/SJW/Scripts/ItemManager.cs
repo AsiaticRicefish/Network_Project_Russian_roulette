@@ -10,6 +10,8 @@ public class ItemManager : Singleton<ItemManager>
 {
     public void UseItem(ItemData item, GamePlayer user, GamePlayer target)
     {
+        Debug.Log($"[UseItem 디버그] item: {(item == null ? "null" : item.itemId)}, isUsed: {item?.isUsed}");
+
         if (item == null || item.isUsed)
         {
             Debug.LogWarning("아이템이 null이거나 이미 사용됨");
