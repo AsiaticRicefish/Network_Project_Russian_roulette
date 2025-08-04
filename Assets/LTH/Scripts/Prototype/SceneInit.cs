@@ -13,7 +13,7 @@ public class SceneInit : MonoBehaviour
 
     private void Start()
     {
-        if (SceneManager.GetActiveScene().name != "LTH_GameScene") return;
+        //if (SceneManager.GetActiveScene().name != "LTH_GameScene") return;
 
         if (PhotonNetwork.IsConnectedAndReady && PhotonNetwork.InRoom)
         {
