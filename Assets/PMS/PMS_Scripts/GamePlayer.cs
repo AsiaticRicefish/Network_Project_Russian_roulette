@@ -130,6 +130,14 @@ public class GamePlayer : MonoBehaviour, IComparer<GamePlayer>
     }
 
     #region 플레이어 hp 관련 메서드
+
+    [PunRPC]
+    public void RPC_IncreaseHp(int amount)
+    {
+        IncreaseHp(amount);
+    }
+
+
     public void IncreaseHp(int amount)
     {
         if (!IsAlive) return;
@@ -185,7 +193,7 @@ public class GamePlayer : MonoBehaviour, IComparer<GamePlayer>
         _spawnPointindex = receiveSpawnPointIndex; 
         Debug.Log($"RPC로 수신된 플레이어 닉네임: {_data.nickname}, 플레이어 ID: {_data.playerId}, 승리: {_data.winCount}, 패배: {_data.loseCount}");
 
-        //PlayerManager.Instance.RegisterPlayer(this);
+        PlayerManager.Instance.RegisterPlayer(this);
 
         // TODO - 모든 플레이어가 List의 순서를 보장해줘야한다.
         //PlayerManager.Instance._playerList.Add(this);      
