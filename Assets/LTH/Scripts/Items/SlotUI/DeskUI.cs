@@ -34,7 +34,6 @@ public class DeskUI : UI_Base
     public void SetOwner(string photonNickname)
     {
         OwnerNickname = photonNickname;
-        Debug.Log($"[DeskUI] SetOwner 호출 → {photonNickname}");
 
         if (itemSlots == null || itemSlots.Count == 0)
             itemSlots = new List<ItemSlot>(GetComponentsInChildren<ItemSlot>(includeInactive: true));
@@ -71,7 +70,6 @@ public class DeskUI : UI_Base
     public void SetInteractable(bool interactable)
     {
         IsInteractable = interactable;
-        Debug.Log($"[DeskUI] SetInteractable: {interactable} → {OwnerNickname}");
 
         if (itemSlots == null || itemSlots.Count == 0)
             itemSlots = new List<ItemSlot>(GetComponentsInChildren<ItemSlot>(includeInactive: true));
