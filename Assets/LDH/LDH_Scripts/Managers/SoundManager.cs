@@ -220,6 +220,25 @@ namespace Managers
             audioSource.PlayOneShot(audioClip);
         }
 
+
+        /// <summary>
+        /// 지정한 사운드 타입의 오디오 재생을 중지.
+        /// (클립은 유지, 단순 정지만 수행)
+        /// </summary>
+        public void Stop(Define_LDH.Sound soundType)
+        {
+            AudioSource source = _audioSources[(int)soundType];
+
+            if (source == null)
+            {
+                Debug.LogWarning($"[{GetType().Name}] AudioSource가 존재하지 않습니다: {soundType}");
+                return;
+            }
+
+            source.Stop();
+            Debug.Log($"[{GetType().Name}] {soundType} 재생 정지");
+        }
+        
         #endregion
 
 
