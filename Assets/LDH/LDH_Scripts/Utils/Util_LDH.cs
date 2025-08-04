@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Object = UnityEngine.Object;
 
@@ -184,10 +185,25 @@ namespace Utils
         
         #endregion
 
-        public static void SetImageRaycastTarget(Image image, bool isOn)
+        #region Load Scene
+
+        /// <summary>
+        /// 로그인 성공 후 씬 전환 코루틴
+        /// </summary>
+        public static IEnumerator LoadSceneWithDelay(string sceneName, float delay)
         {
-            image.raycastTarget = isOn;
+            AsyncOperation op = SceneManager.LoadSceneAsync(sceneName);
+            op.allowSceneActivation = false;
+            
+            // 모달 보여지는 시간 확보
+            yield return new WaitForSeconds(delay);
+            
+            // 씬 전환
+            op.allowSceneActivation = true;
         }
+
+
+        #endregion
     }
     
 }
