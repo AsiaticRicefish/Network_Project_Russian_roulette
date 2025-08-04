@@ -8,57 +8,116 @@ using UnityEngine.UI;
 
 public class PlayerHPUI : MonoBehaviour
 {
-    [SerializeField] private TextMeshProUGUI hpText;
+    [Header("닉네임 & 체력 하트 UI")]
+    [SerializeField] private TextMeshProUGUI myNicknameText;
+    [SerializeField] private Transform myHPPanel;
+    [SerializeField] private TextMeshProUGUI enemyNicknameText;
+    [SerializeField] private Transform enemyHPPanel;
+    [SerializeField] private GameObject heartPrefab;
+
+    [Header("게임 오버 UI")]
     [SerializeField] private GameObject gameOverPanel;
     [SerializeField] private TextMeshProUGUI winnerText;
 
     private GamePlayer myPlayer;
+    private string myId;
     private bool hasShownGameOver = false;
+    private Dictionary<string, GamePlayer> players;
 
     private void Start()
     {
+        myId = PhotonNetwork.NickName;
         StartCoroutine(WaitAndBind());
     }
 
     private IEnumerator WaitAndBind()
     {
-        string myNickname = PhotonNetwork.NickName;
-
         float timeout = 2f;
         float timer = 0f;
 
-        while (myPlayer == null && timer < timeout)
+        while (PlayerManager.Instance == null || PlayerManager.Instance.GetAllPlayers().Count == 0)
         {
-            myPlayer = FindPlayerByNickname_UIOnly(myNickname);
-            if (myPlayer != null) break;
-
             yield return new WaitForSeconds(0.1f);
             timer += 0.1f;
+            if (timer > timeout) yield break;
         }
 
-        if (myPlayer != null)
+        players = PlayerManager.Instance.GetAllPlayers();
+        myPlayer = FindPlayerByNickname_UIOnly(myId);
+
+        foreach (var player in players.Values)
         {
-            myPlayer.OnHpChanged += UpdateHpUI;
-            UpdateHpUI(myPlayer.CurrentHp, myPlayer.IsAlive);
+            player.OnHpChanged += UpdateHpUIForAll;
         }
+
+        UpdateHpUIForAll();
     }
 
     private void OnDestroy()
     {
-        if (myPlayer != null)
-            myPlayer.OnHpChanged -= UpdateHpUI;
+        if (players != null)
+        {
+            foreach (var player in players.Values)
+            {
+                player.OnHpChanged -= UpdateHpUIForAll;
+            }
+        }
     }
 
-    private void UpdateHpUI(int currentHp, bool isAlive)
+    private void UpdateHpUIForAll(int _, bool __)
     {
-        string state = isAlive ? "<color=green>생존</color>" : "<color=red>사망</color>";
-        hpText.text = $"HP: {currentHp} / {myPlayer.MaxHp}   {state}";
+        UpdateHpUIForAll();
+    }
 
-        // 사망 처리
-        if (!isAlive && !hasShownGameOver)
+    private void UpdateHpUIForAll()
+    {
+        foreach (var player in players.Values)
         {
-            hasShownGameOver = true;
-            ShowGameOverUI();
+            bool isMine = player.Nickname == myId;
+
+            if (isMine)
+            {
+                myNicknameText.text = player.Nickname;
+                UpdateHeartUI(myHPPanel, player.CurrentHp, player.MaxHp, true);
+
+                if (!player.IsAlive && !hasShownGameOver)
+                {
+                    hasShownGameOver = true;
+                    ShowGameOverUI();
+                }
+            }
+            else
+            {
+                enemyNicknameText.text = player.Nickname;
+                UpdateHeartUI(enemyHPPanel, player.CurrentHp, player.MaxHp, false);
+            }
+        }
+    }
+
+    private void UpdateHeartUI(Transform panel, int currentHp, int maxHp, bool isMine)
+    {
+        // 하트가 이미 생성된 경우 재사용
+        if (panel.childCount != maxHp)
+        {
+            // 모두 제거 후 재생성
+            foreach (Transform child in panel)
+            {
+                Destroy(child.gameObject);
+            }
+
+            for (int i = 0; i < maxHp; i++)
+            {
+                GameObject heart = Instantiate(heartPrefab, panel);
+                Image img = heart.GetComponent<Image>();
+                img.color = isMine ? Color.red : new Color(0.5f, 0.7f, 1f);
+            }
+        }
+
+        // 하트 활성/비활성만 조정
+        for (int i = 0; i < maxHp; i++)
+        {
+            var heart = panel.GetChild(i).GetComponent<Image>();
+            heart.enabled = i < currentHp; // 현재 체력 이하만 표시
         }
     }
 
@@ -73,21 +132,17 @@ public class PlayerHPUI : MonoBehaviour
 
     private string FindAlivePlayerName()
     {
-        var players = PlayerManager.Instance.GetAllPlayers();
         foreach (var pair in players)
         {
-            if (pair.Value.IsAlive && pair.Value.Nickname != PhotonNetwork.NickName)
-            {
+            if (pair.Value.IsAlive && pair.Value.Nickname != myId)
                 return pair.Value.Nickname;
-            }
         }
         return "상대방";
     }
 
     private GamePlayer FindPlayerByNickname_UIOnly(string nickname)
     {
-        var players = PlayerManager.Instance.GetAllPlayers();
-        foreach (var pair in players)
+        foreach (var pair in PlayerManager.Instance.GetAllPlayers())
         {
             if (pair.Value.Nickname == nickname)
                 return pair.Value;
