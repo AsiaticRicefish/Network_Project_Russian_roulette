@@ -1,10 +1,11 @@
+using DG.Tweening;
+using LTH;
+using Managers;
+using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using LTH; // 임시 Playerm ItemData 정의용 네임스페이스
-using Photon.Pun;
-using DesignPattern; 
-using DG.Tweening;
+using Utils;
 
 /// <summary>
 /// 턴 종료 시 등장하는 보상 상자 매니저
@@ -23,34 +24,79 @@ public class ItemBoxManager : MonoBehaviourPun
 
     [Header("Connect Slot")]
     [SerializeField] private DeskUI deskUI;
-    
-    private string ownerId; // 각 플레이어의 DeskUI와 연결하기 위한 소유자 ID
-    public string OwnerId => ownerId;
+
+
+    private string ownerNickname;
+    public string OwnerNickname
+    {
+        get => ownerNickname;
+        set => ownerNickname = value;
+    }
+
+    public bool IsMine => OwnerNickname == PhotonNetwork.NickName;
+    public int NewItemCount => newItemCount;
 
     private bool isOpened = false;
-    public bool IsMine => ownerId == PhotonNetwork.LocalPlayer.NickName;
-    public int NewItemCount => newItemCount;
+    public bool IsOpened => isOpened;
+
+    private void Awake()
+    {
+        if (photonView != null && photonView.Owner != null)
+        {
+            ownerNickname = photonView.Owner.NickName;
+            ItemBoxSpawnerManager.Instance.RegisterItemBox(ownerNickname, this);
+        }
+    }
+
+    [PunRPC]
+    public void SetOwnerNickname(string nickname)
+    {
+        OwnerNickname = nickname;
+    }
 
     /// <summary>
     /// 각 플레이어에 대한 초기화
     /// </summary>
-    public void Init(string playerId, DeskUI deskUI)
+    public void Init(DeskUI deskUI)
     {
-        ownerId = playerId;
         this.deskUI = deskUI;
-        CloseBoxImmediately(); // 시작 시 닫힌 상태로 초기화
+        photonView.RPC(nameof(RPC_Init), RpcTarget.AllBuffered);
     }
+
+    [PunRPC]
+    private void RPC_Init()
+    {
+        CloseBoxImmediately();
+    }
+
 
     /// <summary>
     /// 상자 등장 (게임 매니저에서 호출)
     /// </summary>
-    public void ShowBox()
+    [PunRPC]
+    public void RPC_ShowBox()
     {
         isOpened = false;
         gameObject.SetActive(true);
+        itemBoxPrefabs.SetActive(true);
 
         CloseBoxImmediately(); // Dotween으로 아이템 상자 닫힌 상태 유지
+
+        itemBoxPrefabs.transform.localScale = Vector3.zero; // 다음 등장 대비
+
+        // 연출: 크기 0에서 등장
+        itemBoxPrefabs.transform
+       .DOScale(0.3f, 0.5f)
+       .SetEase(Ease.OutBack);
+
+        // 사운드: 상자 등장 효과음 재생
+        // Manager.Sound.Play(" ", Define_LDH.Sound.Sfx);
     }
+
+    public void ShowBox()
+{
+    photonView.RPC(nameof(RPC_ShowBox), RpcTarget.All);
+}
 
     /// <summary>
     /// 상자를 닫힌 상태로 초기화
@@ -67,20 +113,43 @@ public class ItemBoxManager : MonoBehaviourPun
     /// </summary>
     public void OnBoxClicked()
     {
-        if (isOpened || !IsMine) return;
+        Debug.Log($"[BoxClicked] 호출됨 → {PhotonNetwork.NickName}, isOpened: {isOpened}, IsMine: {IsMine}");
 
-        isOpened = true;
+        if (isOpened)
+        {
+            Debug.LogWarning("[BoxClicked] 이미 열린 상자입니다.");
+            return;
+        }
+
+        if (!IsMine)
+        {
+            Debug.LogWarning("[BoxClicked] 상자 주인이 아닙니다.");
+            return;
+        }
+
+        isOpened = true;;
+
         var rewards = ItemDatabaseManager.Instance.GetRandomItems(newItemCount);
         var rewardIds = new List<string>();
-        foreach (var item in rewards)
-            rewardIds.Add(item.itemId);
 
-        photonView.RPC(nameof(RPC_DistributeRewards), RpcTarget.All, rewardIds.ToArray());
+        foreach (var item in rewards)
+        {
+            if (item == null || string.IsNullOrEmpty(item.itemId))
+            {
+                Debug.LogError("[ItemBoxManager] 잘못된 아이템 감지됨");
+                continue;
+            }
+
+            rewardIds.Add(item.itemId);
+        }
+
+        photonView.RPC(nameof(RPC_DistributeRewards), RpcTarget.All, string.Join(",", rewardIds));
     }
 
     [PunRPC]
-    private void RPC_DistributeRewards(string[] itemIds)
+    private void RPC_DistributeRewards(string joinedIds)
     {
+        string[] itemIds = joinedIds.Split(',');
         isOpened = true;
 
         lidTransform.DOLocalRotate(openRotation, 0.7f)
@@ -129,6 +198,6 @@ public class ItemBoxManager : MonoBehaviourPun
         foreach (var item in customList)
             rewardIds.Add(item.itemId);
 
-        photonView.RPC(nameof(RPC_DistributeRewards), RpcTarget.All, rewardIds.ToArray());
+        photonView.RPC(nameof(RPC_DistributeRewards), RpcTarget.All, string.Join(",", rewardIds));
     }
 }

@@ -65,6 +65,13 @@ MonoBehaviour:
   - GoToLobbyScene
   - ShowGameOverPanel
   - LoadAdditiveSceneRPC
+  - RequestFire
+  - RPC_Init
+  - ClearSlot
+  - RPC_PlayItemAppearEffect
+  - RPC_ShowBox
+  - SetOwnerNickname
+  - RPC_ReceiveBulletInfo
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

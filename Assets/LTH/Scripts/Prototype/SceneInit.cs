@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Managers;
 
 public class SceneInit : MonoBehaviour
 {
@@ -10,15 +11,28 @@ public class SceneInit : MonoBehaviour
 
     [SerializeField] private Transform[] spawnPoints;
 
-    [SerializeField] private Transform tableCenter; // 탁자 중심 Transform
-
     private void Start()
     {
         if (SceneManager.GetActiveScene().name != "LTH_GameScene") return;
 
         if (PhotonNetwork.IsConnectedAndReady && PhotonNetwork.InRoom)
         {
-            StartCoroutine(SpawnPlayerWithDelay());
+            StartCoroutine(InitFlow());
+        }
+    }
+
+    private IEnumerator InitFlow()
+    {
+        // 플레이어 스폰
+        yield return SpawnPlayerWithDelay();
+
+        // 마스터만 게임 시작 진행
+        if (PhotonNetwork.IsMasterClient)
+        {
+            yield return WaitForBoxSpawner();
+
+            // 게임 시작
+            InGameManager.Instance.StartGame();
         }
     }
 
@@ -27,7 +41,6 @@ public class SceneInit : MonoBehaviour
         while (!PhotonNetwork.IsConnectedAndReady)
             yield return null;
 
-        // 테이블이 완전히 생성될 때까지 대기
         yield return new WaitUntil(() => GameObject.Find("GameTable") != null);
 
         Transform tableCenter = GameObject.Find("GameTable").transform;
@@ -37,23 +50,18 @@ public class SceneInit : MonoBehaviour
 
         var obj = PhotonNetwork.Instantiate(playerPrefabName, spawnPos, Quaternion.identity);
 
-        // 회전 적용
         Vector3 dir = (tableCenter.position - obj.transform.position).normalized;
         dir.y = 0f;
         obj.transform.rotation = Quaternion.LookRotation(dir);
 
-        // GamePlayer 데이터 전달
         GamePlayer gp = obj.GetComponent<GamePlayer>();
         if (gp != null && gp.GetComponent<PhotonView>().IsMine)
         {
-            // 여기에 실제 닉네임과 Firebase UID로 교체
             string nickname = PhotonNetwork.NickName;
             string playerId = PhotonNetwork.LocalPlayer.UserId;
-            int win = 0;
-            int lose = 0;
 
-            gp._data = new PlayerData(nickname, playerId, win, lose);
-            gp.SendMyPlayerDataRPC();  // 모든 클라이언트에 브로드캐스트
+            gp._data = new PlayerData(nickname, playerId, 0, 0);
+            gp.SendMyPlayerDataRPC();
 
             // 카메라 회전 보정
             Camera cam = obj.GetComponentInChildren<Camera>();
@@ -61,6 +69,24 @@ public class SceneInit : MonoBehaviour
             {
                 cam.transform.rotation = Quaternion.LookRotation((tableCenter.position - cam.transform.position).normalized);
             }
+        }
+    }
+
+    private IEnumerator WaitForBoxSpawner()
+    {
+        float timer = 0f;
+        float timeout = 2f;
+
+        while (!ItemBoxSpawnerManager.Instance?.IsInitialized ?? true)
+        {
+            if (timer > timeout)
+            {
+                Debug.LogWarning("[SceneInit] 아이템 박스 스포너 초기화 대기 타임아웃!");
+                break;
+            }
+
+            yield return new WaitForSeconds(0.1f);
+            timer += 0.1f;
         }
     }
 }
