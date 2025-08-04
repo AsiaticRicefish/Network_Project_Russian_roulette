@@ -45847,6 +45847,8 @@ PlayableDirector:
     value: {fileID: 64678178876303482}
   - key: {fileID: 3401014123468440587, guid: fb3e140bba21744c0ab610abe3caafc1, type: 2}
     value: {fileID: 555778980}
+  - key: {fileID: -6921896901990826600, guid: fb3e140bba21744c0ab610abe3caafc1, type: 2}
+    value: {fileID: 6656096999914128330}
   m_ExposedReferences:
     m_References:
     - 3d11981c2ead74e2eba81585405eff32: {fileID: 1892868560}
@@ -46531,7 +46533,7 @@ Camera:
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 51
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -46551,8 +46553,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1276274265}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0.9048361, z: 0, w: 0.42576012}
-  m_LocalPosition: {x: 9.6, y: 2.097004, z: -9.311}
+  m_LocalRotation: {x: 0.022519838, y: 0.9702898, z: -0.099625885, w: 0.21932913}
+  m_LocalPosition: {x: -2.4283695, y: 9.08015, z: 8.423491}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -83748,26 +83750,6 @@ MonoBehaviour:
     m_MipBias: 0
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
---- !u!114 &3108254758527930942
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6656096999914129818}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 34dd7d4b94903e9449ad881307522640, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _pv: {fileID: 8212014869854412041}
-  _data:
-    nickname: 
-    playerId: 
-    winCount: 0
-    loseCount: 0
-  _spawnPointindex: -1
-  IsCuffedThisTurn: 0
 --- !u!1 &3426008977724082988
 GameObject:
   m_ObjectHideFlags: 0
@@ -83784,20 +83766,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &3829477093287205527
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6656096999914129818}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4aea7b5c138f4c7409affdd22c3d1c25, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _cameraHolder: {fileID: 3426008977724082988}
-  _mouseSensitivity: 2
 --- !u!1 &6573872928540596095
 GameObject:
   m_ObjectHideFlags: 0
@@ -89706,11 +89674,6 @@ GameObject:
   - component: {fileID: 6656096999923628634}
   - component: {fileID: 6656097000384851153}
   - component: {fileID: 6656097000384851152}
-  - component: {fileID: 8212014869854412041}
-  - component: {fileID: 8955679720236600140}
-  - component: {fileID: 3829477093287205527}
-  - component: {fileID: 3108254758527930942}
-  - component: {fileID: 8322331512318256886}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -102626,57 +102589,6 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
---- !u!114 &8212014869854412041
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6656096999914129818}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ObservedComponentsFoldoutOpen: 1
-  Group: 0
-  prefixField: -1
-  Synchronization: 3
-  OwnershipTransfer: 0
-  observableSearch: 2
-  ObservedComponents:
-  - {fileID: 8955679720236600140}
-  sceneViewId: 1
-  InstantiationId: 0
-  isRuntimeInstantiated: 0
---- !u!114 &8322331512318256886
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6656096999914129818}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 534d782efacc44b47969c14d4e03b49d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &8955679720236600140
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6656096999914129818}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 627855c7f81362d41938ffe0b1475957, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_SynchronizePosition: 1
-  m_SynchronizeRotation: 1
-  m_SynchronizeScale: 0
-  m_UseLocal: 1
 --- !u!81 &9108092917592787732
 AudioListener:
   m_ObjectHideFlags: 0
