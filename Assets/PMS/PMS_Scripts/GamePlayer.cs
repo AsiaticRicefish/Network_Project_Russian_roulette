@@ -86,16 +86,30 @@ public class GamePlayer : MonoBehaviour, IComparer<GamePlayer>
 
     private void Start()
     {
-        Debug.Log($"[GamePlayer] Start 실행됨! IsMine: {_pv.IsMine}, Nick: {PhotonNetwork.NickName}");
         if (_pv.IsMine)
         {
-            //테스트 코드
-            //일단 지금 당장 순서 보장해주기 힘드니깐 정렬을 사용해보자
-            StartCoroutine(PlayerListSortDelay());           
             Initialize();
-            SendMyPlayerDataRPC();
+            StartCoroutine(PlayerListSortDelay());
         }
     }
+
+    /*private void OnEnable()
+    {
+        //게임 시작 호출을 못받았다.
+        if (_pv.IsMine)
+        {
+            InGameManager.Instance.OnGameStart += Initialize;
+            StartCoroutine(PlayerListSortDelay());
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (_pv.IsMine)
+        {
+            InGameManager.Instance.OnGameStart -= Initialize;
+        }
+    }*/
 
     public void Initialize()
     {
@@ -164,16 +178,17 @@ public class GamePlayer : MonoBehaviour, IComparer<GamePlayer>
     //receiveSpawnPointIndex 범위 0 ~ 플레이어수-1  -> 이값을 가지고 List를 넣는 순서를 제어해도 괜찮을 것 같다. 이유 : 일단 자리에 앉으면 오른쪽으로 도는형식, 1대1에서 의미가 없지만 3인이상일 경우 턴순서를 확인할 수 있다.
     // PlayerData 객체를 직접 전송하는 RPC 함수
     [PunRPC]
-    public void ReceivePlayerData(string receivedNickname, string receivedPlayerId, int receivedWinCount, int receivedLoseCount, int receiveSpawnPointIndex)
+    public void ReceivePlayerData(string receivedNickname, string receivedPlayerId, int receivedWinCount, int receivedLoseCount, int receiveSpawnPointIndex, PhotonMessageInfo info)
     {
         // 수신된 데이터를 사용하여 플레이어 업데이트
         _data = new PlayerData(receivedNickname, receivedPlayerId, receivedWinCount, receivedLoseCount);
         _spawnPointindex = receiveSpawnPointIndex; 
         Debug.Log($"RPC로 수신된 플레이어 닉네임: {_data.nickname}, 플레이어 ID: {_data.playerId}, 승리: {_data.winCount}, 패배: {_data.loseCount}");
-        PlayerManager.Instance.RegisterPlayer(this);
+
+        //PlayerManager.Instance.RegisterPlayer(this);
 
         // TODO - 모든 플레이어가 List의 순서를 보장해줘야한다.
-        PlayerManager.Instance._playerList.Add(this);
+        //PlayerManager.Instance._playerList.Add(this);      
     }
 
     // 내 PlayerData를 다른 클라이언트에게 보내는 함수
