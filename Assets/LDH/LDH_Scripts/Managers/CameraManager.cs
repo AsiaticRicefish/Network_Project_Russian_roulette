@@ -83,4 +83,60 @@ public class CameraManager : Singleton<CameraManager>
     }
 
     #endregion
+    
+    #region Impulse 기능
+
+    /// <summary>
+    /// 현재 스택 최상단 카메라의 ImpulseSource에 흔들림 효과를 줌
+    /// </summary>
+    /// <param name="force">세기 (기본값 1f)</param>
+    public void PlayImpulse(float force = 1f)
+    {
+        if (_cameraStack.Count == 0)
+        {
+            Debug.LogWarning("[CameraManager] 카메라 스택이 비어 있어 Impulse를 줄 수 없습니다.");
+            return;
+        }
+
+        var camId = _cameraStack.Peek();
+        var cam = GetCamera(camId);
+        if (cam == null)
+        {
+            Debug.LogWarning($"[CameraManager] {camId} 카메라를 찾을 수 없습니다.");
+            return;
+        }
+
+        var impulse = cam.GetComponent<CinemachineImpulseSource>();
+        if (impulse == null)
+        {
+            Debug.LogWarning($"[CameraManager] {camId} 카메라에 ImpulseSource가 없습니다.");
+            return;
+        }
+
+        impulse.GenerateImpulseWithForce(force);
+    }
+
+    /// <summary>
+    /// 특정 카메라 ID에 ImpulseSource가 있으면 흔들림 발생
+    /// </summary>
+    public void PlayImpulse(string id, float force = 1f)
+    {
+        var cam = GetCamera(id);
+        if (cam == null)
+        {
+            Debug.LogWarning($"[CameraManager] {id} 카메라를 찾을 수 없습니다.");
+            return;
+        }
+
+        var impulse = cam.GetComponent<CinemachineImpulseSource>();
+        if (impulse == null)
+        {
+            Debug.LogWarning($"[CameraManager] {id} 카메라에 ImpulseSource가 없습니다.");
+            return;
+        }
+
+        impulse.GenerateImpulseWithForce(force);
+    }
+
+    #endregion
 }
