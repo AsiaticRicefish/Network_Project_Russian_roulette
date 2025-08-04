@@ -23,7 +23,7 @@ public class BulletInfoUI : MonoBehaviour
         if (timer < updateInterval) return;
         timer = 0f;
 
-        string turnInfo = TurnSync.CurrentTurnPlayerId == myId
+        string turnInfo = Managers.Manager.Game.CurrentTurn == myId
             ? "<color=green> 내 턴입니다</color>"
             : "<color=red> 내 턴이 아닙니다</color>";
 

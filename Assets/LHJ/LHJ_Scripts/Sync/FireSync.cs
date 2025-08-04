@@ -34,9 +34,10 @@ public class FireSync : MonoBehaviourPun
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            if (TurnSync.CurrentTurnPlayerId != myId)
+            // if (TurnSync.CurrentTurnPlayerId != myId)
+            if (Manager.Game.CurrentTurn != myId)
             {
-                Debug.LogWarning($"[FireSync] 내 턴 아님 → 발사 차단 (myId: {myId}, 현재 턴: {TurnSync.CurrentTurnPlayerId})");
+                Debug.LogWarning($"[FireSync] 내 턴 아님 → 발사 차단 (myId: {myId}, 현재 턴: {Manager.Game.CurrentTurn})");
                 return;
             }
 

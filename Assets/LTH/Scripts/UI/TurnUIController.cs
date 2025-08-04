@@ -14,7 +14,7 @@ public class TurnUIController : MonoBehaviour
 
     private void Update()
     {
-        string currentId = TurnSync.CurrentTurnPlayerId;
+        string currentId = Managers.Manager.Game.CurrentTurn;
         Debug.Log($"[UI] 현재 감지된 턴 ID: {currentId}");
 
         Debug.Log($"[TEST] TurnSync.CurrentTurnPlayerId: {currentId}, LastTurnId: {lastTurnId}");

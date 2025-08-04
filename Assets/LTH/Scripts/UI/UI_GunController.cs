@@ -36,12 +36,12 @@ public class UI_GunController : MonoBehaviour
     private void Update()
     {
         // 내 턴일 때만 버튼 활성화
-        fireButton.interactable = (TurnSync.CurrentTurnPlayerId == myId);
+        fireButton.interactable = (Manager.Game.CurrentTurn == myId);
     }
 
     private void OnFireButtonClicked()
     {
-        if (TurnSync.CurrentTurnPlayerId != myId)
+        if (Manager.Game.CurrentTurn != myId)
         {
             Debug.LogWarning("[FireButtonController] 내 턴이 아님 → 발사 안 됨");
             return;
