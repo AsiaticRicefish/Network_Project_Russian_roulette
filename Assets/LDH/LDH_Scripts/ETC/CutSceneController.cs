@@ -1,4 +1,5 @@
 using Managers;
+using Photon.Pun;
 using System;
 using UnityEngine;
 using UnityEngine.Playables;
@@ -16,6 +17,7 @@ namespace ETC
 
         private void Init()
         {
+            PhotonNetwork.AutomaticallySyncScene = false;
             SetAudioSource();
         }
 

@@ -192,7 +192,7 @@ namespace Utils
         /// </summary>
         public static IEnumerator LoadSceneWithDelay(string sceneName, float delay)
         {
-            AsyncOperation op = SceneManager.LoadSceneAsync("Lobby");
+            AsyncOperation op = SceneManager.LoadSceneAsync(sceneName);
             op.allowSceneActivation = false;
             
             // 모달 보여지는 시간 확보
