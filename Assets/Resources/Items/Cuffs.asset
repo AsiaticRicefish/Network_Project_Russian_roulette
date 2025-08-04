@@ -18,5 +18,5 @@ MonoBehaviour:
   description: Skip the opponent's next turn
   icon: {fileID: 0}
   isUsed: 0
-  itemPrefab: {fileID: 2869829193639882400, guid: 76e5a6556aa4bfa47be3209f27dfdba3,
+  itemPrefab: {fileID: 2869829193639882400, guid: 26ed8dd171d920e4183afcb788e4ff67,
     type: 3}
