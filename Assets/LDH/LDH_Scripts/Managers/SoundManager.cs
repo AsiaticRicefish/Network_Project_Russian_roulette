@@ -1,11 +1,9 @@
 using System.Collections;
-using System.Collections.Generic;
 using DesignPattern;
 using Sound;
 using UnityEngine;
 using UnityEngine.Audio;
-using UnityEngine.Events;
-using UnityEngine.Rendering.VirtualTexturing;
+using DG.Tweening;
 using Utils;
 
 namespace Managers
@@ -187,10 +185,8 @@ namespace Managers
                 // 같은 audio clip을 재생하는 경우는 무시
                 if (audioSource.clip == audioClip) return;
                 
-                // audioclip 교체
-                audioSource.Stop();
-                audioSource.clip = audioClip;
-                audioSource.Play();
+                // 기존 클립 페이드 아웃 후 전환
+                StartCoroutine(SmoothBgmTransition(audioSource, audioClip));
             }
             else if (soundType == Define_LDH.Sound.Sfx)
             {
@@ -241,6 +237,24 @@ namespace Managers
         
         #endregion
 
+        private IEnumerator SmoothBgmTransition(AudioSource source, AudioClip newClip, float fadeDuration = 0.5f)
+        {
+            // 현재 볼륨 저장
+            float originalVolume = source.volume;
+
+            // 페이드 아웃
+            source.DOFade(0f, fadeDuration);
+            yield return new WaitForSeconds(fadeDuration);
+
+            // 클립 교체
+            source.Stop();
+            source.clip = newClip;
+            source.Play();
+
+            // 페이드 인
+            source.DOFade(originalVolume, fadeDuration);
+        }
+        
 
         #region Utility
 
@@ -269,6 +283,48 @@ namespace Managers
 
         #endregion
 
+
+        #region SFX Utility (sfx 효과 묶어서 재생하는거 미리 만들어둔 영역 : 예를 들어 총 발사 후에 장전하고 탄피 떨어지는 소리까지 한방에 묶어서 타이밍 맞추서 만들어두고 이거 한번호출로 실해오디게_)
+
+        
+        /// <summary>
+        /// 실탄 발사 시 연출되는 사운드 시퀀스를 재생합니다.
+        /// (발사 → 리로드 → 탄피 낙하)
+        /// </summary>
+        public void PlayFire()
+        {
+            StartCoroutine(CoPlayLiveBulletSequence());
+        }
+        private IEnumerator CoPlayLiveBulletSequence()
+        {
+            PlaySfxByKey("Fire");
+            yield return new WaitForSeconds(0.5f);
+            PlaySfxByKey("Reload");
+            yield return new WaitForSeconds(0.35f);
+            PlaySfxByKey("DropBullet");
+        }
+
+        
+        /// <summary>
+        /// 공포탄 발사 시 연출되는 사운드 시퀀스를 재생합니다.
+        /// (헛발 → 리로드)
+        /// </summary>
+        public void PlayBlank()
+        {
+            StartCoroutine(CoPlayBlankBulletSequence());
+        }
+        private IEnumerator CoPlayBlankBulletSequence()
+        {
+            PlaySfxByKey("Blank");
+            yield return new WaitForSeconds(0.5f);
+            PlaySfxByKey("Reload");
+            yield return new WaitForSeconds(0.35f);
+            PlaySfxByKey("DropBullet");
+        }
+        
+        #endregion
+        
+        
     }
 }
 

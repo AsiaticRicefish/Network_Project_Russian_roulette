@@ -22,14 +22,19 @@ public class SfxPlayTest : MonoBehaviour
         Manager.Sound.PlaySfxByKey(_audioClipKey);
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 
     public void MoveScene(string sceneName)
     {
         SceneManager.LoadScene(sceneName);
+    }
+
+    public void PlayFire()
+    {
+        Manager.Sound.PlayFire();
+    }
+
+    public void PlayBlank()
+    {
+        Manager.Sound.PlayBlank();
     }
 }

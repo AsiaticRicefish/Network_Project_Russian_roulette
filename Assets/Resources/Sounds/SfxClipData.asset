@@ -15,13 +15,13 @@ MonoBehaviour:
   _clips:
   - key: Fire
     clip: {fileID: 8300000, guid: 9b93ee0c205224bfc846fdd3ab71bf87, type: 3}
-  - key: FireEmpty
+  - key: Blank
     clip: {fileID: 8300000, guid: af8adc1e8a144476fbc56ec6bec51861, type: 3}
   - key: Reload
-    clip: {fileID: 8300000, guid: 67b8752318d5f4b5a973b9aa88472c2b, type: 3}
+    clip: {fileID: 8300000, guid: 0869b5c3b8d5c4fc2a0210313c0b73a3, type: 3}
   - key: ItemSpawn
     clip: {fileID: 8300000, guid: 7d3afc5a326a04b30b91780142a20e48, type: 3}
   - key: DropBullet
-    clip: {fileID: 8300000, guid: 7370d96b10b274dd2987801ff3445575, type: 3}
+    clip: {fileID: 8300000, guid: 0940cc5f0bdf84060b0431b14da0e445, type: 3}
   - key: CameraChange
     clip: {fileID: 8300000, guid: 576c922c48e49412a8e82f0f576a5b0c, type: 3}

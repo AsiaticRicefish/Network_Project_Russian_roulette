@@ -51,7 +51,7 @@ public class PlayerController : MonoBehaviourPun
     {
         if (!_pv.IsMine) return;
 
-        PlayerLook();
+        //PlayerLook();
     }
 
     //시점 변경 테스트코드
@@ -99,6 +99,6 @@ public class PlayerController : MonoBehaviourPun
         //카메라 매니저에 stack에 push
         CinemachineVirtualCamera vcam = GetComponentInChildren<CinemachineVirtualCamera>();
         var playerVCam = Util_LDH.GetOrAddComponent<VirtualCam_LocalPlayer>(vcam.gameObject);
-        Manager.Camera.PushCamera(playerVCam.cameraID);
+       
     }
 }
