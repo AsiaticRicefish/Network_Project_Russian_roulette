@@ -60,7 +60,7 @@ public class ItemSync : MonoBehaviourPun
             // {
 
             #endregion
-            
+
             int spawnIndex = GetMySpawnIndex();
             var spawnPoints = ItemBoxSpawnerManager.Instance.GetComponentsInChildren<Transform>()
                 .Where(t => t.CompareTag("ItemBoxSpawnPoint")).ToArray();
@@ -238,11 +238,7 @@ public class ItemSync : MonoBehaviourPun
     private void UseItem(string nickname, string itemId)
     {
         // 현재 자신의 턴이 아닐 대 아이템 사용 불가 이중으로 확인
-        if (TurnSync.CurrentTurnPlayerId != nickname)
-        {
-            Debug.LogWarning($"[UseItem] {nickname}는 현재 턴이 아님 → 아이템 사용 차단");
-            return;
-        }
+        if (TurnSync.CurrentTurnPlayerId != nickname) return;
 
         var items = ItemSyncManager.Instance.GetSyncedItems(nickname);
         var targetItem = items.FirstOrDefault(i => i.itemId == itemId);
@@ -267,11 +263,8 @@ public class ItemSync : MonoBehaviourPun
     private void ClearSlot(string nickname, string itemId)
     {
         var deskUI = DeskUIManager.Instance.GetDeskUI(nickname);
-        if (deskUI == null)
-        {
-            Debug.LogWarning($"[ClearSlot] {nickname}의 DeskUI 없음");
-            return;
-        }
+        
+        if (deskUI == null) return;
 
         deskUI.ClearItemSlotById(itemId);
     }
