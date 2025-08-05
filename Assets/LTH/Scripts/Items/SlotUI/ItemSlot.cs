@@ -116,7 +116,7 @@ public class ItemSlot : MonoBehaviourPun
         {
             return;
         }
-        
+
         photonView.RPC(nameof(RPC_PlaceItem), RpcTarget.All, itemId);
     }
 
@@ -213,10 +213,10 @@ public class ItemSlot : MonoBehaviourPun
         if (currentItem != null)
         {
             var view = currentItem.GetComponent<PhotonView>();
-            if (PhotonNetwork.IsConnected && view != null && view.IsMine)
-                PhotonNetwork.Destroy(currentItem);
+            if (view != null && view.IsMine)
+                PhotonNetwork.Destroy(currentItem); // 내가 소유자 일 경우 PhotonNetwork.Destroy → 네트워크 상에서 제거
             else
-                Destroy(currentItem);
+                Destroy(currentItem); // 상대방은 그냥 로컬에서 지우는 처리
 
             currentItem = null;
         }
