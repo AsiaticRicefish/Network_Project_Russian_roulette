@@ -27,22 +27,29 @@ public class PlayerHPUI : MonoBehaviour
     private void Start()
     {
         myId = PhotonNetwork.NickName;
-        StartCoroutine(WaitAndBind());
     }
 
-    private IEnumerator WaitAndBind()
+    //----- 생략----- //
+    //Start 부분에 있는 StartCoroutine은 제거
+    //PlayerManager의 OnAddPlayer는 _players 딕셔너리에 Player가 추가될때마다 호출되는데,
+    //해당 딕셔너리에 플레이어가 추가되는 시점은 : 모두 씬에 들어왔을 때 각자 자기의 플레이어 오브젝트를 photon instantiate 하면 -> PlayerController에서 딕셔너리에 추가한다.
+    //그러면 PlayerHPUI는 OnAddPlayer 이벤트에 WaitandBind 대신에, Bind라는 함수를 구독시킨다.
+    //Bind 함수는 PlayerManager.Instance.GetAllPlayers == 2개됐을 때 -> ui랑 연동하는 부분 로직을 그대로 실행
+
+    private void OnEnable()
     {
-        float timeout = 2f;
-        float timer = 0f;
+        PlayerManager.Instance.OnAddPlayer += Bind;
+    }
 
-        while (PlayerManager.Instance == null || PlayerManager.Instance.GetAllPlayers().Count == 0)
-        {
-            yield return new WaitForSeconds(0.1f);
-            timer += 0.1f;
-            if (timer > timeout) yield break;
-        }
+    // 2는 현재 플레이어 총인원
+    private void Bind()
+    {
+        if (PlayerManager.Instance.GetAllPlayers().Count != 2) return;
 
+        //Debug.Log($"[PlayerHPUI]에서 Bind 호출됨"); - 호출되는거 확인
+        //자기 UI만 뛰우고 있다.
         players = PlayerManager.Instance.GetAllPlayers();
+
         myPlayer = FindPlayerByNickname_UIOnly(myId);
 
         foreach (var player in players.Values)
@@ -53,6 +60,31 @@ public class PlayerHPUI : MonoBehaviour
         UpdateHpUIForAll();
     }
 
+    #region 이전코드 IEnumerator WaitAndBind()
+    //private IEnumerator WaitAndBind()
+    //{
+    //    float timeout = 2f;
+    //    float timer = 0f;
+
+    //    while (PlayerManager.Instance == null || PlayerManager.Instance.GetAllPlayers().Count == 0)
+    //    {
+    //        yield return new WaitForSeconds(0.1f);
+    //        timer += 0.1f;
+    //        if (timer > timeout) yield break;
+    //    }
+
+    //    players = PlayerManager.Instance.GetAllPlayers();
+    //    myPlayer = FindPlayerByNickname_UIOnly(myId);
+
+    //    foreach (var player in players.Values)
+    //    {
+    //        player.OnHpChanged += UpdateHpUIForAll;
+    //    }
+
+    //    UpdateHpUIForAll();
+    //}
+    #endregion
+
     private void OnDestroy()
     {
         if (players != null)
@@ -62,6 +94,7 @@ public class PlayerHPUI : MonoBehaviour
                 player.OnHpChanged -= UpdateHpUIForAll;
             }
         }
+        PlayerManager.Instance.OnAddPlayer -= Bind;
     }
 
     private void UpdateHpUIForAll(int _, bool __)
