@@ -1,3 +1,4 @@
+using Managers;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -30,6 +31,10 @@ public class PlayerController : MonoBehaviourPun
             GetComponentInChildren<Camera>().gameObject.SetActive(false);
             Destroy(_rb);
         }
+        
+        //player manager에 player를 등록한다.
+        var gamePlayer = GetComponent<GamePlayer>();
+        Manager.PlayerManager.RegisterPlayer(gamePlayer);
     }
 
     private void Update()

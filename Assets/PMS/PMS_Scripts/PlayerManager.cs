@@ -5,6 +5,7 @@ using UnityEngine;
 using Photon.Pun; 
 using Photon.Realtime;
 using ExitGames.Client.Photon;
+using System;
 
 //TODO - 만약 게임 플레이 중간에 플레이어가 나가면 해당 유저의 정보를 삭제해야하는 부분이 필요 
 //인게임 플레이어 매니저를 만드는게 빠를것같다.
@@ -14,6 +15,7 @@ public class PlayerManager : Singleton<PlayerManager>
     //리스트를 딱한번 공유해야하는 상황 -> 모든 유저가 다 등록이 되었을 때 모든 유저가 해당 데이터를 들고 있도록 해야한다.
     [SerializeField] public List<GamePlayer> _playerList;
     [SerializeField] private Dictionary<string, GamePlayer> _players;
+    
 
     //플레이어 생성전 플레이어의 데이터를 firebase들고와서 key:firebaseId Value:PlayerData로 저장해놓는다.
     //지금 당장 필요할 것 같지는 않다.
@@ -21,6 +23,8 @@ public class PlayerManager : Singleton<PlayerManager>
     [SerializeField] public List<PlayerData> _playerDataList;
 
     public Dictionary<string, GamePlayer> GetAllPlayers() => _players;
+
+    public Action OnAddPlayer;
 
     private void Awake()
     {
@@ -36,8 +40,8 @@ public class PlayerManager : Singleton<PlayerManager>
     // TODO - 해제를 해주는 곳이 애매하다.
     private void OnDisable()
     {
-        _players.Clear();
-        _playerList.Clear();
+        _players?.Clear();
+        _playerList?.Clear();
         InGameManager.Instance.OnGameStart -= AllGamePlayerAdd; 
     }
 
@@ -92,6 +96,8 @@ public class PlayerManager : Singleton<PlayerManager>
         {
             _players.Add(player.PlayerId, player);
             Debug.Log($"Player added! Player FirebaseUID Number : {player.PlayerId}, Player NickName : {player.Nickname}. Current players: {_players.Count}");
+            
+            OnAddPlayer?.Invoke();
         }
         else
         {

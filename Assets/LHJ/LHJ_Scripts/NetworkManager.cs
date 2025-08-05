@@ -387,12 +387,22 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         lobbyPanel.SetActive(false);
         roomPanel.SetActive(true);
 
+        //자기 자신의 isInGameScene 프로퍼티 초기화
+        Hashtable playerProperty = new Hashtable
+        {
+            { "IsInGameScene", false }
+        };
+        
+        PhotonNetwork.LocalPlayer.SetCustomProperties(playerProperty);
+        
+        
         codeJoinButton.interactable = true;         // 버튼 복원 (코드로 방 입장 시 비활성화 시켰던 버튼 복원)
         
         roomManager.InitRoom();                     // UI 및 설정 초기화
         foreach (Player player in PhotonNetwork.PlayerList)
         {
             roomManager.SetPlayerPanel(player);     // 각 플레이어 UI 설정
+            
         }
     }
     

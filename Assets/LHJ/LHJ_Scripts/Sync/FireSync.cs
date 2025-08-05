@@ -114,7 +114,7 @@ public class FireSync : MonoBehaviourPun
             next = default;
         }
         GunManager.Instance.SetLoadedBullet(next);
-        Debug.LogError($"장전된 탄: {GunManager.Instance.LoadedBullet}, 남은 탄 수: {GunManager.Instance.Magazine.Count}");
+        Debug.Log($"장전된 탄: {GunManager.Instance.LoadedBullet}, 남은 탄 수: {GunManager.Instance.Magazine.Count}");
 
         // 탄을 모두 소진했을 경우 마스터만 자동 장전 후 동기화
         if (PhotonNetwork.IsMasterClient && GunManager.Instance.LoadedBullet == default && GunManager.Instance.Magazine.Count == 0)
