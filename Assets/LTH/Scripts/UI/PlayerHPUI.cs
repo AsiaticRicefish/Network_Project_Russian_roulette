@@ -92,6 +92,20 @@ public class PlayerHPUI : MonoBehaviour
                 UpdateHeartUI(enemyHPPanel, player.CurrentHp, player.MaxHp, false);
             }
         }
+        
+        // 닉네임을 승자이름으로 전달하기 위함
+        if (myPlayer != null && myPlayer.IsAlive && !hasShownGameOver)
+        {
+            foreach (var pair in players)
+            {
+                if (pair.Key != myId && !pair.Value.IsAlive)
+                {
+                    hasShownGameOver = true;
+                    ShowGameOverUI();
+                    break;
+                }
+            }
+        }
     }
 
     private void UpdateHeartUI(Transform panel, int currentHp, int maxHp, bool isMine)
@@ -134,7 +148,7 @@ public class PlayerHPUI : MonoBehaviour
     {
         foreach (var pair in players)
         {
-            if (pair.Value.IsAlive && pair.Value.Nickname != myId)
+            if (pair.Value.IsAlive)
                 return pair.Value.Nickname;
         }
         return "상대방";

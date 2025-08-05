@@ -196,7 +196,7 @@ public class GamePlayer : MonoBehaviour, IComparer<GamePlayer>
         PlayerManager.Instance.RegisterPlayer(this);
 
         // TODO - 모든 플레이어가 List의 순서를 보장해줘야한다.
-        //PlayerManager.Instance._playerList.Add(this);      
+        PlayerManager.Instance._playerList.Add(this);      
     }
 
     // 내 PlayerData를 다른 클라이언트에게 보내는 함수
