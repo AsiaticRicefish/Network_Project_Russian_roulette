@@ -73,6 +73,11 @@ public class PlayerHPUI : MonoBehaviour
     {
         foreach (var player in players.Values)
         {
+            if (player.MaxHp <= 0)
+                return; // 아직 게임 시작 전이거나 초기화 안 됨
+        }
+        foreach (var player in players.Values)
+        {
             bool isMine = player.Nickname == myId;
 
             if (isMine)

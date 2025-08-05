@@ -137,6 +137,11 @@ public class GamePlayer : MonoBehaviour, IComparer<GamePlayer>
         IncreaseHp(amount);
     }
 
+    [PunRPC]
+    public void RPC_DecreaseHp(int amount)
+    {
+        DecreaseHp(amount);
+    }
 
     public void IncreaseHp(int amount)
     {
