@@ -31,6 +31,10 @@ public class ItemManager : Singleton<ItemManager>
                 Debug.Log("담배 사용 → 피1 회복");
                 break;
 
+            case ItemType.Saw:
+                Debug.Log("톱 사용 → 이번턴 총기 데미지 2배");
+                break;
+
             case ItemType.Cuffs:
                 target.IsCuffedThisTurn = true;
                 Debug.Log("수갑 사용 → 대상의 다음 턴 스킵 예약됨");
