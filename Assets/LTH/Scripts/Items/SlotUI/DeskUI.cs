@@ -102,7 +102,7 @@ public class DeskUI : UI_Base
         {
             if (!slot.IsEmpty && slot.HasItemId(itemId))
             {
-                slot.ClearSlot();
+                slot.RequestClearViaRPC();
                 break;
             }
         }
