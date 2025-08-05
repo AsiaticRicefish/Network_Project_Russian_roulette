@@ -1,3 +1,6 @@
+using Managers;
+using System;
+using System.Collections;
 using UnityEngine;
 
 namespace GameCamera
@@ -8,6 +11,14 @@ namespace GameCamera
         {
             cameraID = "Player";
             base.Awake();
+        }
+
+        private IEnumerator Start()
+        {
+            yield return null;
+            Debug.Log("push 시점");
+            
+            Manager.Camera.PushCamera(cameraID);
         }
     }
 }

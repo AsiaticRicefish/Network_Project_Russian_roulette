@@ -21,6 +21,8 @@ namespace Test
                 Manager.Camera.PushCamera("BulletDisplay");
             else
                 Manager.Camera.PopCamera();
+            
+            Manager.Sound.PlaySfxByKey("CameraChange");
         }
     }
 }
