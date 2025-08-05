@@ -66,7 +66,10 @@ public class ItemBoxManager : MonoBehaviourPun
         
         //spawn manager에 register 하기
         ItemBoxSpawnerManager.Instance.RegisterItemBox(ownerNickname, this);
-        
+
+        // 오직 자기 자신인 경우에만 연결
+        if (PhotonNetwork.LocalPlayer.UserId != userID) return;
+   
         //각 플레이어의 itemsync의 myItemBox에 현재 itemBox 할당하기
         if (Manager.PlayerManager.GetAllPlayers().TryGetValue(userID, out GamePlayer gamePlayer))
         {
@@ -78,8 +81,6 @@ public class ItemBoxManager : MonoBehaviourPun
             Debug.Log($"[ItemBoxManager] PlayerManager의 _players에서 {userID}로 된 GamePlayer를 찾을 수 없습니다.");
             return;
         }
-        
-
     }
 
     /// <summary>

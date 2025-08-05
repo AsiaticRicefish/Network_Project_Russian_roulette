@@ -32,6 +32,8 @@ public class BulletDisplayer : MonoBehaviour
     // 총알 데이터 수신용 캐시
     private List<BulletType> syncedBullets = new();
 
+    private Coroutine hideCoroutine; // 코루틴 캐시용
+
     private void Start()
     {
         if (Manager.Game != null)
@@ -58,8 +60,10 @@ public class BulletDisplayer : MonoBehaviour
         List<BulletType> allBullets = new() { GunManager.Instance.LoadedBullet };
         allBullets.AddRange(GunManager.Instance.Magazine);
 
-        int[] serialized = allBullets.ConvertAll(b => (int)b).ToArray();
+        // 실탄 → 공포탄 순으로 정렬
+        allBullets.Sort((a, b) => ((int)b).CompareTo((int)a));
 
+        int[] serialized = allBullets.ConvertAll(b => (int)b).ToArray();
         pv.RPC(nameof(RPC_ReceiveBulletInfo), RpcTarget.All, serialized);
     }
 
@@ -116,8 +120,13 @@ public class BulletDisplayer : MonoBehaviour
         // 등장 연출
         bulletInfoPanel.transform.DOScale(1f, fadeDuration).SetEase(Ease.OutBack);
 
-        // 일정 시간 후 퇴장
-        StartCoroutine(HideBulletInfoPanelAfterDelay());
+        // 기존 코루틴이 있으면 중단
+        if (hideCoroutine != null)
+        {
+            StopCoroutine(hideCoroutine);
+        }
+        // 새로운 코루틴 시작
+        hideCoroutine = StartCoroutine(HideBulletInfoPanelAfterDelay());
     }
 
     private IEnumerator HideBulletInfoPanelAfterDelay()
@@ -132,6 +141,8 @@ public class BulletDisplayer : MonoBehaviour
                 bulletInfoPanel.SetActive(false);
               
             });
+
+        hideCoroutine = null;
     }
 
     public void ClearBullets()

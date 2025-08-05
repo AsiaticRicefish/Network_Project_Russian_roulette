@@ -54,17 +54,6 @@ public class PlayerController : MonoBehaviourPun
         PlayerLook();
     }
 
-    // 해당 함수는 내가 작동시키나 RPC함수의 실행은 모든클라이언트에서 이루어져야함 -> RPCTarget.All로 설정
-    public void AttackPlayer(GamePlayer targetPlayer, int damage)
-    {
-        // 내가 이 공격을 수행하는 주체일 때만 RPC 호출
-        if (photonView.IsMine)
-        {
-            // 타겟 플레이어의 ID를 RPC로 전송하여 모든 클라이언트에서 HP 감소 로직을 실행
-            photonView.RPC("RPC_DecreasePlayerHp", RpcTarget.All, targetPlayer.PlayerId, damage);
-        }
-    }
-
     //시점 변경 테스트코드
     private void PlayerLook()
     {

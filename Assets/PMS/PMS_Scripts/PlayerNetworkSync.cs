@@ -21,7 +21,7 @@ public class PlayerNetworkSync : MonoBehaviourPun
         }
     }
 
-    private void OnEnable()
+    /*private void OnEnable()
     {
         // GamePlayer의 이벤트를 구독하여 hp 변경시 hp 및 Alive 값 전달 RPC 호출
         if (_gamePlayer != null)
@@ -39,10 +39,10 @@ public class PlayerNetworkSync : MonoBehaviourPun
             _gamePlayer.OnHpChanged -= OnGamePlayerCurrentHpChanged;
             _gamePlayer.OnMaxHpChanged -= OnGamePlayerMaxHpChanged;
         }
-    }
+    }*/
 
     //두개의 이벤트모두 나자신에게 전송할 필요가없다.
-    private void OnGamePlayerMaxHpChanged(int MaxHp, bool isAlive)
+    /*private void OnGamePlayerMaxHpChanged(int MaxHp, bool isAlive)
     {
         // 내가 소유한 GamePlayer의 체력만 동기화
         if (photonView.IsMine)
@@ -122,5 +122,7 @@ public class PlayerNetworkSync : MonoBehaviourPun
         {
             Debug.Log($"[PlayerNetworkSync] {_gamePlayer.Nickname}이 공격하여 {targetPlayer.Nickname}의 HP가 {amount}만큼 감소했습니다. 현재 HP: {targetPlayer.CurrentHp}");
         }
-    }
+    }*/
+
+
 }
