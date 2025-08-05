@@ -103,8 +103,13 @@ public class BulletDisplayer : MonoBehaviour
         }
     }
 
+    
+    //카메라 연출 추가
     private void ShowBulletInfoPanel()
     {
+        //bulletinfo panel을 보여주는 vcam 활성화
+        
+        
         bulletInfoPanel.SetActive(true);
         bulletInfoPanel.transform.localScale = Vector3.zero;
 
@@ -125,6 +130,7 @@ public class BulletDisplayer : MonoBehaviour
             .OnComplete(() =>
             {
                 bulletInfoPanel.SetActive(false);
+              
             });
     }
 

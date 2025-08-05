@@ -180,7 +180,7 @@ GameObject:
   - component: {fileID: 3048136458651098031}
   - component: {fileID: 6107450352362455639}
   m_Layer: 0
-  m_Name: Virtual Camera
+  m_Name: Player Virtual Camera
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -18678,7 +18678,7 @@ MonoBehaviour:
     winCount: 0
     loseCount: 0
   _spawnPointindex: -1
-  IsCuffedThisTurn: 0
+  IsCuffedThisTurn: 1
 --- !u!114 &8322331512635834442
 MonoBehaviour:
   m_ObjectHideFlags: 0
