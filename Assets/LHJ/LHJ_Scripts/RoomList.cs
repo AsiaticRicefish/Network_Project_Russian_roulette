@@ -18,7 +18,7 @@ public class RoomList : MonoBehaviour
     [Header("UI Components")]
     [SerializeField] private TextMeshProUGUI roomNameText;
     [SerializeField] private TextMeshProUGUI playerCountText;
-    [SerializeField] private TextMeshProUGUI statusText;
+    // [SerializeField] private TextMeshProUGUI statusText;
     [SerializeField] private Button roomListButton;
 
     [Header("Colors")]
@@ -60,7 +60,7 @@ public class RoomList : MonoBehaviour
         //------ ui 초기화 -----//
         roomNameText.text = $"{_userRoomName}";
         playerCountText.text = $"{info.PlayerCount} / {info.MaxPlayers}";
-        statusText.text = "Waiting"; //todo: status Text (상태값을 동적으로 표시하기 위해서 커스텀 프로퍼티 추가해야 함)
+        // statusText.text = "Waiting"; //todo: status Text (상태값을 동적으로 표시하기 위해서 커스텀 프로퍼티 추가해야 함)
         
         //---- 이벤트 등록 -----//
         roomListButton.onClick.RemoveListener(SelectRoom);

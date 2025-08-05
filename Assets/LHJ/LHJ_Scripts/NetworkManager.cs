@@ -140,7 +140,9 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     #region NickName
 
     /// <summary>
-    /// 유저 닉네임 설정 후 로비 진입 시도
+    /// 유저 닉네임을 입력받아 고유 닉네임으로 설정하고, 로비에 진입합니다.
+    /// - 실제 PhotonNetwork.NickName에는 입력값 + UserId 조합이 저장됩니다.
+    /// - 사용자에게는 입력한 닉네임만 표시됩니다.
     /// </summary>
     public void NicknameAdmit()
     {
@@ -155,11 +157,22 @@ public class NetworkManager : MonoBehaviourPunCallbacks
             return;
         }
         
-        PhotonNetwork.NickName = nickname;
+        SetUniqueNickName(nickname);
         Manager.UI.ShowNotifyModal(NotifyMessage.MessageEntities[NotifyMessageType.NicknameSuccess]);       // ui modal
         
         PhotonNetwork.JoinLobby();     // 로비 진입
         
+    }
+
+    /// <summary>
+    /// 입력한 닉네임에 UserId를 결합하여 고유한 내부 닉네임으로 설정합니다.
+    /// UI에는 입력한 닉네임만 표시되고, 내부적으로는 중복 방지를 위해 UserId가 함께 사용됩니다.
+    /// </summary>
+    /// <param name="nickname"></param>
+    private void SetUniqueNickName(string inputNickname)
+    {
+        string userId = PhotonNetwork.LocalPlayer.UserId;
+        PhotonNetwork.NickName = $"{inputNickname}{Define_LDH.NicknameDelimiter}{userId}";
     }
 
     #endregion

@@ -5,6 +5,8 @@ namespace Utils
 {
     public class Define_LDH : MonoBehaviour
     {
+        public const string NicknameDelimiter = "__";
+        
         // 사운드 타입
         public enum Sound
         {
