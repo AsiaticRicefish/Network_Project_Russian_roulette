@@ -1,9 +1,9 @@
+using Photon.Realtime;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 using Object = UnityEngine.Object;
 
 namespace Utils
@@ -33,7 +33,6 @@ namespace Utils
 
         #endregion
         
-        
         #region Validation
         ///<summary>
         /// index가 리스트/배열 등 순차 컬렉션 내에서 유효한 범위인지 확인
@@ -47,8 +46,7 @@ namespace Utils
         }
 
         #endregion
-
-
+        
         #region Resource
 
         public static T Instantiate<T>(string prefabPath, Transform parent = null) where T : UnityEngine.Object
@@ -68,7 +66,6 @@ namespace Utils
 
 
         #endregion
-        
         
         
         #region RectTransform Control
@@ -204,6 +201,38 @@ namespace Utils
 
 
         #endregion
+
+
+        #region Network
+
+        
+        /// <summary>
+        /// 내부적으로 설정된 고유 닉네임(입력닉네임 + 구분자 + UserId)에서
+        /// 사용자가 실제 입력한 닉네임 부분만 추출하여 반환합니다.
+        /// </summary>
+        /// <param name="player">Photon Player 객체</param>
+        /// <returns>사용자가 입력한 닉네임 (UserId 제외)</returns>
+        public static string GetUserNickname(Player player)
+        {
+            return GetUserNickname(player?.NickName);
+        }
+
+        /// <summary>
+        /// 고유 닉네임 문자열(입력닉네임 + 구분자 + UserId)에서
+        /// 사용자가 실제 입력한 닉네임 부분만 추출하여 반환합니다.
+        /// </summary>
+        /// <param name="rawNickname">고유 닉네임 문자열</param>
+        /// <returns>입력한 닉네임 부분 (UserId 제외)</returns>
+        public static string GetUserNickname(string rawNickname)
+        {
+            if (string.IsNullOrEmpty(rawNickname))
+                return null;
+
+            int index = rawNickname.IndexOf(Define_LDH.NicknameDelimiter, StringComparison.Ordinal);  // StringComparison.Ordinal : 문화권/로케일 영향을 받지 않고 바이트 값을 기준으로 비교 처리
+            return index >= 0 ? rawNickname.Substring(0, index) : rawNickname;
+        }
+        #endregion
+        
     }
     
 }
