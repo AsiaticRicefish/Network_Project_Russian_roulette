@@ -152,6 +152,8 @@ public class ItemSlot : MonoBehaviourPun
         slotEffectController?.PlayItemAppearEffect(anchorPoint.position);
     }
 
+
+    #region Item Usage
     /// <summary>
     /// 클릭 → 아이템 사용
     /// </summary>
@@ -179,17 +181,22 @@ public class ItemSlot : MonoBehaviourPun
 
     private void UseItem()
     {
-        if (itemSync == null)
+        if (itemSync == null || !itemSync.IsMine()) return;
+
+        if (TurnSync.CurrentTurnPlayerId != itemSync.MyNickname)
         {
-            Debug.LogWarning("[ItemSlot] ItemSync 연결 안됨");
+            Debug.LogWarning("[ItemSlot] 현재 턴이 아님 → 연출 및 사용 차단");
             return;
         }
 
         Debug.Log($"[ItemSlot] 아이템 사용 요청: {itemData.itemId}");
         slotEffectController?.PlayUseEffect(currentItem);
         itemSync.UseItemRequest(itemData.itemId);
+    }
 
-        // 슬롯 비우기 동기화
+    public void RequestClearViaRPC()
+    {
+        if (!itemSync.IsMine()) return;
         photonView.RPC(nameof(RPC_Clear), RpcTarget.All);
     }
 
@@ -201,6 +208,8 @@ public class ItemSlot : MonoBehaviourPun
 
     public void ClearSlot()
     {
+        Debug.Log($"[ItemSlot] ClearSlot 실행됨 → {itemData?.itemId}, 호출자: {photonView.Owner.NickName}");
+
         if (currentItem != null)
         {
             var view = currentItem.GetComponent<PhotonView>();
@@ -214,7 +223,9 @@ public class ItemSlot : MonoBehaviourPun
 
         itemData = null;
     }
+    #endregion
 
+    #region Interaction Control
     /// <summary>
     /// 슬롯 상호작용 여부 설정
     /// </summary>
@@ -226,7 +237,9 @@ public class ItemSlot : MonoBehaviourPun
             Debug.Log($"[ItemSlot] Collider {(interactable ? "활성화" : "비활성화")}");
         }
     }
+    #endregion
 
+    #region Tooltip
     private void OnHoverEnter(PointerEventData eventData)
     {
         if (!IsEmpty && itemData != null)
@@ -247,4 +260,5 @@ public class ItemSlot : MonoBehaviourPun
         // 툴팁 닫기
         Manager.UI.CloseGlobalUI(Define_LDH.GlobalUI.UI_InventoryInfo);
     }
+    #endregion
 }

@@ -225,12 +225,25 @@ public class ItemSync : MonoBehaviourPun
 
     public void UseItemRequest(string itemId)
     {
+        if (TurnSync.CurrentTurnPlayerId != MyNickname) // 현재 자신의 턴이 아닐 대 아이템 사용 불가
+        {
+            Debug.LogWarning($"[ItemSync] 현재 턴이 아님 → 아이템 사용 불가: {MyNickname}");
+            return;
+        }
+
         photonView.RPC(nameof(UseItem), RpcTarget.AllViaServer, MyNickname, itemId);
     }
 
     [PunRPC]
     private void UseItem(string nickname, string itemId)
     {
+        // 현재 자신의 턴이 아닐 대 아이템 사용 불가 이중으로 확인
+        if (TurnSync.CurrentTurnPlayerId != nickname)
+        {
+            Debug.LogWarning($"[UseItem] {nickname}는 현재 턴이 아님 → 아이템 사용 차단");
+            return;
+        }
+
         var items = ItemSyncManager.Instance.GetSyncedItems(nickname);
         var targetItem = items.FirstOrDefault(i => i.itemId == itemId);
 
