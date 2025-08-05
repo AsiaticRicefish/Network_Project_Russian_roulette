@@ -126,6 +126,7 @@ public class FireSync : MonoBehaviourPun
             bullets.AddRange(Array.ConvertAll(current, b => (int)b));
 
             photonView.RPC("ReloadSync", RpcTarget.All, bullets.ToArray(), bullets[0]);
+            ItemBoxSpawnerManager.Instance.ShowAllBoxes();
         }
 
         if (PhotonNetwork.IsMasterClient)

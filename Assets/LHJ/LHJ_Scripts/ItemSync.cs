@@ -209,10 +209,19 @@ public class ItemSync : MonoBehaviourPun
     [PunRPC]
     private void InitPlayerItems(string nickname)
     {
-        var myItems = new List<ItemData>(itemDataList);
+        var myItems = new List<ItemData>();
+
+        foreach (var item in itemDataList)
+        {
+            var copy = Instantiate(item);     // 복제
+            copy.isUsed = false;              // 상태 초기화
+            myItems.Add(copy);
+        }
+
         ItemSyncManager.Instance.OnSyncReceived(nickname, myItems);
         Debug.Log($"[ItemSync] 아이템 동기화 완료 → {nickname}");
     }
+
 
     public void UseItemRequest(string itemId)
     {
