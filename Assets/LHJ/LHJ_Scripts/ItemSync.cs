@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using GameUI;
 using UnityEngine;
+using System;
 
 
 /// <summary>
@@ -91,22 +92,25 @@ public class ItemSync : MonoBehaviourPun
             Debug.Log($"[ItemSync] 내 ItemBox 생성 완료 → {MyNickname}");
             
         }
+
+        #region removed legacy code
         // else
         // {
-            // // 내 박스를 이미 생성한 마스터의 것을 가져와 Init만 (x) 각자 자기 박스 생성(마스터에서 생성하는게 아니라)
-            // yield return new WaitUntil(() => ItemBoxSpawnerManager.Instance.TryGetItemBox(MyNickname, out _));
-            //
-            // if (ItemBoxSpawnerManager.Instance.TryGetItemBox(MyNickname, out var foundBox))
-            // {
-            //     foundBox.Init(myDeskUI);
-            //     myItemBox = foundBox;
-            //     Debug.Log($"[ItemSync] 박스 연결 완료 → {MyNickname}");
-            // }
-            // else
-            // {
-            //     Debug.LogError($"[ItemSync] 박스 연결 실패 → {MyNickname}");
-            // }
+        // // 내 박스를 이미 생성한 마스터의 것을 가져와 Init만 (x) 각자 자기 박스 생성(마스터에서 생성하는게 아니라)
+        // yield return new WaitUntil(() => ItemBoxSpawnerManager.Instance.TryGetItemBox(MyNickname, out _));
+        //
+        // if (ItemBoxSpawnerManager.Instance.TryGetItemBox(MyNickname, out var foundBox))
+        // {
+        //     foundBox.Init(myDeskUI);
+        //     myItemBox = foundBox;
+        //     Debug.Log($"[ItemSync] 박스 연결 완료 → {MyNickname}");
         // }
+        // else
+        // {
+        //     Debug.LogError($"[ItemSync] 박스 연결 실패 → {MyNickname}");
+        // }
+        // }
+        #endregion
 
         // 아이템 초기화 동기화
         photonView.RPC(nameof(InitPlayerItems), RpcTarget.AllBuffered, MyNickname);
@@ -129,6 +133,7 @@ public class ItemSync : MonoBehaviourPun
                 }
             }
         }
+        #region removed legacy code
         //yield return new WaitUntil(() =>
         //   PhotonNetwork.IsConnected &&
         //   DeskUIManager.Instance != null &&
@@ -202,9 +207,9 @@ public class ItemSync : MonoBehaviourPun
         //        }
         //    }
         //}
+        #endregion
     }
 
-    
 
     [PunRPC]
     private void InitPlayerItems(string nickname)
@@ -213,8 +218,7 @@ public class ItemSync : MonoBehaviourPun
 
         foreach (var item in itemDataList)
         {
-            var copy = Instantiate(item);     // 복제
-            copy.isUsed = false;              // 상태 초기화
+            var copy = item.Clone();
             myItems.Add(copy);
         }
 
@@ -222,41 +226,49 @@ public class ItemSync : MonoBehaviourPun
         Debug.Log($"[ItemSync] 아이템 동기화 완료 → {nickname}");
     }
 
-
-    public void UseItemRequest(string itemId)
+    public void RegisterItem(ItemData item)
     {
-        if (TurnSync.CurrentTurnPlayerId != MyNickname) // 현재 자신의 턴이 아닐 대 아이템 사용 불가
+        if (item == null) return;
+
+        ItemSyncManager.Instance.RegisterSyncedItem(MyNickname, item);
+        Debug.Log($"[ItemSync] {MyNickname} → {item.itemId} ({item.uniqueInstanceId}) 등록됨");
+    }
+
+    public void UseItemRequest(string uniqueInstanceId)
+    {
+        if (TurnSync.CurrentTurnPlayerId != MyNickname)
         {
             Debug.LogWarning($"[ItemSync] 현재 턴이 아님 → 아이템 사용 불가: {MyNickname}");
             return;
         }
 
-        photonView.RPC(nameof(UseItem), RpcTarget.AllViaServer, MyNickname, itemId);
+        photonView.RPC(nameof(UseItem), RpcTarget.MasterClient, MyNickname, uniqueInstanceId);
     }
 
     [PunRPC]
-    private void UseItem(string nickname, string itemId)
+    private void UseItem(string nickname, string uniqueItemId)
     {
-        // 현재 자신의 턴이 아닐 대 아이템 사용 불가 이중으로 확인
+        // 현재 자신의 턴이 아닐 때 아이템 사용 불가 (이중 확인)
         if (TurnSync.CurrentTurnPlayerId != nickname) return;
 
         var items = ItemSyncManager.Instance.GetSyncedItems(nickname);
-        var targetItem = items.FirstOrDefault(i => i.itemId == itemId);
+        var targetItem = items.FirstOrDefault(i => i.uniqueInstanceId == uniqueItemId);
 
         if (targetItem == null)
         {
-            Debug.LogWarning($"[UseItem] {nickname}에게 {itemId} 아이템 없음");
+            Debug.LogWarning($"[UseItem] {nickname}에게 {uniqueItemId} 고유 아이템 없음");
             return;
         }
 
-        Debug.Log($"[UseItem] {nickname} → {itemId} 사용");
+        Debug.Log($"[UseItem] {nickname} → {targetItem.itemId} 사용");
 
         var user = FindPlayerByNickname(nickname);
         var target = FindTargetPlayer(user);
 
         ItemManager.Instance.UseItem(targetItem, user, target);
 
-        photonView.RPC(nameof(ClearSlot), RpcTarget.All, nickname, itemId);
+        // 아이템 사용 후 슬롯 제거도 고유 ID 기준
+        photonView.RPC(nameof(ClearSlot), RpcTarget.All, nickname, uniqueItemId);
     }
 
     [PunRPC]
