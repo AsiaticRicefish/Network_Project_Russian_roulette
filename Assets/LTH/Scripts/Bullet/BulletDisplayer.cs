@@ -1,10 +1,11 @@
 using DG.Tweening;
 using Managers;
+using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
-using Photon.Pun;
 
 public class BulletDisplayer : MonoBehaviour
 {
@@ -61,7 +62,7 @@ public class BulletDisplayer : MonoBehaviour
         allBullets.AddRange(GunManager.Instance.Magazine);
 
         // 실탄 → 공포탄 순으로 정렬
-        allBullets.Sort((a, b) => ((int)b).CompareTo((int)a));
+        // allBullets.Sort((a, b) => ((int)b).CompareTo((int)a));
 
         int[] serialized = allBullets.ConvertAll(b => (int)b).ToArray();
         pv.RPC(nameof(RPC_ReceiveBulletInfo), RpcTarget.All, serialized);
@@ -99,6 +100,7 @@ public class BulletDisplayer : MonoBehaviour
             GameObject bullet = Instantiate(prefab, position, rotation, anchorPoint);
             spawnedBullets.Add(bullet);
         }
+        Debug.Log("[DisplayBullets] 표시할 탄 배열: " + string.Join(", ", syncedBullets.Select(b => b.ToString())));
 
         if (bulletInfoPanel != null && bulletCountText != null)
         {

@@ -1,9 +1,10 @@
+using Managers;
+using Photon.Pun;
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
-using Photon.Pun;
-using Managers;
-using System;
 
 public class FireSync : MonoBehaviourPun
 {
@@ -25,6 +26,7 @@ public class FireSync : MonoBehaviourPun
             var current = GunManager.Instance.Magazine.ToArray();
             var bullets = new List<int> { (int)GunManager.Instance.LoadedBullet };
             bullets.AddRange(Array.ConvertAll(current, b => (int)b));
+            bullets.Sort((a, b) => b.CompareTo(a));
 
             photonView.RPC("ReloadSync", RpcTarget.All, bullets.ToArray(), bullets[0]);
         }
@@ -61,6 +63,7 @@ public class FireSync : MonoBehaviourPun
 
         photonView.RPC("ReloadSync", RpcTarget.All, totalBullets.ToArray(), totalBullets[0]);
     }
+
 
     /// <summary>
     /// 모든 클라이언트에서 발사 동작을 실행하는 RPC
@@ -176,6 +179,24 @@ public class FireSync : MonoBehaviourPun
         }
         //=================================================//
     }
+
+    [PunRPC]
+    public void RequestFire(string shooterId)
+    {
+        if (!PhotonNetwork.IsMasterClient)
+        {
+            Debug.LogWarning("[RequestFire] 마스터 클라이언트가 아님 → 무시");
+            return;
+        }
+
+        BulletType loaded = GunManager.Instance.LoadedBullet;
+        Debug.Log($"[RequestFire] {shooterId} 요청에 따라 마스터가 발사 처리 → 탄: {loaded}");
+
+        // 발사 처리: 마스터가 모든 클라이언트에 발사 결과 전송
+        photonView.RPC("Fire", RpcTarget.All, shooterId, (int)loaded);
+    }
+
+
     [PunRPC]
     private void FireResult(string targetId, int bulletInt)
     {
@@ -225,6 +246,7 @@ public class FireSync : MonoBehaviourPun
             else if (bullet == BulletType.blank) blankCount++;
         }
         Debug.LogWarning($"장전된 탄: {GunManager.Instance.LoadedBullet}, 남은 탄 수: {GunManager.Instance.Magazine.Count}, 실탄: {liveCount}, 공포탄: {blankCount}");
+        Debug.Log("[ReloadSync] 받은 탄 배열: " + string.Join(", ", bullets.Select(b => ((BulletType)b).ToString())));
     }
 
     private string GetNextTargetId(string shooterId)

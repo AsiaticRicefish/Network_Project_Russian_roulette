@@ -29,11 +29,10 @@ public class TurnUIController : MonoBehaviour
 
     private void ShowMessageForTurn(string playerId)
     {
-        
-        string myId = PhotonNetwork.LocalPlayer.NickName; // 또는 LobbyTest.MyPlayerId
+        string myId = PhotonNetwork.LocalPlayer.NickName;
         string message = playerId == myId
                 ? "당신의 턴입니다"
-            : $"{Util_LDH.GetUserNickname(playerId)}의 턴입니다";
+            : $"상대방의 턴입니다";
 
         ShowTurnMessage(message);
     }

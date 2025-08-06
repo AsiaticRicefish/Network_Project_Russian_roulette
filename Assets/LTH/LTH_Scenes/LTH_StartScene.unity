@@ -1373,7 +1373,7 @@ MonoBehaviour:
   panelLoading: {fileID: 330348535}
   startButton: {fileID: 172897843}
   roomName: DevTestRoom
-  gameSceneName: LTH_GameScene
+  gameSceneName: LTH_InGameScene
   requiredPlayerCount: 2
 --- !u!4 &1166964056
 Transform:

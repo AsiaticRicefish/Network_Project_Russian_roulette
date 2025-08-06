@@ -27,12 +27,12 @@ EditorBuildSettings:
     path: Assets/PMS/PMS_Scene/PMS_InGame.unity
     guid: b3e1705ab9f9873419efaec79f9f704b
   - enabled: 1
-    path: Assets/LTH/LTH_Scenes/LTH_LobbyScene.unity
-    guid: 45148f2c85c52134f807b8130967835f
+    path: Assets/LTH/LTH_Scenes/LTH_Lobby.unity
+    guid: af1eafe8dbc225c4e99ed2f7305698e4
   - enabled: 1
     path: Assets/LTH/LTH_Scenes/LTH_GameScene.unity
     guid: ede080dae4fb03b4ba964ec47515be69
   - enabled: 1
-    path: Assets/LTH/LTH_Scenes/LTH_InGameScene.unity
-    guid: 0f675c877a309fb4a8d12a59c2789dbc
+    path: Assets/LTH/LTH_Scenes/LTH_InGame.unity
+    guid: ec6b05a149a99a74b91bc0c9bae5f814
   m_configObjects: {}

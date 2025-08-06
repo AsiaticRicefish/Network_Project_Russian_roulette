@@ -324,4 +324,15 @@ public class GamePlayer : MonoBehaviourPun, IComparer<GamePlayer>
         Debug.Log(triggerName);
         _animator.SetTrigger(triggerName);
     }
+
+    [PunRPC]
+    public void RPC_ShowBulletInfo(int bulletTypeInt)
+    {
+        BulletType type = (BulletType)bulletTypeInt;
+        MagnifyingGlassUI ui = FindObjectOfType<MagnifyingGlassUI>();
+        if (ui != null)
+        {
+            ui.ShowBulletInfo(type);
+        }
+    }
 }
