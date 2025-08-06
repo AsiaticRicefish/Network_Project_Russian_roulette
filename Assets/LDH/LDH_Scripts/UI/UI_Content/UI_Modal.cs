@@ -1,5 +1,6 @@
 using Managers;
 using Michsky.UI.ModernUIPack;
+using System;
 using System.Diagnostics;
 using UnityEngine;
 using Utils;
@@ -29,6 +30,7 @@ namespace GameUI
              canvas.sortingOrder = canvas.sortingOrder + canvasOrder;
 
          }
+         
 
          //모달 ui를 실제로 show하려면 이 메서드 호출
         public override void Show()
@@ -36,6 +38,7 @@ namespace GameUI
             base.Show();
             _notification.OpenNotification();
         }
+        
 
         //모달 내용 변경
         public void SetContent(Define_LDH.NotifyType notifyType, string title, string description)

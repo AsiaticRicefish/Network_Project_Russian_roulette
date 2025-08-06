@@ -27,7 +27,7 @@ public class PlayerHPUI : MonoBehaviour
 
     private void Start()
     {
-        myId = Util_LDH.GetUserNickname(PhotonNetwork.NickName);
+        myId = PhotonNetwork.NickName;
     }
 
     //----- 생략----- //
@@ -116,7 +116,7 @@ public class PlayerHPUI : MonoBehaviour
 
             if (isMine)
             {
-                myNicknameText.text = player.Nickname;
+                myNicknameText.text = Util_LDH.GetUserNickname(player.Nickname);
                 UpdateHeartUI(myHPPanel, player.CurrentHp, player.MaxHp, true);
 
                 if (!player.IsAlive && !hasShownGameOver)
@@ -127,7 +127,7 @@ public class PlayerHPUI : MonoBehaviour
             }
             else
             {
-                enemyNicknameText.text = player.Nickname;
+                enemyNicknameText.text = Util_LDH.GetUserNickname(player.Nickname);
                 UpdateHeartUI(enemyHPPanel, player.CurrentHp, player.MaxHp, false);
             }
         }
