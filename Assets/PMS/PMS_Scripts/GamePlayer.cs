@@ -305,4 +305,15 @@ public class GamePlayer : MonoBehaviourPun, IComparer<GamePlayer>
 
         player.CurrentHp = hp; //setter 이벤트 호출
     }
+
+    [PunRPC]
+    public void RPC_ShowBulletInfo(int bulletTypeInt)
+    {
+        BulletType type = (BulletType)bulletTypeInt;
+        MagnifyingGlassUI ui = FindObjectOfType<MagnifyingGlassUI>();
+        if (ui != null)
+        {
+            ui.ShowBulletInfo(type);
+        }
+    }
 }
