@@ -75,6 +75,35 @@ public class SceneInit : MonoBehaviourPunCallbacks
                 go.AddComponent<ItemBoxSpawnerManager>();
                 DontDestroyOnLoad(go);
             }
+
+            if (InGameManager.Instance == null)
+            {
+                GameObject go = new GameObject("InGameManager");
+                go.AddComponent<InGameManager>();
+                DontDestroyOnLoad(go);
+            }
+
+            if (GunManager.Instance == null)
+            {
+                GameObject go = new GameObject("GunManager");
+                go.AddComponent<GunManager>();
+                DontDestroyOnLoad(go);
+            }
+
+            if (PlayerManager.Instance == null)
+            {
+                GameObject go = new GameObject("PlayerManager");
+                go.AddComponent<PlayerManager>();
+                DontDestroyOnLoad(go);
+            }
+
+            if (ItemSyncManager.Instance == null)
+            {
+                GameObject go = new GameObject("ItemSyncManager");
+                go.AddComponent<ItemSyncManager>();
+                DontDestroyOnLoad(go);
+            }
+
             InGameManager.Instance.StartGame();
         }
             
