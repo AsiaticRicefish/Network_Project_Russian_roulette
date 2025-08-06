@@ -228,7 +228,7 @@ public class InGameManager : Singleton<InGameManager>
         // 턴 시작시 이벤트 실행
         OnTurnStart?.Invoke();
 
-        Debug.Log($"[IngameManager] {CurrentTurn} Turn Start.");
+        // Debug.Log($"[IngameManager] {CurrentTurn} Turn Start.");
 
     }
 
@@ -238,7 +238,7 @@ public class InGameManager : Singleton<InGameManager>
         // 턴 종료시 이벤트 실행
         OnTurnEnd?.Invoke();
 
-        Debug.Log($"[IngameManager] {CurrentTurn} Turn End.");
+        // Debug.Log($"[IngameManager] {CurrentTurn} Turn End.");
 
         // 라운드 종료 확인
         if (CheckRoundEnd())
@@ -248,7 +248,7 @@ public class InGameManager : Singleton<InGameManager>
         }
 
         // 현재 턴을 다음으로 넘긴다.
-        int nextTurn = (_currentTurn == _turnOrder.Length - 1) ? 0 : _currentTurn + 1;
+        int nextTurn = (_turnOrder.Length == 1 || _currentTurn == _turnOrder.Length - 1) ? 0 : _currentTurn + 1;
         _photonView.RPC(nameof(SyncTurn), RpcTarget.All, nextTurn);
         // 턴 시작
         StartTurn();

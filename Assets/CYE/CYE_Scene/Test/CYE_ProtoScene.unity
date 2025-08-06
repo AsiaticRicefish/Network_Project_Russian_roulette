@@ -414,6 +414,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: TargetSelectUI
       objectReference: {fileID: 0}
+    - target: {fileID: 7613765445896465260, guid: 9f1bdd56d9ab4c643a7ae2337486fe5d,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

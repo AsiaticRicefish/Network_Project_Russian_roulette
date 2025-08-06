@@ -8,27 +8,36 @@ using UnityEngine.UI;
 /// </summary>
 public class TargetSelectUI : MonoBehaviour
 {
-    [SerializeField] private List<Transform> _playerSelectBtnPos;
-    [SerializeField] private GameObject _targetBtnPrefab;
-    private Button _btnComponent;
+    private const int MAX_USER_COUNT = 4;
 
-    void Awake() => Init();
+    [SerializeField] private Transform[] _playerSelectBtnPos = new Transform[MAX_USER_COUNT];
+    [SerializeField] private GameObject _targetBtnPrefab;
+
+    void Start() => Init();
     void Init()
     {
-        _btnComponent = GetComponent<Button>();
-        _btnComponent.onClick.AddListener(SelectTarget);
+        // _btnComponent = GetComponent<Button>();
+        // _btnComponent.onClick.AddListener(SelectTarget);
+        GamePlayer[] gamePlayers = SearchPlayerObjects();
+        
+        foreach (GamePlayer temp in gamePlayers)
+        {
+            Debug.Log($"{temp.gameObject.name}");
+        }
     }
 
-    public void AddTargetUserBtn(string userId)
+    public void AddTargetUserBtn(int userIndex, string userId)
     {
-        // userId(photon id, nickname 등등)로 유저 정보 가져옴
-        // 해당 유저의 방향으로 버튼 생성(_playerSelectBtnPos에서 위치 가져와서 _targetBtnPrefab Initialize)
-        // 생성된 버튼과 유저 매핑(id 연결)
+        GameObject selectButton = Instantiate(_targetBtnPrefab, _playerSelectBtnPos[userIndex]);
+        selectButton.transform.parent = transform;
+        if (selectButton.GetComponent<TargetSelectButton>() != null)
+        {
+            selectButton.GetComponent<TargetSelectButton>().UserId = userId;
+        }
     }
 
-    public void SelectTarget()
+    private GamePlayer[] SearchPlayerObjects()
     {
-        // 클릭된 버튼과 연결된 유저 id를 가져옴
-        // Fire(target Id)
+        return GameObject.FindObjectsByType<GamePlayer>(FindObjectsSortMode.None);
     }
 }
