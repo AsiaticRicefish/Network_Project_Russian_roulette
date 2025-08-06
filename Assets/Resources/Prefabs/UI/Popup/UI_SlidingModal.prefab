@@ -208,6 +208,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _notification: {fileID: 3149045013981145838}
   _uiManagerNotification: {fileID: 4443592527004483669}
+  canvasOrder: 100
 --- !u!1 &1221655246580301782
 GameObject:
   m_ObjectHideFlags: 0
@@ -280,7 +281,19 @@ MonoBehaviour:
       m_Calls: []
   onClose:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 5376648905405567545}
+        m_TargetAssemblyTypeName: GameUI.UI_Popup, Assembly-CSharp
+        m_MethodName: Close
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!225 &814210932985232191
 CanvasGroup:
   m_ObjectHideFlags: 0

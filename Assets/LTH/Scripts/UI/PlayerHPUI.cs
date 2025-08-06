@@ -27,7 +27,7 @@ public class PlayerHPUI : MonoBehaviour
 
     private void Start()
     {
-        myId = Util_LDH.GetUserNickname(PhotonNetwork.NickName);
+        myId = PhotonNetwork.NickName;
     }
 
     //----- 생략----- //
@@ -107,11 +107,16 @@ public class PlayerHPUI : MonoBehaviour
     {
         foreach (var player in players.Values)
         {
+            if (player.MaxHp <= 0)
+                return; // 아직 게임 시작 전이거나 초기화 안 됨
+        }
+        foreach (var player in players.Values)
+        {
             bool isMine = player.Nickname == myId;
 
             if (isMine)
             {
-                myNicknameText.text = player.Nickname;
+                myNicknameText.text = Util_LDH.GetUserNickname(player.Nickname);
                 UpdateHeartUI(myHPPanel, player.CurrentHp, player.MaxHp, true);
 
                 if (!player.IsAlive && !hasShownGameOver)
@@ -122,7 +127,7 @@ public class PlayerHPUI : MonoBehaviour
             }
             else
             {
-                enemyNicknameText.text = player.Nickname;
+                enemyNicknameText.text = Util_LDH.GetUserNickname(player.Nickname);
                 UpdateHeartUI(enemyHPPanel, player.CurrentHp, player.MaxHp, false);
             }
         }

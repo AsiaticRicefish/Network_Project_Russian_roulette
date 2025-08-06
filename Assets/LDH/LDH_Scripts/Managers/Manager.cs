@@ -63,7 +63,7 @@ namespace Managers
         
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-        private static void Initialize()
+        public static void Initialize()
         {
             var prefab = Resources.Load<GameObject>("Prefabs/@Manager");
             manager = GameObject.Instantiate(prefab);
