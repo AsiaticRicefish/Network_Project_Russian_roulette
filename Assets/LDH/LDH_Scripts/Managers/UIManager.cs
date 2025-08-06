@@ -14,7 +14,7 @@ namespace Managers
     public class UIManager : DesignPattern.Singleton<UIManager>
     {
         //---- Stack 관리 ----//
-        private int _order = 10;        // UI 정렬 순서 제어용
+        [SerializeField] private int _order = 10;        // UI 정렬 순서 제어용
         private Stack<UI_Popup> _popupStack = new();    // 팝업 UI Stack
         
         //---- 전역 UI 관리 (Global UI) ----//

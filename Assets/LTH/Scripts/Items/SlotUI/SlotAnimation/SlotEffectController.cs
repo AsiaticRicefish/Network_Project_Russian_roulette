@@ -1,5 +1,7 @@
 using DG.Tweening;
 using LDH_Animation;
+using Managers;
+using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -20,6 +22,8 @@ public class SlotEffectController : MonoBehaviour
             GameObject fx = Instantiate(itemAppearEffectPrefab, position, Quaternion.identity);
             fx.transform.SetParent(transform, worldPositionStays: true);
             Destroy(fx, 1.5f);
+            
+            
         }
     }
 

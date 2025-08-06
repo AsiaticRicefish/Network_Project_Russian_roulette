@@ -7,6 +7,7 @@ using Photon.Realtime;
 
 public class GamePlayer : MonoBehaviourPun, IComparer<GamePlayer>
 {
+    private Animator _animator;
     public PhotonView _pv;
 
     public PlayerData _data;
@@ -81,6 +82,7 @@ public class GamePlayer : MonoBehaviourPun, IComparer<GamePlayer>
 
     private void Awake()
     {
+        _animator = GetComponent<Animator>();
         _pv = GetComponent<PhotonView>();
         Initialize();
     }
@@ -90,33 +92,33 @@ public class GamePlayer : MonoBehaviourPun, IComparer<GamePlayer>
         //StartCoroutine(PlayerListSortDelay());
     }
 
-    private void Update()
-    {
-        if (_pv.IsMine)
-        {
-            Debug.Log(PlayerManager.Instance.GetAllPlayers().Count);
-
-            if (Input.GetKeyDown(KeyCode.Tab) && PlayerManager.Instance.GetAllPlayers().Count == 2)
-            {
-                foreach (var a in PlayerManager.Instance.GetAllPlayers())
-                {
-                    Debug.Log($"[GamePlayer]Update에서 호출 - {a.Value.PlayerId}, {a.Value.Nickname},{a.Value.CurrentHp}");
-                }
-            }
-        }
-
-        if (Input.GetKeyDown(KeyCode.C) && PhotonNetwork.IsMasterClient && _pv.IsMine)
-        {
-            IncreaseHp(1);
-            //CurrentHp += 1;
-        }
-
-        if (Input.GetKeyDown(KeyCode.X) && PhotonNetwork.IsMasterClient && _pv.IsMine)
-        {
-            DecreaseHp(1);
-            //CurrentHp -= 1;
-        }
-    }
+    // private void Update()
+    // {
+    //     if (_pv.IsMine)
+    //     {
+    //         Debug.Log(PlayerManager.Instance.GetAllPlayers().Count);
+    //
+    //         if (Input.GetKeyDown(KeyCode.Tab) && PlayerManager.Instance.GetAllPlayers().Count == 2)
+    //         {
+    //             foreach (var a in PlayerManager.Instance.GetAllPlayers())
+    //             {
+    //                 Debug.Log($"[GamePlayer]Update에서 호출 - {a.Value.PlayerId}, {a.Value.Nickname},{a.Value.CurrentHp}");
+    //             }
+    //         }
+    //     }
+    //
+    //     if (Input.GetKeyDown(KeyCode.C) && PhotonNetwork.IsMasterClient && _pv.IsMine)
+    //     {
+    //         IncreaseHp(1);
+    //         //CurrentHp += 1;
+    //     }
+    //
+    //     if (Input.GetKeyDown(KeyCode.X) && PhotonNetwork.IsMasterClient && _pv.IsMine)
+    //     {
+    //         DecreaseHp(1);
+    //         //CurrentHp -= 1;
+    //     }
+    // }
 
     /*private void OnEnable()
     {
@@ -252,7 +254,7 @@ public class GamePlayer : MonoBehaviourPun, IComparer<GamePlayer>
         if (target == null)
         {
             Debug.LogError($"[RPC_InCreasePlayerCurrentHp] Player ID '{requestId}' 를 찾지 못함");
-            PlayerManager.Instance.PlayerListPrint(); // 현재 등록된 플레이어들 출력
+            PlayerManager.Instance.PlayerListPrint(); // 현재 등록된 플레이어들 출력                             //이거 내가 추가했나?
             return;
         }
 
@@ -300,10 +302,27 @@ public class GamePlayer : MonoBehaviourPun, IComparer<GamePlayer>
     [PunRPC]
     void RPC_ApplyHp(string id, int hp)
     {
+        Debug.Log("[GamePlayer] --- ApplyHp 호출");
         var player = PlayerManager.Instance.FindPlayerByUID(id);
         if (player == null) return;
 
+        int oldHp = player.CurrentHp;
         player.CurrentHp = hp; //setter 이벤트 호출
+
+        // HP가 감소했고, 내가 마스터 클라이언트인 경우에만 애니메이션 RPC 전송
+        if (hp < oldHp && PhotonNetwork.IsMasterClient)
+        {
+            // 해당 플레이어에게만 애니메이션 재생 지시
+            player.photonView.RPC("RPC_PlayTrigger", RpcTarget.All, "Hit");
+        }
+    }
+
+    [PunRPC]
+    void RPC_PlayTrigger(string triggerName)
+    {
+        Debug.Log("[GamePlayer] --- 트리거 호출");
+        Debug.Log(triggerName);
+        _animator.SetTrigger(triggerName);
     }
 
     [PunRPC]

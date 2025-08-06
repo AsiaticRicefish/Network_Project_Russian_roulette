@@ -5,13 +5,13 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using Utils;
 
 public class GameOverSync : MonoBehaviourPunCallbacks
 {
     [SerializeField] private GameObject gameOverPanel;
     [SerializeField] private TextMeshProUGUI winnerText;
     [SerializeField] private TextMeshProUGUI countdownText;
-
     private bool hasShow = false;
 
     public static GameOverSync Instance;
@@ -46,6 +46,10 @@ public class GameOverSync : MonoBehaviourPunCallbacks
 
         hasShow = true;
 
+        //닉네임 파싱
+        winnerNickname = Util_LDH.GetUserNickname(winnerNickname);
+        
+        
         if (gameOverPanel != null)
             gameOverPanelManager.OpenWindow();
 
@@ -78,17 +82,18 @@ public class GameOverSync : MonoBehaviourPunCallbacks
         InGameManager.Release();
         ItemBoxSpawnerManager.Release();
         DeskUIManager.Release();
+        ItemSyncManager.Release();
 
         photonView.RPC("GoToLobbyScene", RpcTarget.All);
     }
     public override void OnLeftRoom()
     {
-        if (Managers.Manager.manager == null)
-        {
-            Debug.LogWarning("@Manager가 없어서 재생성 시도");
+        //if (Managers.Manager.manager == null)
+        //{
+        //    Debug.LogWarning("@Manager가 없어서 재생성 시도");
 
-            Managers.Manager.Initialize();
-        }
-        PhotonNetwork.LoadLevel("LHJ_TestScene");
+        //    Managers.Manager.Initialize();
+        //}
+        PhotonNetwork.LoadLevel("Lobby");
     }
 }
