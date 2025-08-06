@@ -89,6 +89,6 @@ public class GameOverSync : MonoBehaviourPunCallbacks
 
             Managers.Manager.Initialize();
         }
-        PhotonNetwork.LoadLevel("LHJ_TestScene");
+        PhotonNetwork.LoadLevel("Lobby");
     }
 }
