@@ -2,7 +2,7 @@ using DesignPattern;
 using LTH;
 using System.Collections.Generic;
 using UnityEngine;
-
+using System.Linq;
 
 /// <summary>
 /// 각 플레이어의 아이템 동기화 상태를 관리하는 싱글톤 매니저.
@@ -24,13 +24,10 @@ public class ItemSyncManager : Singleton<ItemSyncManager>
     /// </summary>
     public void OnSyncReceived(string nickname, List<ItemData> items)
     {
-        if (items == null)
-        {
-            Debug.LogWarning($"[ItemSyncManager] 동기화 실패: {nickname}의 아이템 리스트가 null");
-            return;
-        }
+        if (items == null) return;
 
         syncedItems[nickname] = new List<ItemData>(items);
+        foreach(var i in items)
         Debug.Log($"[ItemSyncManager] 아이템 동기화 수신 완료: {nickname}, 개수: {items.Count}");
     }
 
@@ -39,11 +36,21 @@ public class ItemSyncManager : Singleton<ItemSyncManager>
     /// </summary>
     public List<ItemData> GetSyncedItems(string nickname)
     {
-        if (syncedItems.TryGetValue(nickname, out var items))
-            return items;
+        if (syncedItems.TryGetValue(nickname, out var items)) return items;
 
-        Debug.LogWarning($"[ItemSyncManager] 동기화된 아이템 없음: {nickname}");
         return new List<ItemData>();
+    }
+
+    public void RegisterSyncedItem(string nickname, ItemData item)
+    {
+        if (!syncedItems.ContainsKey(nickname))
+            syncedItems[nickname] = new List<ItemData>();
+
+        // 이미 같은 unique ID가 등록되어 있다면 중복 방지
+        if (!syncedItems[nickname].Any(i => i.uniqueInstanceId == item.uniqueInstanceId))
+        {
+            syncedItems[nickname].Add(item);
+        }
     }
 
     /// <summary>
@@ -52,27 +59,5 @@ public class ItemSyncManager : Singleton<ItemSyncManager>
     public bool TryGetSyncedItems(string nickname, out List<ItemData> items)
     {
         return syncedItems.TryGetValue(nickname, out items);
-    }
-
-    /// <summary>
-    /// 개발용: 로컬에서 아이템 생성 후 동기화 시뮬레이션
-    /// </summary>
-    [ContextMenu("GenerateTestItems")]
-    public void GenerateAndSyncTestItems()
-    {
-#if UNITY_EDITOR
-        string localNick = Photon.Pun.PhotonNetwork.NickName;
-
-        var generated = new List<ItemData>
-        {
-            ItemDatabaseManager.Instance.GetItemById("cigarette"),
-            ItemDatabaseManager.Instance.GetItemById("cuffs"),
-            ItemDatabaseManager.Instance.GetItemById("magnifyingGlass"),
-            ItemDatabaseManager.Instance.GetItemById("saw"),
-        };
-
-        syncedItems[localNick] = generated;
-        Debug.Log($"[ItemSyncManager] 테스트용 아이템 동기화 완료: {localNick}");
-#endif
     }
 }

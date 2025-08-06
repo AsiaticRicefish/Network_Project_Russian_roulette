@@ -112,15 +112,11 @@ public class ItemBoxManager : MonoBehaviourPun
 
         CloseBoxImmediately(); // Dotween으로 아이템 상자 닫힌 상태 유지
 
-        itemBoxPrefabs.transform.localScale = Vector3.zero; // 다음 등장 대비
+        itemBoxPrefabs.transform.localScale = Vector3.zero;
 
-        // 연출: 크기 0에서 등장
         itemBoxPrefabs.transform
        .DOScale(0.3f, 0.5f)
        .SetEase(Ease.OutBack);
-
-        // 사운드: 상자 등장 효과음 재생
-        // Manager.Sound.Play(" ", Define_LDH.Sound.Sfx);
     }
 
     public void ShowBox()
@@ -160,34 +156,41 @@ public class ItemBoxManager : MonoBehaviourPun
         isOpened = true;;
 
         var rewards = ItemDatabaseManager.Instance.GetRandomItems(newItemCount);
-        var rewardIds = new List<string>();
+        var ids = new List<string>();
+        var uniqueIds = new List<string>();
 
         foreach (var item in rewards)
         {
-            if (item == null || string.IsNullOrEmpty(item.itemId))
-            {
-                Debug.LogError("[ItemBoxManager] 잘못된 아이템 감지됨");
-                continue;
-            }
-
-            rewardIds.Add(item.itemId);
+            var instance = item.Clone();
+            ids.Add(instance.itemId);
+            uniqueIds.Add(instance.uniqueInstanceId);
         }
 
-        photonView.RPC(nameof(RPC_DistributeRewards), RpcTarget.All, string.Join(",", rewardIds));
+        photonView.RPC(nameof(RPC_DistributeRewards), RpcTarget.All, string.Join(",", ids), string.Join(",", uniqueIds));
     }
 
     [PunRPC]
-    private void RPC_DistributeRewards(string joinedIds)
+    private void RPC_DistributeRewards(string joinedIds, string joinedUniqueIds)
     {
         string[] itemIds = joinedIds.Split(',');
+        string[] uniqueIds = joinedUniqueIds.Split(',');
+
         isOpened = true;
 
         lidTransform.DOLocalRotate(openRotation, 0.7f)
             .SetEase(Ease.OutBack)
             .OnComplete(() =>
             {
-                Debug.Log("RPC_DisttibuteRewards");
-                AutoPlaceToSlots(itemIds);
+                var rewardItems = new List<ItemData>();
+                for (int i = 0; i < itemIds.Length && i < uniqueIds.Length; i++)
+                {
+                    var template = ItemDatabaseManager.Instance.GetItemById(itemIds[i]);
+                    var instance = template.Clone();
+                    instance.uniqueInstanceId = uniqueIds[i]; // 동기화된 고유 ID로 맞춰줌
+                    rewardItems.Add(instance);
+                }
+
+                AutoPlaceToSlots(rewardItems);
                 StartCoroutine(HideBoxAfterDelay());
             });
     }
@@ -195,14 +198,12 @@ public class ItemBoxManager : MonoBehaviourPun
     /// <summary>
     /// 빈 슬롯에 아이템 자동 배치
     /// </summary>
-    private void AutoPlaceToSlots(string[] itemIds)
+    private void AutoPlaceToSlots(List<ItemData> items)
     {
-        Debug.Log($"[ItemBoxManager] {deskUI==null}");
         var emptySlots = deskUI.GetEmptySlots();
-        Debug.Log("emplyslot 가져오기이후 실행됨.");
-        for (int i = 0; i < itemIds.Length && i < emptySlots.Count; i++)
+        for (int i = 0; i < items.Count && i < emptySlots.Count; i++)
         {
-            emptySlots[i].PlaceItemById(itemIds[i]);
+            emptySlots[i].PlaceItemByInstance(items[i]);
         }
     }
 
