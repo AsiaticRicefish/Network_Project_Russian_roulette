@@ -108,7 +108,7 @@ public class FireSync : MonoBehaviourPun
             
             
             //총 발사 효과음
-            GunManager.Instance.PV.RPC("RPC_PlayShotSFX", RpcTarget.All, bullet==BulletType.live);
+            photonView.RPC(nameof(RPC_PlayShotSFX), RpcTarget.All, bullet==BulletType.live);
             
             if (bullet == BulletType.live)
             {
@@ -290,4 +290,18 @@ public class FireSync : MonoBehaviourPun
 
         return nextPlayer.PlayerId;  // 진짜 PlayerId 반환
     }
+    
+    
+    
+
+    [PunRPC]
+    public void RPC_PlayShotSFX(bool isLiveBullet)
+    {
+        Debug.Log($"sfx : 실탄인지? {isLiveBullet}");
+        if(isLiveBullet)
+            Manager.Sound.PlayFire();
+        else
+            Manager.Sound.PlayBlank();
+    }
+
 }
