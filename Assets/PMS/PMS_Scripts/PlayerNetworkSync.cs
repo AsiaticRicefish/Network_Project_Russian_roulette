@@ -21,6 +21,7 @@ public class PlayerNetworkSync : MonoBehaviourPun
         }
     }
 
+    #region Lecacy 기존의 코드를 GamePlayer에 통합
     /*private void OnEnable()
     {
         // GamePlayer의 이벤트를 구독하여 hp 변경시 hp 및 Alive 값 전달 RPC 호출
@@ -123,6 +124,6 @@ public class PlayerNetworkSync : MonoBehaviourPun
             Debug.Log($"[PlayerNetworkSync] {_gamePlayer.Nickname}이 공격하여 {targetPlayer.Nickname}의 HP가 {amount}만큼 감소했습니다. 현재 HP: {targetPlayer.CurrentHp}");
         }
     }*/
-
+    #endregion
 
 }

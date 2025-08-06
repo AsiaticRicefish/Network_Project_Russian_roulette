@@ -204,6 +204,10 @@ public class ItemBoxManager : MonoBehaviourPun
         {
             emptySlots[i].PlaceItemByInstance(items[i]);
         }
+        
+        //소리 연출 추가
+        if(IsMine)
+            Manager.Sound.PlaySfxByKey("ItemSpawn");
     }
 
     public List<ItemData> PickRandomRewards()

@@ -13,11 +13,12 @@ namespace GameUI
         [Header("Manager")]
          [SerializeField] private NotificationManager _notification;
          [SerializeField] private UIManagerNotification _uiManagerNotification;
-
+         
 
          [Header("Canvas Order")] [SerializeField]
          private int canvasOrder = 100;
-         
+
+         private Canvas _canvas;
 
          protected override void Init()
          {
@@ -25,9 +26,9 @@ namespace GameUI
              
              //모달은 가장 상위에 뜨도록 order를 추가 설정
              
-             Canvas canvas = GetComponent<Canvas>();
+             _canvas = GetComponent<Canvas>();
 
-             canvas.sortingOrder = canvas.sortingOrder + canvasOrder;
+             _canvas.sortingOrder +=  canvasOrder;
 
          }
          
@@ -38,7 +39,13 @@ namespace GameUI
             base.Show();
             _notification.OpenNotification();
         }
-        
+
+        // public override void Close()
+        // {
+        //     _canvas.sortingOrder -= canvasOrder;
+        //     base.Close();
+        // }
+
 
         //모달 내용 변경
         public void SetContent(Define_LDH.NotifyType notifyType, string title, string description)

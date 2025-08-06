@@ -30,22 +30,22 @@ public class FireSync : MonoBehaviourPun
         }
     }
 
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            if (TurnSync.CurrentTurnPlayerId != myId)
-            {
-                Debug.LogWarning($"[FireSync] 내 턴 아님 → 발사 차단 (myId: {myId}, 현재 턴: {TurnSync.CurrentTurnPlayerId})");
-                return;
-            }
-
-            // 내 턴이면 발사 진행
-            BulletType fireBullet = GunManager.Instance.LoadedBullet;
-            photonView.RPC("Fire", RpcTarget.All, myId, (int)fireBullet);
-            turnSync.photonView.RPC("RequestEndTurn", RpcTarget.MasterClient);
-        }
-    }
+    // private void Update()
+    // {
+    //     if (Input.GetKeyDown(KeyCode.Space))
+    //     {
+    //         if (TurnSync.CurrentTurnPlayerId != myId)
+    //         {
+    //             Debug.LogWarning($"[FireSync] 내 턴 아님 → 발사 차단 (myId: {myId}, 현재 턴: {TurnSync.CurrentTurnPlayerId})");
+    //             return;
+    //         }
+    //
+    //         // 내 턴이면 발사 진행
+    //         BulletType fireBullet = GunManager.Instance.LoadedBullet;
+    //         photonView.RPC("Fire", RpcTarget.All, myId, (int)fireBullet);
+    //         turnSync.photonView.RPC("RequestEndTurn", RpcTarget.MasterClient);
+    //     }
+    // }
 
     // 탄창 전체를 클라이언트와 동기화하는 함수
     private void SendReloadSync()
@@ -62,51 +62,86 @@ public class FireSync : MonoBehaviourPun
         photonView.RPC("ReloadSync", RpcTarget.All, totalBullets.ToArray(), totalBullets[0]);
     }
 
-    // 모든 클라이언트에서 발사 동작을 실행하는 RPC
+    /// <summary>
+    /// 모든 클라이언트에서 발사 동작을 실행하는 RPC
+    /// </summary>
+    /// <param name="playerId">photon network player nickname</param>
+    /// <param name="bulletInt"></param>
     [PunRPC]
     private void Fire(string playerId, int bulletInt)
     {
-        BulletType bullet = (BulletType)bulletInt;
-        string targetNick = GetNextTargetId(playerId);
-        if (string.IsNullOrEmpty(targetNick))
-        {
-            Debug.LogError("타겟 ID를 찾을 수 없습니다.");
-            return;
-        }
-        //string targetId = (playerId == "player1") ? "player2" : "player1";
-        Debug.LogError($"{playerId}이(가) {bullet} 탄을 발사했습니다.");
-        if (bullet == BulletType.live)
-        {
-            Debug.LogError($"{targetNick}이 데미지를 입었습니다.");
 
-            // 닉네임 기반으로 먼저 찾고 → PlayerId로 변환
-            GamePlayer targetByNick = PlayerManager.Instance.FindPlayerByNickname(targetNick);
-            if (targetByNick != null)
+        BulletType bullet = (BulletType)bulletInt;
+
+        //===================== 마스터만 실행 ======================== //
+        if (PhotonNetwork.IsMasterClient)
+        {
+            #region 타겟 찾아서 hp 감소 처리
+
+            string targetNick = GetNextTargetId(playerId); 
+            if (string.IsNullOrEmpty(targetNick))
             {
-                string targetPlayerId = targetByNick.PlayerId;
-                // PlayerId로 Dictionary에서 정확하게 찾아서 데미지 적용
-                if (PlayerManager.Instance.GetAllPlayers().TryGetValue(targetPlayerId, out GamePlayer target))
+                Debug.LogError("타겟 ID를 찾을 수 없습니다.");
+                return;
+            }
+            //string targetId = (playerId == "player1") ? "player2" : "player1";
+            Debug.Log($"{playerId}이(가) {bullet} 탄을 발사했습니다.");
+            GamePlayer shooter = PlayerManager.Instance.FindPlayerByNickname(playerId);
+            if (shooter == null)
+            {
+                Debug.LogError($"[FireSync] {playerId}에 해당하는 GamePlayer를 찾아오지 못했습니다.");
+                return;
+            }
+            
+            //shooter 애니메이션 실행 (RPC로 모든 클라이언트에서 실행되도록 함) - 마스터만 호출하기 때문에 rpc 중복 호출 x
+            shooter._pv.RPC("RPC_PlayTrigger", RpcTarget.All, "Shot");
+            
+            
+            
+            //총 발사 효과음
+            GunManager.Instance.PV.RPC("RPC_PlayShotSFX", RpcTarget.All, bullet==BulletType.live);
+            
+            if (bullet == BulletType.live)
+            {
+                Debug.Log($"{targetNick}이 데미지를 입었습니다.");
+
+                // 닉네임 기반으로 먼저 찾고 → PlayerId로 변환
+                GamePlayer targetByNick = PlayerManager.Instance.FindPlayerByNickname(targetNick);
+                if (targetByNick != null)
                 {
-                    int damage = GunManager.Instance.IsEnhanced ? 2 : 1;
-                    target._pv.RPC("RPC_DecreaseHp", RpcTarget.All, damage);
-                    Debug.Log($"[FireSync] 대상 {target.Nickname}에게 데미지 {damage} 적용됨 → 남은 HP: {target.CurrentHp}");
+                    string targetPlayerId = targetByNick.PlayerId;
+                    // PlayerId로 Dictionary에서 정확하게 찾아서 데미지 적용
+                    if (PlayerManager.Instance.GetAllPlayers().TryGetValue(targetPlayerId, out GamePlayer target))
+                    {
+                        int damage = GunManager.Instance.IsEnhanced ? 2 : 1;
+                        // target._pv.RPC("RPC_DecreaseHp", RpcTarget.All, damage);
+                        //-----쏜 사람만 decrese 호출해주면 rpc로 적용됨 ----//
+                        targetByNick.DecreaseHp(damage);
+                        // target._pv.RPC(" RPC_DecreasePlayerCurrentHp", RpcTarget.All, damage);
+                        Debug.Log($"[FireSync] 대상 {target.Nickname}에게 데미지 {damage} 적용됨 → 남은 HP: {target.CurrentHp}");
+                    }
+                    else
+                    {
+                        Debug.LogError($"[FireSync] PlayerId({targetPlayerId}) 기준으로도 GamePlayer를 못 찾았습니다.");
+                    }
                 }
                 else
                 {
-                    Debug.LogError($"[FireSync] PlayerId({targetPlayerId}) 기준으로도 GamePlayer를 못 찾았습니다.");
+                    Debug.LogError($"[FireSync] Nickname({targetNick}) 기준으로도 GamePlayer를 찾지 못했습니다.");
                 }
             }
             else
             {
-                Debug.LogError($"[FireSync] Nickname({targetNick}) 기준으로도 GamePlayer를 찾지 못했습니다.");
+                Debug.Log($"{targetNick}이 데미지를 입지 않았습니다.");
             }
-        }
-        else
-        {
-            Debug.LogError($"{targetNick}이 데미지를 입지 않았습니다.");
-        }
 
-        photonView.RPC("FireResult", RpcTarget.All, targetNick, (int)bullet);
+            #endregion
+            
+            photonView.RPC("FireResult", RpcTarget.All, targetNick, (int)bullet);
+            
+        }
+       //=================================================//
+        
         // 탄 소모 및 다음 탄 장전
         GunManager.Instance.IsEnhanced = false;
         if (!GunManager.Instance.Magazine.TryDequeue(out var next))
@@ -116,6 +151,8 @@ public class FireSync : MonoBehaviourPun
         GunManager.Instance.SetLoadedBullet(next);
         Debug.Log($"장전된 탄: {GunManager.Instance.LoadedBullet}, 남은 탄 수: {GunManager.Instance.Magazine.Count}");
 
+        
+        //===================== 마스터만 실행 ======================== //
         // 탄을 모두 소진했을 경우 마스터만 자동 장전 후 동기화
         if (PhotonNetwork.IsMasterClient && GunManager.Instance.LoadedBullet == default && GunManager.Instance.Magazine.Count == 0)
         {
@@ -137,6 +174,7 @@ public class FireSync : MonoBehaviourPun
             else
                 Debug.LogError("TurnSync를 찾을 수 없습니다.");
         }
+        //=================================================//
     }
     [PunRPC]
     private void FireResult(string targetId, int bulletInt)
