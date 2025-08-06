@@ -88,7 +88,7 @@ public class FireSync : MonoBehaviourPun
                 if (PlayerManager.Instance.GetAllPlayers().TryGetValue(targetPlayerId, out GamePlayer target))
                 {
                     int damage = GunManager.Instance.IsEnhanced ? 2 : 1;
-                    target.DecreaseHp(damage);
+                    target._pv.RPC("RPC_DecreaseHp", RpcTarget.All, damage);
                     Debug.Log($"[FireSync] 대상 {target.Nickname}에게 데미지 {damage} 적용됨 → 남은 HP: {target.CurrentHp}");
                 }
                 else
@@ -105,8 +105,8 @@ public class FireSync : MonoBehaviourPun
         {
             Debug.LogError($"{targetNick}이 데미지를 입지 않았습니다.");
         }
-          
-        OnPlayerHit?.Invoke(targetNick, bullet);
+
+        photonView.RPC("FireResult", RpcTarget.All, targetNick, (int)bullet);
         // 탄 소모 및 다음 탄 장전
         GunManager.Instance.IsEnhanced = false;
         if (!GunManager.Instance.Magazine.TryDequeue(out var next))
@@ -138,7 +138,12 @@ public class FireSync : MonoBehaviourPun
                 Debug.LogError("TurnSync를 찾을 수 없습니다.");
         }
     }
-
+    [PunRPC]
+    private void FireResult(string targetId, int bulletInt)
+    {
+        BulletType bullet = (BulletType)bulletInt;
+        OnPlayerHit?.Invoke(targetId, bullet);
+    }
     private IEnumerator DelayedFindAndDamage(string targetId)
     {
         float waitTime = 0f;

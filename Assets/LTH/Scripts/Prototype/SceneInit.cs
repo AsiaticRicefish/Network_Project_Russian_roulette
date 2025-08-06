@@ -60,7 +60,24 @@ public class SceneInit : MonoBehaviourPunCallbacks
     private void InitGame()
     {
         if(Manager.PlayerManager.GetAllPlayers().Count == 2)
+        {
+
+            if (DeskUIManager.Instance == null)
+            {
+                GameObject go = new GameObject("DeskUIManager");
+                go.AddComponent<DeskUIManager>();
+                DontDestroyOnLoad(go);
+            }
+
+            if (ItemBoxSpawnerManager.Instance == null)
+            {
+                GameObject go = new GameObject("ItemBoxSpawnerManager");
+                go.AddComponent<ItemBoxSpawnerManager>();
+                DontDestroyOnLoad(go);
+            }
             InGameManager.Instance.StartGame();
+        }
+            
         // // 마스터만 게임 시작 진행
         // if (PhotonNetwork.IsMasterClient)
         // {
