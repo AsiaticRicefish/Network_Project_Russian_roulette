@@ -1,3 +1,4 @@
+using Cinemachine;
 using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
@@ -6,7 +7,9 @@ using UnityEngine.SceneManagement;
 using Managers;
 using System;
 using ExitGames.Client.Photon.StructWrapping;
+using GameCamera;
 using Photon.Realtime;
+using Utils;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 
 
@@ -15,7 +18,10 @@ public class SceneInit : MonoBehaviourPunCallbacks
     [SerializeField] private string playerPrefabName;
 
     [SerializeField] private Transform[] spawnPoints;
-
+    [SerializeField] private CinemachineVirtualCamera[] virtualCameras;
+    
+    
+    
     private void Awake()
     {
         SceneManager.sceneLoaded += OnEnterScene;
@@ -77,7 +83,12 @@ public class SceneInit : MonoBehaviourPunCallbacks
 
         int actorIndex = PhotonNetwork.LocalPlayer.ActorNumber - 1;
         Vector3 spawnPos = spawnPoints.Length > actorIndex ? spawnPoints[actorIndex].position : Vector3.zero;
-
+        
+        
+        //bulletdisaplay virtual cam 할당 및 설정
+        Util_LDH.GetOrAddComponent<VirtualCam_BulletDisplay>(virtualCameras[actorIndex].gameObject);
+        
+        
         var obj = PhotonNetwork.Instantiate(playerPrefabName, spawnPos, Quaternion.identity);
 
         Vector3 dir = (tableCenter.position - obj.transform.position).normalized;
@@ -100,6 +111,8 @@ public class SceneInit : MonoBehaviourPunCallbacks
                 cam.transform.rotation = Quaternion.LookRotation((tableCenter.position - cam.transform.position).normalized);
             }
         }
+        
+        
     }
 
     private IEnumerator WaitForBoxSpawner()

@@ -87,22 +87,22 @@ public class DeskUI : UI_Base
         }
     }
 
-    public void PlaceItems(List<string> itemIds)
+    public void PlaceItems(List<ItemData> items)
     {
         var emptySlots = GetEmptySlots();
-        for (int i = 0; i < itemIds.Count && i < emptySlots.Count; i++)
+        for (int i = 0; i < items.Count && i < emptySlots.Count; i++)
         {
-            emptySlots[i].PlaceItemById(itemIds[i]);
+            emptySlots[i].PlaceItemByInstance(items[i]);
         }
     }
 
-    public void ClearItemSlotById(string itemId)
+    public void ClearItemSlotById(string uniqueId)
     {
         foreach (var slot in itemSlots)
         {
-            if (!slot.IsEmpty && slot.HasItemId(itemId))
+            if (!slot.IsEmpty && slot.HasItemId(uniqueId))
             {
-                slot.ClearSlot();
+                slot.RequestClearViaRPC();
                 break;
             }
         }

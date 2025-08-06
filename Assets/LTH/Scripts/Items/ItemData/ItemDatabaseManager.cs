@@ -32,7 +32,7 @@ public class ItemDatabaseManager : Singleton<ItemDatabaseManager>
     public ItemData GetItemById(string id)
     {
         itemDict.TryGetValue(id, out var data);
-        return data;
+        return data?.Clone();
     }
 
     public List<ItemData> GetRandomItems(int count)
@@ -44,7 +44,7 @@ public class ItemDatabaseManager : Singleton<ItemDatabaseManager>
         for (int i = 0; i < count; i++)
         {
             int rand = Random.Range(0, validItems.Count);
-            result.Add(validItems[rand]); // 중복 허용
+            result.Add(validItems[rand].Clone());
         }
         return result;
     }

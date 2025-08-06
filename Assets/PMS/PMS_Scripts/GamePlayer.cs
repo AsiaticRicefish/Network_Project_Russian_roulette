@@ -246,7 +246,13 @@ public class GamePlayer : MonoBehaviourPun, IComparer<GamePlayer>
         if (!PhotonNetwork.IsMasterClient) return;
 
         var target = PlayerManager.Instance.FindPlayerByUID(requestId);
-        if (target == null) return;
+
+        if (target == null)
+        {
+            Debug.LogError($"[RPC_InCreasePlayerCurrentHp] Player ID '{requestId}' 를 찾지 못함");
+            PlayerManager.Instance.PlayerListPrint(); // 현재 등록된 플레이어들 출력
+            return;
+        }
 
         int newHp = Mathf.Min(target.CurrentHp + healAmount, target.MaxHp);
         // 결과를 모든 클라에게 전파

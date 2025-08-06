@@ -1,8 +1,11 @@
+using Cinemachine;
+using GameCamera;
 using Managers;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
+using Utils;
 
 public class PlayerController : MonoBehaviourPun
 {
@@ -31,22 +34,28 @@ public class PlayerController : MonoBehaviourPun
             GetComponentInChildren<Camera>().gameObject.SetActive(false);
             Destroy(_rb);
         }
+        else
+        {
+            InitCameraSetting();
+        }
         
         //player manager에 player를 등록한다.
         var gamePlayer = GetComponent<GamePlayer>();
         Manager.PlayerManager.RegisterPlayer(gamePlayer);
+        
+       
     }
+    
 
     private void Update()
     {
         if (!_pv.IsMine) return;
-
-        PlayerLook();
         
         if(Input.GetKeyDown(KeyCode.Space))
         {
             _animator.SetTrigger("Shot");
         }
+        //PlayerLook();
     }
 
     //시점 변경 테스트코드
@@ -77,5 +86,23 @@ public class PlayerController : MonoBehaviourPun
         { 
             _rb.AddForce(transform.up * 5.0f, ForceMode.Impulse);
         }
+    }
+
+    //가상 카메라 및 시네머신 브레인 설정, 초기화
+    private void InitCameraSetting()
+    {
+        Camera cam = GetComponentInChildren<Camera>();
+        // 내 플레이어의 캠을 카메라 매니저의 매인캠으로 등록, CinemachineBrain 추가, ImpulseListener 추가
+        Manager.Camera.SetMainCamera(cam);
+        Manager.Camera.ApplyBlenderSettingToBrain(cam, "InGameCinemahineBlenderSetting");
+        
+        Util_LDH.GetOrAddComponent<CinemachineBrain>(cam.gameObject);
+        Util_LDH.GetOrAddComponent<CinemachineIndependentImpulseListener>(cam.gameObject);
+        
+        //플레이어 시야쪽 가상 캠에 VirtualCam_Base 를 추가해서 카메라 매니저에 등록
+        //카메라 매니저에 stack에 push
+        CinemachineVirtualCamera vcam = GetComponentInChildren<CinemachineVirtualCamera>();
+        var playerVCam = Util_LDH.GetOrAddComponent<VirtualCam_LocalPlayer>(vcam.gameObject);
+       
     }
 }
