@@ -85,7 +85,7 @@ public class InGameManager : Singleton<InGameManager>
     /// </summary>
     public void StartGame()
     {
-        Debug.Log("StartGame");
+        Debug.Log("[InGameManager] StartGame");
 
         // 게임 시작시 초기화 진행
         GameInit();

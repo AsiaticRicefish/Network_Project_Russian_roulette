@@ -242,4 +242,5 @@ MonoBehaviour:
   itemBoxPrefabs: {fileID: 8407699597835493399}
   lidTransform: {fileID: 3303187644947256456}
   openRotation: {x: -120, y: 0, z: 0}
-  deskUI: {fileID: 2219249472637266601, guid: 3342e1cb6fa8e9442b3c86efbae95e26, type: 3}
+  deskUI: {fileID: 0}
+  ownerNickname: 
