@@ -19,10 +19,24 @@ public class GunManager : Singleton<GunManager>
     private void Awake()
     {
         SingletonInit();
-        _pv = GetComponent<PhotonView>();
+        _pv = gameObject.AddComponent<PhotonView>(); // 동적으로 PhotonView 추가
+
+        if (_pv.ViewID == 0)
+        {
+            bool success = PhotonNetwork.AllocateViewID(_pv); // ViewID 수동 할당
+            Debug.Log($"[GunManager] ViewID 할당됨: {_pv.ViewID}, 성공여부: {success}");
+        }
+
         _isEnhanced = false;
-        Manager.Game.OnTurnStart += Reload;
+
+        Manager.Game.OnTurnStart += () =>
+        {
+            GunManager.Instance.PV.RPC("RPC_SetEnhanced", RpcTarget.All, false);
+            Reload();
+        };
+
     }
+
 
 
     // 다른 곳에서 RPC 호출 가능하게
@@ -38,7 +52,7 @@ public class GunManager : Singleton<GunManager>
     private Queue<BulletType> _magazine = new(BULLET_MAX_COUNT * Enum.GetValues(typeof(BulletType)).Length);
     public Queue<BulletType> Magazine { get { return _magazine; } private set { _magazine = value; } }
     private BulletType _loadedBullet; // 현재 장전된 탄환
-    public BulletType LoadedBullet { get{ return _loadedBullet; } private set { _loadedBullet = value; } }
+    public BulletType LoadedBullet { get { return _loadedBullet; } private set { _loadedBullet = value; } }
     private bool _isEnhanced;
     public bool IsEnhanced { get { return _isEnhanced; } set { _isEnhanced = value; } }
     #endregion
@@ -72,8 +86,8 @@ public class GunManager : Singleton<GunManager>
         if (!target)
         {
             Debug.Log($"{playerId}에 해당하는 플레이어를 찾을 수 없습니다.");
-            return;            
-        }        
+            return;
+        }
         FireGunToTarget(target);
     }
 
@@ -171,7 +185,7 @@ public class GunManager : Singleton<GunManager>
         return preSet.ToArray();
     }
     #endregion
-    
+
     /// <summary>
     /// 현재 장전은 마스터 클라이언트만 장전하고 탄창을 클라이언트와 공유하는형식
     /// 마스터는 Reload를 호출하여_loadedBullet 값을 변경하지만
@@ -203,4 +217,12 @@ public class GunManager : Singleton<GunManager>
         _loadedBullet = switchBullet;
         Debug.Log($"다이얼 사용 성공 → 현재 탄환: {_loadedBullet}");
     }
+
+    [PunRPC]
+    public void RPC_SetEnhanced(bool value)
+    {
+        _isEnhanced = value;
+        Debug.Log($"[동기화] isEnhanced = {value}");
+    }
+
 }
