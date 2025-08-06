@@ -11,7 +11,6 @@ public class GameOverSync : MonoBehaviourPunCallbacks
     [SerializeField] private GameObject gameOverPanel;
     [SerializeField] private TextMeshProUGUI winnerText;
     [SerializeField] private TextMeshProUGUI countdownText;
-    private PhotonView _pv;
     private bool hasShow = false;
 
     public static GameOverSync Instance;
