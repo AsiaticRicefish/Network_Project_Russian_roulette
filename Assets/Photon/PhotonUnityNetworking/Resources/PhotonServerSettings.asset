@@ -79,7 +79,6 @@ MonoBehaviour:
   - RPC_InCreasePlayerCurrentHp
   - RPC_RequestAttack
   - InitTurnOrder
-  - RPC_SetEnhanced
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1
