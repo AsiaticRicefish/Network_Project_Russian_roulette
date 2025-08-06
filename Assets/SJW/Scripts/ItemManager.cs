@@ -24,6 +24,7 @@ public class ItemManager : Singleton<ItemManager>
 
     public void ApplyEffect(ItemType itemType, GamePlayer user, GamePlayer target)
     {
+        Debug.Log($"[ApplyEffect 디버그] 전달된 itemType: {itemType}");
         switch (itemType)
         {
             case ItemType.Cigarette:
@@ -32,8 +33,23 @@ public class ItemManager : Singleton<ItemManager>
                 break;
 
             case ItemType.Saw:
+                Debug.Log("[아이템] Saw 진입");
+
+                //if (GunManager.Instance == null)
+                //{
+                //    Debug.LogError("GunManager.Instance가 null");
+                //    break;
+                //}
+                //if (GunManager.Instance.PV == null)
+                //{
+                //    Debug.LogError("GunManager.Instance.PV가 null");
+                //    break;
+                //}
+
+                GunManager.Instance.PV.RPC("RPC_SetEnhanced", RpcTarget.All, true);
                 Debug.Log("톱 사용 → 이번턴 총기 데미지 2배");
                 break;
+
 
             case ItemType.Cuffs:
                 target.IsCuffedThisTurn = true;

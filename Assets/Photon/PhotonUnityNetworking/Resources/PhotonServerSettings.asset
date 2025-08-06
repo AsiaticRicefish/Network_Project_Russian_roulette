@@ -72,6 +72,7 @@ MonoBehaviour:
   - RPC_ShowBox
   - SetOwnerNickname
   - RPC_ReceiveBulletInfo
+  - RPC_SetEnhanced
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

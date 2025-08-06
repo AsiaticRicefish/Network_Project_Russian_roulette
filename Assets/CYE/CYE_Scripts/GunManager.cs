@@ -19,10 +19,24 @@ public class GunManager : Singleton<GunManager>
     private void Awake()
     {
         SingletonInit();
-        _pv = GetComponent<PhotonView>();
+        _pv = gameObject.AddComponent<PhotonView>(); // 동적으로 PhotonView 추가
+
+        if (_pv.ViewID == 0)
+        {
+            bool success = PhotonNetwork.AllocateViewID(_pv); // ViewID 수동 할당
+            Debug.Log($"[GunManager] ViewID 할당됨: {_pv.ViewID}, 성공여부: {success}");
+        }
+
         _isEnhanced = false;
-        Manager.Game.OnTurnStart += Reload;
+
+        Manager.Game.OnTurnStart += () =>
+        {
+            GunManager.Instance.PV.RPC("RPC_SetEnhanced", RpcTarget.All, false);
+            Reload();
+        };
+
     }
+
 
 
     // 다른 곳에서 RPC 호출 가능하게
@@ -203,4 +217,12 @@ public class GunManager : Singleton<GunManager>
         _loadedBullet = switchBullet;
         Debug.Log($"다이얼 사용 성공 → 현재 탄환: {_loadedBullet}");
     }
+
+    [PunRPC]
+    public void RPC_SetEnhanced(bool value)
+    {
+        _isEnhanced = value;
+        Debug.Log($"[동기화] isEnhanced = {value}");
+    }
+
 }
