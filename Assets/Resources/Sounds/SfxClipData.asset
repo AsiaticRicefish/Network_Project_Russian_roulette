@@ -12,8 +12,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 28b979dc181443e6809a8e3972621fb7, type: 3}
   m_Name: SfxClipData
   m_EditorClassIdentifier: 
-  clips:
-  - key: Hit
-    clip: {fileID: 8300000, guid: 6621b7f143b5f4e3ebd61f3095765533, type: 3}
-  - key: Confirm
-    clip: {fileID: 8300000, guid: 84ba7fc28031440e186143c6f644c9ee, type: 3}
+  _clips:
+  - key: Fire
+    clip: {fileID: 8300000, guid: 9b93ee0c205224bfc846fdd3ab71bf87, type: 3}
+  - key: Blank
+    clip: {fileID: 8300000, guid: af8adc1e8a144476fbc56ec6bec51861, type: 3}
+  - key: Reload
+    clip: {fileID: 8300000, guid: 0869b5c3b8d5c4fc2a0210313c0b73a3, type: 3}
+  - key: ItemSpawn
+    clip: {fileID: 8300000, guid: 7d3afc5a326a04b30b91780142a20e48, type: 3}
+  - key: DropBullet
+    clip: {fileID: 8300000, guid: 0940cc5f0bdf84060b0431b14da0e445, type: 3}
+  - key: CameraChange
+    clip: {fileID: 8300000, guid: 576c922c48e49412a8e82f0f576a5b0c, type: 3}

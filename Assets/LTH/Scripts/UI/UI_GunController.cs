@@ -17,12 +17,14 @@ public class UI_GunController : MonoBehaviour
     private void Start()
     {
         myId = PhotonNetwork.NickName;
+
         fireButton.onClick.AddListener(OnFireButtonClicked);
 
         // 초기 메시지 비우기
         if (hitMessageText != null)
             hitMessageText.text = "";
 
+        Debug.Log("[UI_GunController] 이벤트 구독 시도");
         // 이벤트 구독
         FireSync.OnPlayerHit += HandlePlayerHit;
     }
@@ -53,6 +55,7 @@ public class UI_GunController : MonoBehaviour
     // 맞은 사람과 탄 종류에 따라 메시지 출력
     private void HandlePlayerHit(string targetId, BulletType bullet)
     {
+        Debug.Log($"[HandlePlayerHit] 내 클라이언트에서 호출됨 → {targetId}, {bullet}");
         if (hitMessageText == null) return;
 
         string result = bullet == BulletType.live

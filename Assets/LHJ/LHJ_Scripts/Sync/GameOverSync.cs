@@ -1,4 +1,5 @@
 using Managers;
+using Michsky.UI.ModernUIPack;
 using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
@@ -15,9 +16,16 @@ public class GameOverSync : MonoBehaviourPunCallbacks
 
     public static GameOverSync Instance;
 
+    private ModalWindowManager gameOverPanelManager;
+    
     private void Awake()
     {
         Instance = this;
+    }
+
+    private void Start()
+    {
+        gameOverPanelManager = gameOverPanel.GetComponent<ModalWindowManager>();
     }
 
     /// <summary>
@@ -39,11 +47,11 @@ public class GameOverSync : MonoBehaviourPunCallbacks
         hasShow = true;
 
         if (gameOverPanel != null)
-            gameOverPanel.SetActive(true);
+            gameOverPanelManager.OpenWindow();
 
         if (winnerText != null)
-            winnerText.text = $"{winnerNickname}님이 우승했습니다!";
-
+            winnerText.text = $"{winnerNickname}is the winner!!";
+       
         Debug.Log($" 모든 클라이언트에서 게임 종료 UI 표시. 승자: {winnerNickname}");
         StartCoroutine(GoBackToLobbyAfterDelay(5f));
     }
@@ -59,7 +67,7 @@ public class GameOverSync : MonoBehaviourPunCallbacks
         while (remaining > 0)
         {
             if (countdownText != null)
-                countdownText.text = $"{Mathf.CeilToInt(remaining)}초 후 로비로 이동합니다...";
+                countdownText.text = $"Returning to the lobby in {Mathf.CeilToInt(remaining)} seconds...";
 
             yield return new WaitForSeconds(1f);
             remaining -= 1f;

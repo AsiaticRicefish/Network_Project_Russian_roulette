@@ -27,7 +27,7 @@ public class ItemManager : Singleton<ItemManager>
         switch (itemType)
         {
             case ItemType.Cigarette:
-                user.GetComponent<PhotonView>().RPC("RPC_IncreaseHp", RpcTarget.All, 1);
+                user.GetComponent<PhotonView>().RPC("RPC_InCreasePlayerCurrentHp", RpcTarget.MasterClient, user.PlayerId, 1);
                 Debug.Log("담배 사용 → 피1 회복");
                 break;
 
@@ -71,7 +71,12 @@ public class ItemManager : Singleton<ItemManager>
                 {
                     BulletType loadedBullet = GunManager.Instance.LoadedBullet;
                     Debug.Log($"[돋보기] 현재 장전된 탄: {loadedBullet}");
-                    // 여기에 UI 표시 붙이고 싶으면 붙이면 됨
+
+                    MagnifyingGlassUI ui = FindObjectOfType<MagnifyingGlassUI>();
+                    if (ui != null)
+                    {
+                        ui.ShowBulletInfo(loadedBullet);
+                    }
                 }
                 else
                 {

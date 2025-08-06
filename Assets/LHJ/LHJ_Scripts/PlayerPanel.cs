@@ -6,6 +6,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Rendering.VirtualTexturing;
 using UnityEngine.UI;
+using Utils;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 
 public class PlayerPanel : MonoBehaviour
@@ -51,7 +52,7 @@ public class PlayerPanel : MonoBehaviour
         _player = player;
         
         // 닉네임 설정
-        nicknameText.text = player.NickName;
+        nicknameText.text = Util_LDH.GetUserNickname(player);
         
         // waiting 표시 제거 및 이미지 적용
         if (!player.IsMasterClient)

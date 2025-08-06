@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Utils;
 
 public class PlayerHPUI : MonoBehaviour
 {
@@ -26,7 +27,7 @@ public class PlayerHPUI : MonoBehaviour
 
     private void Start()
     {
-        myId = PhotonNetwork.NickName;
+        myId = Util_LDH.GetUserNickname(PhotonNetwork.NickName);
     }
 
     //----- 생략----- //
