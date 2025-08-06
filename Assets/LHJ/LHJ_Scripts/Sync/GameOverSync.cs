@@ -90,6 +90,7 @@ public class GameOverSync : MonoBehaviourPunCallbacks
         //    Managers.Manager.Initialize();
         //}
         
+        //인게임 매니저 release
         GunManager.Release();
         PlayerManager.Release();
         InGameManager.Release();
@@ -97,6 +98,9 @@ public class GameOverSync : MonoBehaviourPunCallbacks
         DeskUIManager.Release();
         ItemSyncManager.Release();
 
+        //플레이어 커스텀 프로퍼티 초기화
+        Util_LDH.ClearAllPlayerProperty();
+        
         Debug.Log("로비로 이동합니다.");
         SceneManager.LoadScene("Lobby");
     }

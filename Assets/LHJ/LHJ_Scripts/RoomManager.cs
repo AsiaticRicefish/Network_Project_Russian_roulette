@@ -4,6 +4,7 @@ using Photon.Pun;
 using Photon.Realtime;
 using System;
 using UnityEngine;
+using Utils;
 
 /// <summary>
 /// 방 내부의 플레이어 패널 관리 및 게임 시작/퇴장 로직을 담당하는 매니저
@@ -77,14 +78,8 @@ public class RoomManager : MonoBehaviour
         // 자신의 UI만 초기화
         ResetPlayerPanel(PhotonNetwork.LocalPlayer);
         
-        // 자신의 custom property 초기화
-        Hashtable playerProperty = new Hashtable
-        {
-            { "Ready", false }
-        };
-        
-        PhotonNetwork.LocalPlayer.SetCustomProperties(playerProperty);
-        
+        //플레이어 커스텀 프로퍼티 초기화
+        Util_LDH.ClearAllPlayerProperty();
         PhotonNetwork.LeaveRoom(); // 방 나가기
     }
 

@@ -1,3 +1,4 @@
+using Photon.Pun;
 using Photon.Realtime;
 using System;
 using System.Collections;
@@ -230,6 +231,21 @@ namespace Utils
 
             int index = rawNickname.IndexOf(Define_LDH.NicknameDelimiter, StringComparison.Ordinal);  // StringComparison.Ordinal : 문화권/로케일 영향을 받지 않고 바이트 값을 기준으로 비교 처리
             return index >= 0 ? rawNickname.Substring(0, index) : rawNickname;
+        }
+
+
+        public static void ClearAllPlayerProperty()
+        {
+            var customProperties = PhotonNetwork.LocalPlayer.CustomProperties;
+
+            var clearProperties = new ExitGames.Client.Photon.Hashtable();
+
+            foreach (var key in customProperties.Keys)
+            {
+                clearProperties[key] = null;
+            }
+
+            PhotonNetwork.LocalPlayer.SetCustomProperties(clearProperties);
         }
         #endregion
         

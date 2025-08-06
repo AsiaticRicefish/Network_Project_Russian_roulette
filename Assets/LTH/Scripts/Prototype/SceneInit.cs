@@ -84,7 +84,8 @@ public class SceneInit : MonoBehaviourPunCallbacks
 
         Transform tableCenter = GameObject.Find("GameTable").transform;
 
-        int actorIndex = PhotonNetwork.LocalPlayer.ActorNumber - 1;
+        //int actorIndex = PhotonNetwork.LocalPlayer.ActorNumber - 1; // actornumber로 하면 안됨 actor number는 방에 들어오는 플레이어마다 누적시켜서 카운팅되므로 나갔다 들어오면 증기함
+        int actorIndex = PhotonNetwork.IsMasterClient ? 0 : 1;
         Vector3 spawnPos = spawnPoints.Length > actorIndex ? spawnPoints[actorIndex].position : Vector3.zero;
 
 
