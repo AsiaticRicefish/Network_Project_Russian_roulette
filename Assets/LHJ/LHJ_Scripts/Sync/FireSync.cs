@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Utils;
 
 public class FireSync : MonoBehaviourPun
 {
@@ -14,7 +15,12 @@ public class FireSync : MonoBehaviourPun
     private void Start()
     {
         myId = PhotonNetwork.NickName;
+        InGameManager.Instance.OnGameStart += OnStartGame;
 
+    }
+
+    private void OnStartGame()
+    {
         // 마스터 클라이언트가 게임 시작 시 탄을 장전하고 전체에 동기화
         if (PhotonNetwork.IsMasterClient)
         {
@@ -247,6 +253,9 @@ public class FireSync : MonoBehaviourPun
         }
         Debug.LogWarning($"장전된 탄: {GunManager.Instance.LoadedBullet}, 남은 탄 수: {GunManager.Instance.Magazine.Count}, 실탄: {liveCount}, 공포탄: {blankCount}");
         Debug.Log("[ReloadSync] 받은 탄 배열: " + string.Join(", ", bullets.Select(b => ((BulletType)b).ToString())));
+
+
+        StartCoroutine(Util_LDH.ShowBulletCamereaEffect());
     }
 
     private string GetNextTargetId(string shooterId)

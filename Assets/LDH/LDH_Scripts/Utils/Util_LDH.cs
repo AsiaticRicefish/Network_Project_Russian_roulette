@@ -1,9 +1,11 @@
+using Managers;
 using Photon.Pun;
 using Photon.Realtime;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using Object = UnityEngine.Object;
 
@@ -249,6 +251,20 @@ namespace Utils
         }
         #endregion
         
+        
+
+        public static IEnumerator ShowBulletCamereaEffect()
+        {
+            Debug.Log("PushCamera 실행");
+            Manager.Camera.PushCamera("BulletDisplay");
+            Manager.Sound.PlaySfxByKey("CameraChange");
+            Debug.Log("1초 대기 시작");
+            yield return new WaitForSeconds(2f);
+            Debug.Log("PopCamera 실행");
+            Manager.Camera.PopCamera();
+            Manager.Sound.PlaySfxByKey("CameraChange");
+            
+        }
     }
     
 }

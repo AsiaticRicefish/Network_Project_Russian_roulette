@@ -59,7 +59,7 @@ public class SceneInit : MonoBehaviourPunCallbacks
     {
         if (Manager.PlayerManager.GetAllPlayers().Count == 2)
         {
-            Manager.Camera.PushCamera("Player");
+            // Manager.Camera.PushCamera("Player");
             if (PhotonNetwork.IsMasterClient)
                 InGameManager.Instance.StartGame();
         }
@@ -90,18 +90,25 @@ public class SceneInit : MonoBehaviourPunCallbacks
 
 
         //bulletdisaplay virtual cam 할당 및 설정
-        Util_LDH.GetOrAddComponent<VirtualCam_BulletDisplay>(virtualCameras[actorIndex].gameObject);
+        var displayCam = Util_LDH.GetOrAddComponent<VirtualCam_BulletDisplay>(virtualCameras[actorIndex].gameObject);
+        yield return displayCam.RegisterVCam();
 
-
+        
         var obj = PhotonNetwork.Instantiate(playerPrefabName, spawnPos, Quaternion.identity);
-
+        
         Vector3 dir = (tableCenter.position - obj.transform.position).normalized;
         dir.y = 0f;
         obj.transform.rotation = Quaternion.LookRotation(dir);
-
+        
+        
         GamePlayer gp = obj.GetComponent<GamePlayer>();
         if (gp != null && gp.GetComponent<PhotonView>().IsMine)
         {
+            
+            //시야 가상 카메라 설정
+            PlayerController playerController = gp.GetComponent<PlayerController>();
+            yield return StartCoroutine(playerController.InitCameraSetting());
+            
             string nickname = PhotonNetwork.NickName;
             string playerId = PhotonNetwork.LocalPlayer.UserId;
 
