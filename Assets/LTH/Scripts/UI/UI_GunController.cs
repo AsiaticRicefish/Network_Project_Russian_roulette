@@ -56,8 +56,7 @@ public class UI_GunController : MonoBehaviour
             Debug.LogWarning("[FireButtonController] 내 턴이 아님 → 발사 안 됨");
             return;
         }
-
-        fireSync.photonView.RPC("Fire", RpcTarget.All, myId, (int)GunManager.Instance.LoadedBullet);
+        fireSync.photonView.RPC("RequestFire", RpcTarget.MasterClient, myId);
     }
 
     // 맞은 사람과 탄 종류에 따라 메시지 출력
@@ -70,8 +69,8 @@ public class UI_GunController : MonoBehaviour
         if (hitMessageText == null) return;
 
         string result = bullet == BulletType.live
-            ? $"<color=red>{targetId}</color> 이(가) <b>실탄</b>에 맞았습니다!"
-            : $"<color=green>{targetId}</color> 은(는) <b>공포탄</b>이었습니다.";
+        ? "<color=red>발사된 탄환은 <b>실탄</b>입니다.</color>"
+        : "<color=green>발사된 탄환은 <b>공포탄</b>입니다.</color>";
 
         hitMessageText.text = result;
 

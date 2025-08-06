@@ -81,6 +81,7 @@ MonoBehaviour:
   - InitTurnOrder
   - RPC_SetEnhanced
   - FireResult
+  - RPC_ShowBulletInfo
   - RPC_PlayTrigger
   - RPC_PlayShotSFX
   DisableAutoOpenWizard: 1

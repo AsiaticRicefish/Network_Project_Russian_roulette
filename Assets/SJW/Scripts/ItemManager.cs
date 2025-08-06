@@ -99,7 +99,8 @@ public class ItemManager : Singleton<ItemManager>
                 }
                 else
                 {
-                    Debug.Log("[돋보기] 상대가 사용함");
+                    // 마스터 입장에서는 내가 아닌 상대가 사용했을 경우 → RPC로 해당 클라이언트에 지시
+                    user._pv.RPC("RPC_ShowBulletInfo", user._pv.Owner, (int)GunManager.Instance.LoadedBullet);
                 }
                 break;
 

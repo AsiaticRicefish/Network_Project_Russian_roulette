@@ -364,9 +364,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _uiRoom: {fileID: 7638228818053424113}
-  gameSceneName: LTH_InGameScene
+  gameSceneName: LTH_InGame
   cutSceneName: LDH_CutScene
-  _skipCutScene: 1
+  _skipCutScene: 0
 --- !u!4 &434020709
 Transform:
   m_ObjectHideFlags: 0
@@ -377,6 +377,53 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 632.4296, y: 563.39087, z: -6.147637}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &506701543
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 506701545}
+  - component: {fileID: 506701544}
+  m_Layer: 0
+  m_Name: Bgm Player
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &506701544
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 506701543}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d34535afa529142039385a855bd5a309, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _bgmList:
+  - {fileID: 8300000, guid: 53e4c7a023fa042d5aaa316da5335ca2, type: 3}
+  playFirstBgmOnStart: 1
+--- !u!4 &506701545
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 506701543}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1047.6635, y: 405.95123, z: -0.24460666}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1710,7 +1757,7 @@ PrefabInstance:
     - target: {fileID: 2940185959135385265, guid: 7a3bb046137d141a49ec32d2dd646018,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 217.6
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2940185959135385265, guid: 7a3bb046137d141a49ec32d2dd646018,
         type: 3}
@@ -1937,7 +1984,7 @@ PrefabInstance:
     - target: {fileID: 195407178480788838, guid: 18780d368d1c54a7e981c1d6d2e9cfda,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 271.35
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 195407178480788838, guid: 18780d368d1c54a7e981c1d6d2e9cfda,
         type: 3}
@@ -2277,7 +2324,7 @@ PrefabInstance:
     - target: {fileID: 1569577622350725786, guid: d1326ed455cd94f1eb620cfa4548e8dd,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 95.98
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1569577622350725786, guid: d1326ed455cd94f1eb620cfa4548e8dd,
         type: 3}
@@ -2517,3 +2564,4 @@ SceneRoots:
   - {fileID: 434020709}
   - {fileID: 1732028131}
   - {fileID: 1614394504}
+  - {fileID: 506701545}
