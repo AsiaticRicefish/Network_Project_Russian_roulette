@@ -6815,7 +6815,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "bullet disaplay\uB85C \uC804\uD658"
+  m_text: "\uCE74\uBA54\uB77C \uC804\uD658 \uD14C\uC2A4\uD2B8\uC6A9"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 9b83601e3ee35f943aa3663af9fea835, type: 2}
   m_sharedMaterial: {fileID: -129595453255245585, guid: 9b83601e3ee35f943aa3663af9fea835,
@@ -6843,8 +6843,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 35
-  m_fontSizeBase: 35
+  m_fontSize: 16.76
+  m_fontSizeBase: 16.76
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -55541,7 +55541,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 32, y: -255}
+  m_AnchoredPosition: {x: -686, y: -255}
   m_SizeDelta: {x: 253.1299, y: 72.1995}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1447366770
@@ -84201,7 +84201,7 @@ PrefabInstance:
     - target: {fileID: 961558263106034353, guid: bda476fff2f604e6ea476eeef1d57c3b,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 0
+      value: 139.47
       objectReference: {fileID: 0}
     - target: {fileID: 961558263106034353, guid: bda476fff2f604e6ea476eeef1d57c3b,
         type: 3}

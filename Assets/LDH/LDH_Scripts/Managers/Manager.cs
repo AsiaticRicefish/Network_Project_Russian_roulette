@@ -42,6 +42,8 @@ namespace Managers
         public static SoundManager Sound => SoundManager.Instance;          // 사운드
 
         public static CameraManager Camera => CameraManager.Instance;       // 카메라
+
+        public static AnimationManager Anim => AnimationManager.Instance;   // 애니메이션, 이펙트
       
         public static UIManager UI => UIManager.Instance;                   //  UI
 
@@ -77,6 +79,7 @@ namespace Managers
             manager.AddComponent<GunManager>();
             manager.AddComponent<ItemSyncManager>();
             manager.AddComponent<CameraManager>();
+            manager.AddComponent<AnimationManager>();
         }
     }
 }
