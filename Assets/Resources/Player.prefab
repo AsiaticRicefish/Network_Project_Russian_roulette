@@ -18558,6 +18558,7 @@ GameObject:
   - component: {fileID: 6171036282848974399}
   - component: {fileID: -4687188570341475101}
   - component: {fileID: -5142669447431565515}
+  - component: {fileID: 2881495812183576843}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -18594,7 +18595,7 @@ Animator:
   m_GameObject: {fileID: 6656097000227532582}
   m_Enabled: 1
   m_Avatar: {fileID: 9000000, guid: a4a3ba617ed9c5946bb76844ec1ef299, type: 3}
-  m_Controller: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 724625c452f3f004a90498fd4cecfb27, type: 2}
   m_CullingMode: 1
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -18675,6 +18676,7 @@ MonoBehaviour:
   observableSearch: 2
   ObservedComponents:
   - {fileID: 8955679721357143536}
+  - {fileID: 2881495812183576843}
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
@@ -18775,8 +18777,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4aea7b5c138f4c7409affdd22c3d1c25, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _animator: {fileID: 6656097000234917094}
   _cameraHolder: {fileID: 5849200159816515157}
   _mouseSensitivity: 0
+--- !u!114 &2881495812183576843
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6656097000227532582}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b8c4a61274f60b4ea5fb4299cfdbf14, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowLayerWeightsInspector: 1
+  ShowParameterInspector: 1
+  m_SynchronizeParameters:
+  - Type: 9
+    SynchronizeType: 0
+    Name: Shot
+  - Type: 9
+    SynchronizeType: 0
+    Name: Hit
+  m_SynchronizeLayers:
+  - SynchronizeType: 0
+    LayerIndex: 0
 --- !u!1 &6656097000227532626
 GameObject:
   m_ObjectHideFlags: 0

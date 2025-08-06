@@ -9,8 +9,8 @@ using Utils;
 
 public class PlayerController : MonoBehaviourPun
 {
+    [SerializeField] private Animator _animator;
     [SerializeField] private GameObject _cameraHolder;
-
     [SerializeField] private float _mouseSensitivity;
 
     private float moveSpeed = 5.0f;
@@ -50,7 +50,11 @@ public class PlayerController : MonoBehaviourPun
     private void Update()
     {
         if (!_pv.IsMine) return;
-
+        
+        if(Input.GetKeyDown(KeyCode.Space))
+        {
+            _animator.SetTrigger("Shot");
+        }
         //PlayerLook();
     }
 
