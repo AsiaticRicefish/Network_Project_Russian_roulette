@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2001ace5265a8b148baa9b4e9fcbd50a, type: 3}
+  m_Name: Dial
+  m_EditorClassIdentifier: 
+  itemId: Dial
+  itemType: 5
+  displayName: Dial
+  description: Change Current Bullet
+  itemPrefab: {fileID: 2854877863242993494, guid: f5d7e75d2868826498bc8a1bf2554d55,
+    type: 3}
