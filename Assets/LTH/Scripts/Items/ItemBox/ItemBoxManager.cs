@@ -62,7 +62,6 @@ public class ItemBoxManager : MonoBehaviourPun
         
         //desk ui init
         var myDeskUI = DeskUIManager.Instance.GetDeskUI(ownerNickname);
-        Debug.Log(myDeskUI==null);
         Init(myDeskUI);
         
         //spawn manager에 register 하기
