@@ -90,33 +90,33 @@ public class GamePlayer : MonoBehaviourPun, IComparer<GamePlayer>
         //StartCoroutine(PlayerListSortDelay());
     }
 
-    private void Update()
-    {
-        if (_pv.IsMine)
-        {
-            Debug.Log(PlayerManager.Instance.GetAllPlayers().Count);
-
-            if (Input.GetKeyDown(KeyCode.Tab) && PlayerManager.Instance.GetAllPlayers().Count == 2)
-            {
-                foreach (var a in PlayerManager.Instance.GetAllPlayers())
-                {
-                    Debug.Log($"[GamePlayer]Update에서 호출 - {a.Value.PlayerId}, {a.Value.Nickname},{a.Value.CurrentHp}");
-                }
-            }
-        }
-
-        if (Input.GetKeyDown(KeyCode.C) && PhotonNetwork.IsMasterClient && _pv.IsMine)
-        {
-            IncreaseHp(1);
-            //CurrentHp += 1;
-        }
-
-        if (Input.GetKeyDown(KeyCode.X) && PhotonNetwork.IsMasterClient && _pv.IsMine)
-        {
-            DecreaseHp(1);
-            //CurrentHp -= 1;
-        }
-    }
+    // private void Update()
+    // {
+    //     if (_pv.IsMine)
+    //     {
+    //         Debug.Log(PlayerManager.Instance.GetAllPlayers().Count);
+    //
+    //         if (Input.GetKeyDown(KeyCode.Tab) && PlayerManager.Instance.GetAllPlayers().Count == 2)
+    //         {
+    //             foreach (var a in PlayerManager.Instance.GetAllPlayers())
+    //             {
+    //                 Debug.Log($"[GamePlayer]Update에서 호출 - {a.Value.PlayerId}, {a.Value.Nickname},{a.Value.CurrentHp}");
+    //             }
+    //         }
+    //     }
+    //
+    //     if (Input.GetKeyDown(KeyCode.C) && PhotonNetwork.IsMasterClient && _pv.IsMine)
+    //     {
+    //         IncreaseHp(1);
+    //         //CurrentHp += 1;
+    //     }
+    //
+    //     if (Input.GetKeyDown(KeyCode.X) && PhotonNetwork.IsMasterClient && _pv.IsMine)
+    //     {
+    //         DecreaseHp(1);
+    //         //CurrentHp -= 1;
+    //     }
+    // }
 
     /*private void OnEnable()
     {
@@ -169,6 +169,15 @@ public class GamePlayer : MonoBehaviourPun, IComparer<GamePlayer>
 
         _pv.RPC("RPC_DecreasePlayerCurrentHp", RpcTarget.MasterClient, PlayerId, damage);
     }
+    
+    
+    public void DecreaseHpInLocal(int damage)
+    {
+        //if (!IsAlive) return;
+
+        _pv.RPC("RPC_DecreasePlayerCurrentHp", RpcTarget.MasterClient, PlayerId, damage);
+    }
+    
     #endregion
 
     #region OnPhotonSerializeView 사용 테스트

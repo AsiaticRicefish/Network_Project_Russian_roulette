@@ -43,6 +43,10 @@ public class UI_GunController : MonoBehaviour
 
     private void OnFireButtonClicked()
     {
+        //중복 클릭 방지를 위해 누르자마자 interactable 차단
+        fireButton.interactable = false;
+        
+        
         if (TurnSync.CurrentTurnPlayerId != myId)
         {
             Debug.LogWarning("[FireButtonController] 내 턴이 아님 → 발사 안 됨");
