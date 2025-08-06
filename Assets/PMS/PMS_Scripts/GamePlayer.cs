@@ -94,8 +94,6 @@ public class GamePlayer : MonoBehaviourPun, IComparer<GamePlayer>
     {
         if (_pv.IsMine)
         {
-            Debug.Log(PlayerManager.Instance.GetAllPlayers().Count);
-
             if (Input.GetKeyDown(KeyCode.Tab) && PlayerManager.Instance.GetAllPlayers().Count == 2)
             {
                 foreach (var a in PlayerManager.Instance.GetAllPlayers())

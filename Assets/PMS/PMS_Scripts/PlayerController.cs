@@ -6,8 +6,8 @@ using Photon.Pun;
 
 public class PlayerController : MonoBehaviourPun
 {
+    [SerializeField] private Animator _animator;
     [SerializeField] private GameObject _cameraHolder;
-
     [SerializeField] private float _mouseSensitivity;
 
     private float moveSpeed = 5.0f;
@@ -42,6 +42,11 @@ public class PlayerController : MonoBehaviourPun
         if (!_pv.IsMine) return;
 
         PlayerLook();
+        
+        if(Input.GetKeyDown(KeyCode.Space))
+        {
+            _animator.SetTrigger("Shot");
+        }
     }
 
     //시점 변경 테스트코드

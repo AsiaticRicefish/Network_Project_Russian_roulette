@@ -73,6 +73,10 @@ MonoBehaviour:
   - SetOwnerNickname
   - RPC_ReceiveBulletInfo
   - RegisterItemBox
+  - RPC_ApplyHp
+  - RPC_DecreasePlayerCurrentHp
+  - RPC_InCreasePlayerCurrentHp
+  - RPC_RequestAttack
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1
