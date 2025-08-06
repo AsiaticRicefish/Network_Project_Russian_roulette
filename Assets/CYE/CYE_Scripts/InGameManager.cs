@@ -40,7 +40,7 @@ public class InGameManager : Singleton<InGameManager>
     #endregion
 
     #region >> Constants
-    private const int MAX_ROUND = 3;
+    private const int MAX_ROUND = 1;
     #endregion
 
     #region  >> Variables

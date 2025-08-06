@@ -42,7 +42,7 @@ public class PlayerManager : Singleton<PlayerManager>
     {
         _players?.Clear();
         _playerList?.Clear();
-        InGameManager.Instance.OnGameStart -= AllGamePlayerAdd; 
+        //InGameManager.Instance.OnGameStart -= AllGamePlayerAdd; 
     }
 
     //게임 스타트시 사용해야하는부분

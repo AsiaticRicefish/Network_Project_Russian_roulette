@@ -33,7 +33,7 @@ namespace GameUI
 
         private void OnDestroy()
         {
-            PlayerManager.Instance.OnAddPlayer-= FadeOutAfterLoading;
+            //PlayerManager.Instance.OnAddPlayer-= FadeOutAfterLoading;
         }
 
         private void FadeOutAfterLoading()

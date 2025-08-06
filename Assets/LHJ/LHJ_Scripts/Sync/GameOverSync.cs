@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using Utils;
 
 public class GameOverSync : MonoBehaviourPunCallbacks
@@ -76,15 +77,9 @@ public class GameOverSync : MonoBehaviourPunCallbacks
             yield return new WaitForSeconds(1f);
             remaining -= 1f;
         }
-
-        GunManager.Release();
-        PlayerManager.Release();
-        InGameManager.Release();
-        ItemBoxSpawnerManager.Release();
-        DeskUIManager.Release();
-        ItemSyncManager.Release();
-
-        photonView.RPC("GoToLobbyScene", RpcTarget.All);
+        
+        // photonView.RPC("GoToLobbyScene", RpcTarget.All);
+        GoToLobbyScene();
     }
     public override void OnLeftRoom()
     {
@@ -94,6 +89,15 @@ public class GameOverSync : MonoBehaviourPunCallbacks
 
         //    Managers.Manager.Initialize();
         //}
-        PhotonNetwork.LoadLevel("Lobby");
+        
+        GunManager.Release();
+        PlayerManager.Release();
+        InGameManager.Release();
+        ItemBoxSpawnerManager.Release();
+        DeskUIManager.Release();
+        ItemSyncManager.Release();
+
+        Debug.Log("로비로 이동합니다.");
+        SceneManager.LoadScene("Lobby");
     }
 }

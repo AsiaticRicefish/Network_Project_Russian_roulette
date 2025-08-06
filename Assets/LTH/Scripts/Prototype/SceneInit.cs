@@ -19,15 +19,14 @@ public class SceneInit : MonoBehaviourPunCallbacks
 
     [SerializeField] private Transform[] spawnPoints;
     [SerializeField] private CinemachineVirtualCamera[] virtualCameras;
-    
-    
-    
+
+
     private void Awake()
     {
         SceneManager.sceneLoaded += OnEnterScene;
     }
 
-  
+
     private void Start()
     {
         //if (SceneManager.GetActiveScene().name != "LTH_GameScene") return;
@@ -37,17 +36,16 @@ public class SceneInit : MonoBehaviourPunCallbacks
         //     StartCoroutine(InitFlow());
         // }
 
-        if(PhotonNetwork.IsMasterClient)
-            Manager.PlayerManager.OnAddPlayer += InitGame;
+
+        Manager.PlayerManager.OnAddPlayer += InitGame;
     }
+
     private void OnDestroy()
     {
         SceneManager.sceneLoaded -= OnEnterScene;
-        Manager.PlayerManager.OnAddPlayer -= InitGame;
+        //Manager.PlayerManager.OnAddPlayer -= InitGame;
     }
 
-
-    
 
     //둘 다 씬에 들어왔을 때 실행해줘야 하는데
     private IEnumerator InitFlow()
@@ -59,54 +57,13 @@ public class SceneInit : MonoBehaviourPunCallbacks
 
     private void InitGame()
     {
-        if(Manager.PlayerManager.GetAllPlayers().Count == 2)
+        if (Manager.PlayerManager.GetAllPlayers().Count == 2)
         {
-
-            if (DeskUIManager.Instance == null)
-            {
-                GameObject go = new GameObject("DeskUIManager");
-                go.AddComponent<DeskUIManager>();
-                DontDestroyOnLoad(go);
-            }
-
-            if (ItemBoxSpawnerManager.Instance == null)
-            {
-                GameObject go = new GameObject("ItemBoxSpawnerManager");
-                go.AddComponent<ItemBoxSpawnerManager>();
-                DontDestroyOnLoad(go);
-            }
-
-            if (InGameManager.Instance == null)
-            {
-                GameObject go = new GameObject("InGameManager");
-                go.AddComponent<InGameManager>();
-                DontDestroyOnLoad(go);
-            }
-
-            if (GunManager.Instance == null)
-            {
-                GameObject go = new GameObject("GunManager");
-                go.AddComponent<GunManager>();
-                DontDestroyOnLoad(go);
-            }
-
-            if (PlayerManager.Instance == null)
-            {
-                GameObject go = new GameObject("PlayerManager");
-                go.AddComponent<PlayerManager>();
-                DontDestroyOnLoad(go);
-            }
-
-            if (ItemSyncManager.Instance == null)
-            {
-                GameObject go = new GameObject("ItemSyncManager");
-                go.AddComponent<ItemSyncManager>();
-                DontDestroyOnLoad(go);
-            }
-
-            InGameManager.Instance.StartGame();
+            Manager.Camera.PushCamera("Player");
+            if (PhotonNetwork.IsMasterClient)
+                InGameManager.Instance.StartGame();
         }
-            
+
         // // 마스터만 게임 시작 진행
         // if (PhotonNetwork.IsMasterClient)
         // {
@@ -116,7 +73,7 @@ public class SceneInit : MonoBehaviourPunCallbacks
         //     
         // }
     }
-    
+
 
     private IEnumerator SpawnPlayerWithDelay()
     {
@@ -129,12 +86,12 @@ public class SceneInit : MonoBehaviourPunCallbacks
 
         int actorIndex = PhotonNetwork.LocalPlayer.ActorNumber - 1;
         Vector3 spawnPos = spawnPoints.Length > actorIndex ? spawnPoints[actorIndex].position : Vector3.zero;
-        
-        
+
+
         //bulletdisaplay virtual cam 할당 및 설정
         Util_LDH.GetOrAddComponent<VirtualCam_BulletDisplay>(virtualCameras[actorIndex].gameObject);
-        
-        
+
+
         var obj = PhotonNetwork.Instantiate(playerPrefabName, spawnPos, Quaternion.identity);
 
         Vector3 dir = (tableCenter.position - obj.transform.position).normalized;
@@ -154,11 +111,10 @@ public class SceneInit : MonoBehaviourPunCallbacks
             Camera cam = obj.GetComponentInChildren<Camera>();
             if (cam != null)
             {
-                cam.transform.rotation = Quaternion.LookRotation((tableCenter.position - cam.transform.position).normalized);
+                cam.transform.rotation =
+                    Quaternion.LookRotation((tableCenter.position - cam.transform.position).normalized);
             }
         }
-        
-        
     }
 
     private IEnumerator WaitForBoxSpawner()
@@ -183,11 +139,8 @@ public class SceneInit : MonoBehaviourPunCallbacks
     private void OnEnterScene(Scene scene, LoadSceneMode mode)
     {
         //자기 자신의 isInGameScene 프로퍼티 초기화
-        Hashtable playerProperty = new Hashtable
-        {
-            { "IsInGameScene", true}
-        };
-        
+        Hashtable playerProperty = new Hashtable { { "IsInGameScene", true } };
+
         PhotonNetwork.LocalPlayer.SetCustomProperties(playerProperty);
     }
 
@@ -201,13 +154,12 @@ public class SceneInit : MonoBehaviourPunCallbacks
                 if (!value)
                 {
                     Debug.Log("[SceneInit] 아직 모든 플레이어가 ingame scene으로 들어오지 않았습니다.");
-                    
+
                     return;
                 }
             }
-            
         }
+
         StartCoroutine(InitFlow());
-      
     }
 }

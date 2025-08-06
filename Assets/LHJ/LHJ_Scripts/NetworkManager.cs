@@ -396,6 +396,8 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     // /// </summary>
     public override void OnJoinedRoom()
     {
+        Debug.Log($"[NetworkManager] {PhotonNetwork.PlayerList.Length} 명 있음");
+        
         
         lobbyPanel.SetActive(false);
         roomPanel.SetActive(true);
