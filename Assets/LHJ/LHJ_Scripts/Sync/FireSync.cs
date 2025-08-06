@@ -62,7 +62,11 @@ public class FireSync : MonoBehaviourPun
         photonView.RPC("ReloadSync", RpcTarget.All, totalBullets.ToArray(), totalBullets[0]);
     }
 
-    // 모든 클라이언트에서 발사 동작을 실행하는 RPC
+    /// <summary>
+    /// 모든 클라이언트에서 발사 동작을 실행하는 RPC
+    /// </summary>
+    /// <param name="playerId">photon network player nickname</param>
+    /// <param name="bulletInt"></param>
     [PunRPC]
     private void Fire(string playerId, int bulletInt)
     {
@@ -82,6 +86,21 @@ public class FireSync : MonoBehaviourPun
             }
             //string targetId = (playerId == "player1") ? "player2" : "player1";
             Debug.Log($"{playerId}이(가) {bullet} 탄을 발사했습니다.");
+            GamePlayer shooter = PlayerManager.Instance.FindPlayerByNickname(playerId);
+            if (shooter == null)
+            {
+                Debug.LogError($"[FireSync] {playerId}에 해당하는 GamePlayer를 찾아오지 못했습니다.");
+                return;
+            }
+            
+            //shooter 애니메이션 실행 (RPC로 모든 클라이언트에서 실행되도록 함) - 마스터만 호출하기 때문에 rpc 중복 호출 x
+            shooter._pv.RPC("RPC_PlayTrigger", RpcTarget.All, "Shot");
+            
+            
+            
+            //총 발사 효과음
+            GunManager.Instance.PV.RPC("RPC_PlayShotSFX", RpcTarget.All, bullet==BulletType.live);
+            
             if (bullet == BulletType.live)
             {
                 Debug.Log($"{targetNick}이 데미지를 입었습니다.");

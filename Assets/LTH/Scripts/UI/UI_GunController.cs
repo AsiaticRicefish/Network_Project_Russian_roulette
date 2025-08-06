@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Utils;
 
 public class UI_GunController : MonoBehaviour
 {
@@ -12,6 +13,9 @@ public class UI_GunController : MonoBehaviour
     [SerializeField] private FireSync fireSync;
     [SerializeField] private TextMeshProUGUI hitMessageText;
 
+    /// <summary>
+    /// PhotonNetwork.NickName
+    /// </summary>
     private string myId;
 
     private void Start()
@@ -59,6 +63,9 @@ public class UI_GunController : MonoBehaviour
     // 맞은 사람과 탄 종류에 따라 메시지 출력
     private void HandlePlayerHit(string targetId, BulletType bullet)
     {
+        //target id 파싱
+        targetId = Util_LDH.GetUserNickname(targetId);
+        
         Debug.Log($"[HandlePlayerHit] 내 클라이언트에서 호출됨 → {targetId}, {bullet}");
         if (hitMessageText == null) return;
 

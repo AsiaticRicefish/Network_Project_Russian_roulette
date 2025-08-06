@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using Utils;
 
 public class GameOverSync : MonoBehaviourPunCallbacks
 {
@@ -46,6 +47,10 @@ public class GameOverSync : MonoBehaviourPunCallbacks
 
         hasShow = true;
 
+        //닉네임 파싱
+        winnerNickname = Util_LDH.GetUserNickname(winnerNickname);
+        
+        
         if (gameOverPanel != null)
             gameOverPanelManager.OpenWindow();
 
