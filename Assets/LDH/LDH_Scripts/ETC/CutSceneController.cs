@@ -18,9 +18,14 @@ namespace ETC
         private void Init()
         {
             PhotonNetwork.AutomaticallySyncScene = false;
+            StopBGM();
             SetAudioSource();
         }
 
+        private void StopBGM()
+        {
+            Manager.Sound.Stop(Define_LDH.Sound.Bgm);
+        }
 
         public void SetAudioSource()
         {

@@ -44,7 +44,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: -0.027, y: 1.271}
+  m_AnchoredPosition: {x: -0.026977539, y: 1.2709961}
   m_SizeDelta: {x: 2.2271, y: 1.1814}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!223 &6395663951878543079
@@ -92,7 +92,7 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
-  m_PresetInfoIsWorld: 1
+  m_PresetInfoIsWorld: 0
 --- !u!114 &8869727082241958562
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -129,6 +129,8 @@ MonoBehaviour:
   - {fileID: 5521607125617413529}
   - {fileID: 7251053950795215959}
   - {fileID: 7867994261244216485}
+  _photonView: {fileID: -6490686510047801853}
+  <OwnerNickname>k__BackingField: 
 --- !u!114 &-6490686510047801853
 MonoBehaviour:
   m_ObjectHideFlags: 0

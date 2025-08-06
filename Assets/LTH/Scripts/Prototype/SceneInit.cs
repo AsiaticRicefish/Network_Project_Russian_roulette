@@ -4,37 +4,67 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Managers;
+using System;
+using ExitGames.Client.Photon.StructWrapping;
+using Photon.Realtime;
+using Hashtable = ExitGames.Client.Photon.Hashtable;
 
-public class SceneInit : MonoBehaviour
+
+public class SceneInit : MonoBehaviourPunCallbacks
 {
     [SerializeField] private string playerPrefabName;
 
     [SerializeField] private Transform[] spawnPoints;
 
+    private void Awake()
+    {
+        SceneManager.sceneLoaded += OnEnterScene;
+    }
+
+  
     private void Start()
     {
         //if (SceneManager.GetActiveScene().name != "LTH_GameScene") return;
+        //
+        // if (PhotonNetwork.IsConnectedAndReady && PhotonNetwork.InRoom)
+        // {
+        //     StartCoroutine(InitFlow());
+        // }
 
-        if (PhotonNetwork.IsConnectedAndReady && PhotonNetwork.InRoom)
-        {
-            StartCoroutine(InitFlow());
-        }
+        if(PhotonNetwork.IsMasterClient)
+            Manager.PlayerManager.OnAddPlayer += InitGame;
+    }
+    private void OnDestroy()
+    {
+        SceneManager.sceneLoaded -= OnEnterScene;
+        Manager.PlayerManager.OnAddPlayer -= InitGame;
     }
 
+
+    
+
+    //둘 다 씬에 들어왔을 때 실행해줘야 하는데
     private IEnumerator InitFlow()
     {
+        Debug.Log("[SceneInit] 모든 플레이어가 씬에 들어와 InitFlow() 실행");
         // 플레이어 스폰
         yield return SpawnPlayerWithDelay();
-
-        // 마스터만 게임 시작 진행
-        if (PhotonNetwork.IsMasterClient)
-        {
-            yield return WaitForBoxSpawner();
-
-            // 게임 시작
-            InGameManager.Instance.StartGame();
-        }
     }
+
+    private void InitGame()
+    {
+        if(Manager.PlayerManager.GetAllPlayers().Count == 2)
+            InGameManager.Instance.StartGame();
+        // // 마스터만 게임 시작 진행
+        // if (PhotonNetwork.IsMasterClient)
+        // {
+        //     yield return WaitForBoxSpawner();
+        //
+        //     // 게임 시작
+        //     
+        // }
+    }
+    
 
     private IEnumerator SpawnPlayerWithDelay()
     {
@@ -88,5 +118,37 @@ public class SceneInit : MonoBehaviour
             yield return new WaitForSeconds(0.1f);
             timer += 0.1f;
         }
+    }
+
+
+    private void OnEnterScene(Scene scene, LoadSceneMode mode)
+    {
+        //자기 자신의 isInGameScene 프로퍼티 초기화
+        Hashtable playerProperty = new Hashtable
+        {
+            { "IsInGameScene", true}
+        };
+        
+        PhotonNetwork.LocalPlayer.SetCustomProperties(playerProperty);
+    }
+
+    public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)
+    {
+        base.OnPlayerPropertiesUpdate(targetPlayer, changedProps);
+        foreach (var player in PhotonNetwork.PlayerList)
+        {
+            if (player.CustomProperties.TryGetValue("IsInGameScene", out bool value))
+            {
+                if (!value)
+                {
+                    Debug.Log("[SceneInit] 아직 모든 플레이어가 ingame scene으로 들어오지 않았습니다.");
+                    
+                    return;
+                }
+            }
+            
+        }
+        StartCoroutine(InitFlow());
+      
     }
 }

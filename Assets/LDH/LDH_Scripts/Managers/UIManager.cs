@@ -187,7 +187,7 @@ namespace Managers
             {
                 if (_popupStack.Peek() != popup)
                 {
-                    Debug.LogWarning($"[{GetType().Name}] 닫으려는 팝업이 최상단 팝업이 아닙니다.");
+                    //Debug.LogWarning($"[{GetType().Name}] 닫으려는 팝업이 최상단 팝업이 아닙니다.");
                     return;
                 }
                 _popupStack.Pop();

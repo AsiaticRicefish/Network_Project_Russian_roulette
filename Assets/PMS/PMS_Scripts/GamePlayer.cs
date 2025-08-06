@@ -5,14 +5,14 @@ using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
 
-public class GamePlayer : MonoBehaviour, IComparer<GamePlayer>
+public class GamePlayer : MonoBehaviourPun, IComparer<GamePlayer>
 {
     public PhotonView _pv;
 
     public PlayerData _data;
 
     //데이터를 읽기는 해야하는데 Write하면 안되는 데이터
-    public string Nickname => _data.nickname;       
+    public string Nickname => _data.nickname;
     public string PlayerId => _data.playerId;
 
     //읽고 써야 하는 데이터
@@ -50,7 +50,7 @@ public class GamePlayer : MonoBehaviour, IComparer<GamePlayer>
                 _currentHp = value;
                 if (CurrentHp <= 0) IsAlive = false;
 
-                OnHpChanged?.Invoke(_currentHp,IsAlive);
+                OnHpChanged?.Invoke(_currentHp, IsAlive);
             }
         }
     }
@@ -72,8 +72,8 @@ public class GamePlayer : MonoBehaviour, IComparer<GamePlayer>
     }
 
     //이벤트 
-    public event Action<int,bool> OnHpChanged;           //최대 체력 변경시 - 라운드가 종료 되었을 때
-    public event Action<int,bool> OnMaxHpChanged;         //현재 체력 변경시 - 총을 맞거나 피를 회복할때
+    public event Action<int, bool> OnHpChanged;           //최대 체력 변경시 - 라운드가 종료 되었을 때
+    public event Action<int, bool> OnMaxHpChanged;         //현재 체력 변경시 - 총을 맞거나 피를 회복할때
 
     public event Action<GamePlayer> OnPlayerDied;   // 사망한 플레이어 객체 전달 - 턴관리 넘겨야하는데
 
@@ -82,14 +82,39 @@ public class GamePlayer : MonoBehaviour, IComparer<GamePlayer>
     private void Awake()
     {
         _pv = GetComponent<PhotonView>();
+        Initialize();
     }
 
     private void Start()
     {
+        //StartCoroutine(PlayerListSortDelay());
+    }
+
+    private void Update()
+    {
         if (_pv.IsMine)
         {
-            Initialize();
-            StartCoroutine(PlayerListSortDelay());
+            Debug.Log(PlayerManager.Instance.GetAllPlayers().Count);
+
+            if (Input.GetKeyDown(KeyCode.Tab) && PlayerManager.Instance.GetAllPlayers().Count == 2)
+            {
+                foreach (var a in PlayerManager.Instance.GetAllPlayers())
+                {
+                    Debug.Log($"[GamePlayer]Update에서 호출 - {a.Value.PlayerId}, {a.Value.Nickname},{a.Value.CurrentHp}");
+                }
+            }
+        }
+
+        if (Input.GetKeyDown(KeyCode.C) && PhotonNetwork.IsMasterClient && _pv.IsMine)
+        {
+            IncreaseHp(1);
+            //CurrentHp += 1;
+        }
+
+        if (Input.GetKeyDown(KeyCode.X) && PhotonNetwork.IsMasterClient && _pv.IsMine)
+        {
+            DecreaseHp(1);
+            //CurrentHp -= 1;
         }
     }
 
@@ -111,9 +136,9 @@ public class GamePlayer : MonoBehaviour, IComparer<GamePlayer>
         }
     }*/
 
+    //프로퍼티 사용해서 이벤트 호출하게 해야함 - UI를 위해서
     public void Initialize()
     {
-        //프로퍼티 사용해서 이벤트 호출하게 하여야함. 임시 테스트 코드
         MaxHp = 3;
         CurrentHp = MaxHp;
         IsAlive = true;
@@ -130,37 +155,21 @@ public class GamePlayer : MonoBehaviour, IComparer<GamePlayer>
     }
 
     #region 플레이어 hp 관련 메서드
-
-    [PunRPC]
-    public void RPC_IncreaseHp(int amount)
-    {
-        IncreaseHp(amount);
-    }
-
-
+   
     public void IncreaseHp(int amount)
     {
-        if (!IsAlive) return;
+        //if (!IsAlive) return;
 
-        CurrentHp += amount;
-        CurrentHp = Mathf.Max(CurrentHp, 0); // CurrentHp setter에서 사망 처리
+        _pv.RPC("RPC_InCreasePlayerCurrentHp", RpcTarget.MasterClient, PlayerId, amount);
     }
 
-    public void DecreaseHp(int amount)
+    public void DecreaseHp(int damage)
     {
-        if (!IsAlive) return;
+        //if (!IsAlive) return;
 
-        CurrentHp -= amount;
-        CurrentHp = Mathf.Min(CurrentHp, MaxHp);
-        Debug.Log($"[GamePlayer] {Nickname} → DecreaseHp({amount}) 호출됨, 현재 HP: {CurrentHp}");
+        _pv.RPC("RPC_DecreasePlayerCurrentHp", RpcTarget.MasterClient, PlayerId, damage);
     }
     #endregion
-
-    //Player에서 PlayerData를 넘겨주는 메서드 - 필요하진 모르겟다 
-    public PlayerData ToPlayerData()
-    {
-        return _data;
-    }
 
     #region OnPhotonSerializeView 사용 테스트
     /*public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
@@ -183,6 +192,13 @@ public class GamePlayer : MonoBehaviour, IComparer<GamePlayer>
     }*/
     #endregion
 
+    // 공격 요청 (클라이언트 -> 마스터)
+    public void AttackPlayer(GamePlayer targetPlayer, int damage)
+    {
+        if (!IsAlive || !targetPlayer.IsAlive) return;
+        _pv.RPC("RPC_RequestAttack", RpcTarget.MasterClient, PlayerId, targetPlayer.PlayerId, damage);
+    }
+
     //receiveSpawnPointIndex 범위 0 ~ 플레이어수-1  -> 이값을 가지고 List를 넣는 순서를 제어해도 괜찮을 것 같다. 이유 : 일단 자리에 앉으면 오른쪽으로 도는형식, 1대1에서 의미가 없지만 3인이상일 경우 턴순서를 확인할 수 있다.
     // PlayerData 객체를 직접 전송하는 RPC 함수
     [PunRPC]
@@ -196,7 +212,7 @@ public class GamePlayer : MonoBehaviour, IComparer<GamePlayer>
         PlayerManager.Instance.RegisterPlayer(this);
 
         // TODO - 모든 플레이어가 List의 순서를 보장해줘야한다.
-        //PlayerManager.Instance._playerList.Add(this);      
+        PlayerManager.Instance._playerList.Add(this);      
     }
 
     // 내 PlayerData를 다른 클라이언트에게 보내는 함수
@@ -216,5 +232,71 @@ public class GamePlayer : MonoBehaviour, IComparer<GamePlayer>
     {
         yield return new WaitForSeconds(0.1f);
         PlayerManager.Instance._playerList.Sort(Compare);
+    }
+
+    //Player에서 PlayerData를 넘겨주는 메서드 - 필요하진 모르겟다 
+    public PlayerData ToPlayerData()
+    {
+        return _data;
+    }
+
+    //-----------------------동기화 부분 ---------------------------
+    //자기 자신 회복 할 때 마스터 클라이언트한테 요청하는 함수 - 맥주마실 때 자기자신 hp회복을 요청 
+    [PunRPC]
+    public void RPC_InCreasePlayerCurrentHp(string requestId, int healAmount)
+    {
+        if (!PhotonNetwork.IsMasterClient) return;
+
+        var target = PlayerManager.Instance.FindPlayerByUID(requestId);
+        if (target == null) return;
+
+        int newHp = Mathf.Min(target.CurrentHp + healAmount, target.MaxHp);
+        // 결과를 모든 클라에게 전파
+        photonView.RPC("RPC_ApplyHp", RpcTarget.All, requestId, newHp);
+    }
+
+    //자기 자신피가 깎여야하는 걸 마스터 클라이언트 한테 요청
+    [PunRPC]
+    public void RPC_DecreasePlayerCurrentHp(string requestId, int damage)
+    {
+        if (!PhotonNetwork.IsMasterClient) return;
+
+        var target = PlayerManager.Instance.FindPlayerByUID(requestId);
+        if (target == null) return;
+
+        int newHp = Mathf.Max(target.CurrentHp - damage, 0);
+        // 결과를 모든 클라에게 전파
+        photonView.RPC("RPC_ApplyHp", RpcTarget.All, requestId, newHp);
+    }
+
+
+
+    // 공격 요청: 클라이언트에서 마스터에게 요청
+    [PunRPC]
+    void RPC_RequestAttack(string attackerId, string targetId, int damage)
+    {
+        if (!PhotonNetwork.IsMasterClient) return;
+
+        var target = PlayerManager.Instance.FindPlayerByUID(targetId);
+        if (target == null) return;
+
+        int newHp = Mathf.Max(target.CurrentHp - damage, 0);
+        photonView.RPC("RPC_ApplyHp", RpcTarget.All, targetId, newHp);
+    }
+
+
+    /// <summary>
+    /// 모든 클라이언트 한테 요청한 유저의 Id를 찾아 해당 유저의 Id를 마스터가 작업 수행한 것을 전달받아 해당 유저를 hp를 해당값으로 동기화
+    /// </summary>
+    /// <param name="requestId"> 요청한 요정 ID </param>
+    /// <param name="newHp"> 적용시킬 Hp </param>
+
+    [PunRPC]
+    void RPC_ApplyHp(string id, int hp)
+    {
+        var player = PlayerManager.Instance.FindPlayerByUID(id);
+        if (player == null) return;
+
+        player.CurrentHp = hp; //setter 이벤트 호출
     }
 }

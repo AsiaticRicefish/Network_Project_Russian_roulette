@@ -31,24 +31,9 @@ namespace GameCamera
         
         protected virtual void OnDestroy()
         {
-            //if (!string.IsNullOrEmpty(cameraID))
-                //Manager.Camera.UnregisterCamera(cameraID);
+            if (!string.IsNullOrEmpty(cameraID))
+                Manager.Camera.UnregisterCamera(cameraID);
         }
 
-        /// <summary>
-        /// 카메라 활성화 시 호출됨 (CameraManager.PushCamera → Priority = 10 됐을 때)
-        /// </summary>
-        public virtual void OnActivated()
-        {
-            // 자식 클래스에서 오버라이드 가능
-        }
-
-        /// <summary>
-        /// 카메라 비활성화 시 호출됨 (CameraManager.PopCamera → Priority = 0 됐을 때)
-        /// </summary>
-        public virtual void OnDeactivated()
-        {
-            // 자식 클래스에서 오버라이드 가능
-        }
     }
 }

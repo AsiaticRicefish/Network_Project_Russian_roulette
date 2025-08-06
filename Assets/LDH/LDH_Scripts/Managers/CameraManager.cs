@@ -1,7 +1,9 @@
 using Cinemachine;
 using DesignPattern;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class CameraManager : Singleton<CameraManager>
 {
@@ -11,6 +13,23 @@ public class CameraManager : Singleton<CameraManager>
 
     private void Awake() => SingletonInit();
     private void Start() => _mainCam = Camera.main;
+
+    private void OnEnable()
+    {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+        
+    }
+    
+    private void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+    
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        ClearStack();  // 스택 클리어
+    }
+
 
     #region Camera Register / UnRegister
     
@@ -24,6 +43,12 @@ public class CameraManager : Singleton<CameraManager>
                 Debug.Log($"[{GetType().Name}] 해당 id로 등록된 카메라가 존재합니다.");
         }
            
+    }
+    
+    public void UnregisterCamera(string id)
+    {
+        if (_cameraDict.ContainsKey(id))
+            _cameraDict.Remove(id);
     }
     
     #endregion

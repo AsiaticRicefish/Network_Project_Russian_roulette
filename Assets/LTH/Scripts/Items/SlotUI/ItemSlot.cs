@@ -3,6 +3,7 @@ using GameUI;
 using LTH; // 임시 Playerm ItemData 정의용 네임스페이스
 using Managers;
 using Photon.Pun;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -120,11 +121,12 @@ public class ItemSlot : MonoBehaviourPun
     }
 
     [PunRPC]
-    private void RPC_PlaceItem(string itemId)
+    private void RPC_PlaceItem(string itemId, PhotonMessageInfo messageInfo)
     {
         ClearSlot();
 
         itemData = ItemDatabaseManager.Instance.GetItemById(itemId);
+
         if (itemData != null && itemData.itemPrefab != null)
         {
             string path = "Items/" + itemData.itemPrefab.name;
@@ -133,8 +135,11 @@ public class ItemSlot : MonoBehaviourPun
             Vector3 offset = anchorPoint.forward * -0.05f;
             Vector3 spawnPos = anchorPoint.position + offset;
 
-            currentItem = PhotonNetwork.Instantiate(path, spawnPos, anchorPoint.rotation);
-            currentItem.transform.SetParent(anchorPoint);
+            if (photonView.IsMine)
+            {
+                currentItem = PhotonNetwork.Instantiate(path, spawnPos, anchorPoint.rotation);
+                currentItem.transform.SetParent(anchorPoint);
+            }
 
             // 이펙트 시점은 동기화, 이펙트 자체는 로컬 생성
             photonView.RPC(nameof(RPC_PlayItemAppearEffect), RpcTarget.All);
@@ -147,6 +152,8 @@ public class ItemSlot : MonoBehaviourPun
         slotEffectController?.PlayItemAppearEffect(anchorPoint.position);
     }
 
+
+    #region Item Usage
     /// <summary>
     /// 클릭 → 아이템 사용
     /// </summary>
@@ -174,17 +181,22 @@ public class ItemSlot : MonoBehaviourPun
 
     private void UseItem()
     {
-        if (itemSync == null)
+        if (itemSync == null || !itemSync.IsMine()) return;
+
+        if (TurnSync.CurrentTurnPlayerId != itemSync.MyNickname)
         {
-            Debug.LogWarning("[ItemSlot] ItemSync 연결 안됨");
+            Debug.LogWarning("[ItemSlot] 현재 턴이 아님 → 연출 및 사용 차단");
             return;
         }
 
         Debug.Log($"[ItemSlot] 아이템 사용 요청: {itemData.itemId}");
         slotEffectController?.PlayUseEffect(currentItem);
         itemSync.UseItemRequest(itemData.itemId);
+    }
 
-        // 슬롯 비우기 동기화
+    public void RequestClearViaRPC()
+    {
+        if (!itemSync.IsMine()) return;
         photonView.RPC(nameof(RPC_Clear), RpcTarget.All);
     }
 
@@ -196,20 +208,24 @@ public class ItemSlot : MonoBehaviourPun
 
     public void ClearSlot()
     {
+        Debug.Log($"[ItemSlot] ClearSlot 실행됨 → {itemData?.itemId}, 호출자: {photonView.Owner.NickName}");
+
         if (currentItem != null)
         {
             var view = currentItem.GetComponent<PhotonView>();
-            if (PhotonNetwork.IsConnected && view != null)
-                PhotonNetwork.Destroy(currentItem);
+            if (view != null && view.IsMine)
+                PhotonNetwork.Destroy(currentItem); // 내가 소유자 일 경우 PhotonNetwork.Destroy → 네트워크 상에서 제거
             else
-                Destroy(currentItem);
+                Destroy(currentItem); // 상대방은 그냥 로컬에서 지우는 처리
 
             currentItem = null;
         }
 
         itemData = null;
     }
+    #endregion
 
+    #region Interaction Control
     /// <summary>
     /// 슬롯 상호작용 여부 설정
     /// </summary>
@@ -221,7 +237,9 @@ public class ItemSlot : MonoBehaviourPun
             Debug.Log($"[ItemSlot] Collider {(interactable ? "활성화" : "비활성화")}");
         }
     }
+    #endregion
 
+    #region Tooltip
     private void OnHoverEnter(PointerEventData eventData)
     {
         if (!IsEmpty && itemData != null)
@@ -242,4 +260,5 @@ public class ItemSlot : MonoBehaviourPun
         // 툴팁 닫기
         Manager.UI.CloseGlobalUI(Define_LDH.GlobalUI.UI_InventoryInfo);
     }
+    #endregion
 }

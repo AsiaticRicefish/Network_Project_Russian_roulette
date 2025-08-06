@@ -25,12 +25,12 @@ public class ItemBoxManager : MonoBehaviourPun
     [Header("Connect Slot")]
     [SerializeField] private DeskUI deskUI;
 
-
-    private string ownerNickname;
-    public string OwnerNickname
+    [SerializeField] private string ownerNickname;
+    [field: SerializeField] public string OwnerNickname
     {
         get => ownerNickname;
         set => ownerNickname = value;
+        
     }
 
     public bool IsMine => OwnerNickname == PhotonNetwork.NickName;
@@ -52,6 +52,36 @@ public class ItemBoxManager : MonoBehaviourPun
     public void SetOwnerNickname(string nickname)
     {
         OwnerNickname = nickname;
+    }
+    
+    
+    [PunRPC]
+    private void RegisterItemBox(string userID)
+    {
+        Debug.Log($"[ItemBoxManager] {PhotonNetwork.LocalPlayer.NickName} 의 ItemBoxSpawnerManager에 {ownerNickname}의 ItemBoxManager를 등록합니다.");
+        
+        //desk ui init
+        var myDeskUI = DeskUIManager.Instance.GetDeskUI(ownerNickname);
+        Debug.Log(myDeskUI==null);
+        Init(myDeskUI);
+        
+        //spawn manager에 register 하기
+        ItemBoxSpawnerManager.Instance.RegisterItemBox(ownerNickname, this);
+
+        // 오직 자기 자신인 경우에만 연결
+        if (PhotonNetwork.LocalPlayer.UserId != userID) return;
+   
+        //각 플레이어의 itemsync의 myItemBox에 현재 itemBox 할당하기
+        if (Manager.PlayerManager.GetAllPlayers().TryGetValue(userID, out GamePlayer gamePlayer))
+        {
+            gamePlayer.GetComponent<ItemSync>().myItemBox = this;
+            Debug.Log($"[ItemBoxManager] myItemBox 할당 완료");
+        }
+        else
+        {
+            Debug.Log($"[ItemBoxManager] PlayerManager의 _players에서 {userID}로 된 GamePlayer를 찾을 수 없습니다.");
+            return;
+        }
     }
 
     /// <summary>
@@ -156,6 +186,7 @@ public class ItemBoxManager : MonoBehaviourPun
             .SetEase(Ease.OutBack)
             .OnComplete(() =>
             {
+                Debug.Log("RPC_DisttibuteRewards");
                 AutoPlaceToSlots(itemIds);
                 StartCoroutine(HideBoxAfterDelay());
             });
@@ -166,7 +197,9 @@ public class ItemBoxManager : MonoBehaviourPun
     /// </summary>
     private void AutoPlaceToSlots(string[] itemIds)
     {
+        Debug.Log($"[ItemBoxManager] {deskUI==null}");
         var emptySlots = deskUI.GetEmptySlots();
+        Debug.Log("emplyslot 가져오기이후 실행됨.");
         for (int i = 0; i < itemIds.Length && i < emptySlots.Count; i++)
         {
             emptySlots[i].PlaceItemById(itemIds[i]);
@@ -183,7 +216,10 @@ public class ItemBoxManager : MonoBehaviourPun
     /// </summary>
     private IEnumerator HideBoxAfterDelay()
     {
+        
+        Debug.Log("hide box after delay 호출");
         yield return new WaitForSeconds(1.5f);
+        Debug.Log("1.5초 대기 완료");
         itemBoxPrefabs.SetActive(false);
         gameObject.SetActive(false);
     }
