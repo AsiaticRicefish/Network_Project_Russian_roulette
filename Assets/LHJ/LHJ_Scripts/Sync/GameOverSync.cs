@@ -1,3 +1,4 @@
+using Managers;
 using Michsky.UI.ModernUIPack;
 using Photon.Pun;
 using System.Collections;
@@ -10,7 +11,6 @@ public class GameOverSync : MonoBehaviourPunCallbacks
     [SerializeField] private GameObject gameOverPanel;
     [SerializeField] private TextMeshProUGUI winnerText;
     [SerializeField] private TextMeshProUGUI countdownText;
-
     private bool hasShow = false;
 
     public static GameOverSync Instance;
@@ -71,10 +71,24 @@ public class GameOverSync : MonoBehaviourPunCallbacks
             yield return new WaitForSeconds(1f);
             remaining -= 1f;
         }
+
+        GunManager.Release();
+        PlayerManager.Release();
+        InGameManager.Release();
+        ItemBoxSpawnerManager.Release();
+        DeskUIManager.Release();
+        ItemSyncManager.Release();
+
         photonView.RPC("GoToLobbyScene", RpcTarget.All);
     }
     public override void OnLeftRoom()
     {
+        //if (Managers.Manager.manager == null)
+        //{
+        //    Debug.LogWarning("@Manager가 없어서 재생성 시도");
+
+        //    Managers.Manager.Initialize();
+        //}
         PhotonNetwork.LoadLevel("LHJ_TestScene");
     }
 }

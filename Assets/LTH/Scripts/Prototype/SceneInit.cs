@@ -60,7 +60,53 @@ public class SceneInit : MonoBehaviourPunCallbacks
     private void InitGame()
     {
         if(Manager.PlayerManager.GetAllPlayers().Count == 2)
+        {
+
+            if (DeskUIManager.Instance == null)
+            {
+                GameObject go = new GameObject("DeskUIManager");
+                go.AddComponent<DeskUIManager>();
+                DontDestroyOnLoad(go);
+            }
+
+            if (ItemBoxSpawnerManager.Instance == null)
+            {
+                GameObject go = new GameObject("ItemBoxSpawnerManager");
+                go.AddComponent<ItemBoxSpawnerManager>();
+                DontDestroyOnLoad(go);
+            }
+
+            if (InGameManager.Instance == null)
+            {
+                GameObject go = new GameObject("InGameManager");
+                go.AddComponent<InGameManager>();
+                DontDestroyOnLoad(go);
+            }
+
+            if (GunManager.Instance == null)
+            {
+                GameObject go = new GameObject("GunManager");
+                go.AddComponent<GunManager>();
+                DontDestroyOnLoad(go);
+            }
+
+            if (PlayerManager.Instance == null)
+            {
+                GameObject go = new GameObject("PlayerManager");
+                go.AddComponent<PlayerManager>();
+                DontDestroyOnLoad(go);
+            }
+
+            if (ItemSyncManager.Instance == null)
+            {
+                GameObject go = new GameObject("ItemSyncManager");
+                go.AddComponent<ItemSyncManager>();
+                DontDestroyOnLoad(go);
+            }
+
             InGameManager.Instance.StartGame();
+        }
+            
         // // 마스터만 게임 시작 진행
         // if (PhotonNetwork.IsMasterClient)
         // {

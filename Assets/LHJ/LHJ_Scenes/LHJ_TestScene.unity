@@ -365,6 +365,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _uiRoom: {fileID: 7638228818053424113}
   gameSceneName: LHJ_GameScene
+  cutSceneName: LDH_CutScene
+  _skipCutScene: 0
 --- !u!4 &434020709
 Transform:
   m_ObjectHideFlags: 0
