@@ -16,5 +16,5 @@ MonoBehaviour:
   itemType: 5
   displayName: Dial
   description: Change Current Bullet
-  itemPrefab: {fileID: 2854877863242993494, guid: f5d7e75d2868826498bc8a1bf2554d55,
+  itemPrefab: {fileID: 6943974060355914402, guid: 77a189d9fddd9cd44bbd5cf137c86aa3,
     type: 3}
