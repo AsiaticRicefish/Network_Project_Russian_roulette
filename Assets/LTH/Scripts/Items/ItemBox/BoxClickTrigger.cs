@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 /// <summary>
 /// 상자 클릭 시 해당 주인의 아이템 싱크에게 요청하도록 변경
@@ -18,6 +19,9 @@ public class BoxClickTrigger : MonoBehaviour
 
     private void OnMouseDown()
     {
+        if (EventSystem.current.IsPointerOverGameObject())
+            return;
+
         if (_box == null)
         {
             Debug.LogWarning("[BoxClickTrigger] ItemBoxManager 없음");
