@@ -1,6 +1,7 @@
 using Managers;
 using Michsky.UI.ModernUIPack;
 using Photon.Pun;
+using Photon.Realtime;
 using Sound;
 using System.Collections;
 using System.Collections.Generic;
@@ -104,5 +105,17 @@ public class GameOverSync : MonoBehaviourPunCallbacks
         
         Debug.Log("로비로 이동합니다.");
         SceneManager.LoadScene("Lobby");
+    }
+
+    public override void OnPlayerLeftRoom(Player otherPlayer)
+    {
+        Debug.Log($"플레이어 {otherPlayer.NickName}가 나감");
+
+        if (!InGameManager.Instance.IsGameOver)
+        {
+            //다른 플레이어가 나갔을 때, 게임 오버 상태가 아니고 게임이 진행 중이라면
+            //로컬 플레이어도 나가게 처리한다.
+            PhotonNetwork.LeaveRoom(false);
+        }
     }
 }

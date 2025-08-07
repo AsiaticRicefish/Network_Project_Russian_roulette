@@ -55,11 +55,18 @@ namespace Utils
                 "Please enter a room code before proceeding.", NotifyType.Error
             ),
             
-            [NotifyMessageType.JoinRoomError] = new MessageEntity(
+            [NotifyMessageType.JoinRoomMaxPlayerError] = new MessageEntity(
                 "Room is Full", 
                 "This room is already full. Please try another one.", 
                 NotifyType.Error
             ),
+            
+            [NotifyMessageType.JoinRoomStatusError] = new MessageEntity(
+                "Room In-Game", 
+                "This room is currently in a game. Please try joining another room.", 
+                NotifyType.Error
+            ),
+
         };
 
     }

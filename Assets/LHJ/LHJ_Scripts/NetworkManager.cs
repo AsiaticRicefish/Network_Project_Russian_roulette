@@ -260,14 +260,15 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         ExitGames.Client.Photon.Hashtable customProperties = new ExitGames.Client.Photon.Hashtable
         {
             { "roomCode", roomCode },
-            { "userRoomName", userRoomName }
+            { "userRoomName", userRoomName },
+            {"roomStatus", RoomStatus.Waiting.ToString()}
         };
         
         RoomOptions options = new RoomOptions
         {
             MaxPlayers = 2,
             CustomRoomProperties = customProperties,
-            CustomRoomPropertiesForLobby = new[] { "roomCode", "userRoomName" }
+            CustomRoomPropertiesForLobby = new[] { "roomCode", "userRoomName", "roomStatus" }
         };
         
         // 3. 방 생성 및 속성 적용
@@ -359,7 +360,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         // 3. 일치하는 방이 있는 경우 -> 플레이어 수 초과 체크
         if (matchedRoom.RoomInfo.PlayerCount >= matchedRoom.RoomInfo.MaxPlayers)
         {
-            Manager.UI.ShowNotifyModal(NotifyMessage.MessageEntities[NotifyMessageType.JoinRoomError]);
+            Manager.UI.ShowNotifyModal(NotifyMessage.MessageEntities[NotifyMessageType.JoinRoomMaxPlayerError]);
             return;
         }
         

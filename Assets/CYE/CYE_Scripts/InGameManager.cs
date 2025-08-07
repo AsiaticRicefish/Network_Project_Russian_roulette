@@ -52,6 +52,9 @@ public class InGameManager : Singleton<InGameManager>
     private int _totalRound;
     public int TotalRound { get { return _totalRound; } private set { _totalRound = value; } }
     private List<PlayerPointPair> _playerPointPair = new();
+    
+    private bool _isGameOver = false;    // 게임 오버 여부
+    public bool IsGameOver => _isGameOver;
     #endregion
 
     #region  >> Events
@@ -105,6 +108,9 @@ public class InGameManager : Singleton<InGameManager>
     public void EndGame()
     {
         Debug.Log("EndGame");
+        
+        //게임 오버 플래그 설정
+        _isGameOver = true;
 
         // TO DO: 각 플레이어의 승패를 통해 결과 저장
 
@@ -206,6 +212,9 @@ public class InGameManager : Singleton<InGameManager>
     #region >> Private Function
     private void GameInit()
     {
+        // 게임 오버 플래그 초기화
+        _isGameOver = false;
+        
         // 현재 라운드를 초기화한다.
         _currentRound = 0;
 
