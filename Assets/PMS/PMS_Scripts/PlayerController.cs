@@ -20,12 +20,12 @@ public class PlayerController : MonoBehaviourPun
     [SerializeField] private GameObject _selfDestination;
 
     private bool _isSelf = false;
-    
+
     private Vector3 _oldGunPos;
     private Vector3 _oldGunRotation;
 
     private bool _isGunAnim = false;
-
+    private int _bulletType = 0;
 
     private float moveSpeed = 5.0f;
     private float verticalLookRotation;
@@ -86,22 +86,25 @@ public class PlayerController : MonoBehaviourPun
     // }
 
 
-    public void PlayFire(bool isSelf)
+
+
+    public void PlayFire(int bulletType, bool isSelf)
     {
         if (gunCorutine == null && _isGunAnim == false)
         {
             _isGunAnim = true;
             _isSelf = isSelf;
-            GetGun(_gun.transform, (isSelf? _selfDestination.transform: _destination.transform));
+            _bulletType = bulletType;
+            GetGun(_gun.transform, (isSelf ? _selfDestination.transform : _destination.transform));
         }
     }
-    
+
 
 
     private IEnumerator GunAnimation()
     {
         _animator.SetBool("IsSelf", _isSelf);
-        
+
         _animator.SetTrigger("Shot");
 
         _gun.transform.parent = _gunPos.transform;
@@ -136,11 +139,28 @@ public class PlayerController : MonoBehaviourPun
         });
     }
 
-    private void GunImpuse()
+    private void GunImpulse()
     {
         if (photonView.IsMine)
         {
             Manager.Camera.PlayImpulse(1.0f, CinemachineImpulseDefinition.ImpulseShapes.Rumble);
+        }
+    }
+
+    private void OnGunImpuse()
+    {
+        if (!photonView.IsMine) return;
+
+        Debug.Log($"[PlayerController] 탄값 {_bulletType}");
+        if (_bulletType == 2)
+        {
+            GunImpulse();
+            Debug.Log("Live탄");
+
+        }
+        else if (_bulletType == 1)
+        {
+            Debug.Log("Blank탄");
         }
     }
 
