@@ -76,7 +76,7 @@ public class FireSync : MonoBehaviourPun
     /// <param name="playerId">photon network player nickname</param>
     /// <param name="bulletInt"></param>
     [PunRPC]
-    private void Fire(string playerId, int bulletInt)
+    private void Fire(string targetId, string playerId, int bulletInt)
     {
 
         BulletType bullet = (BulletType)bulletInt;
@@ -86,7 +86,7 @@ public class FireSync : MonoBehaviourPun
         {
             #region 타겟 찾아서 hp 감소 처리
 
-            string targetNick = GetNextTargetId(playerId); 
+            string targetNick = targetId; //GetNextTargetId(playerId); 
             if (string.IsNullOrEmpty(targetNick))
             {
                 Debug.LogError("타겟 ID를 찾을 수 없습니다.");
@@ -140,6 +140,10 @@ public class FireSync : MonoBehaviourPun
             }
             else
             {
+                // GamePlayer targetByNick = PlayerManager.Instance.FindPlayerByNickname(targetNick);
+                // photonView.RPC(nameof(InGameManager.SyncIsKeepTurn), RpcTarget.All, (shooter == targetByNick));
+                Debug.Log($"[FireSync] 발사: {playerId} / 파격: {targetNick}");
+                Manager.Game.ChangeKeepTurn(playerId == targetNick);
                 Debug.Log($"{targetNick}이 데미지를 입지 않았습니다.");
             }
 
@@ -186,7 +190,7 @@ public class FireSync : MonoBehaviourPun
     }
 
     [PunRPC]
-    public void RequestFire(string shooterId)
+    public void RequestFire(string shooterId, string targetId)
     {
         if (!PhotonNetwork.IsMasterClient)
         {
@@ -198,7 +202,7 @@ public class FireSync : MonoBehaviourPun
         Debug.Log($"[RequestFire] {shooterId} 요청에 따라 마스터가 발사 처리 → 탄: {loaded}");
 
         // 발사 처리: 마스터가 모든 클라이언트에 발사 결과 전송
-        photonView.RPC("Fire", RpcTarget.All, shooterId, (int)loaded);
+        photonView.RPC("Fire", RpcTarget.All, targetId, shooterId, (int)loaded);
     }
 
 
@@ -257,7 +261,7 @@ public class FireSync : MonoBehaviourPun
         StartCoroutine(Util_LDH.ShowBulletCamereaEffect());
     }
 
-    private string GetNextTargetId(string shooterId)
+    public string GetNextTargetId(string shooterId)
     {
         var field = typeof(InGameManager).GetField("_turnOrder", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
         var turnOrder = field?.GetValue(InGameManager.Instance) as LinkedList<string>;

@@ -26,7 +26,7 @@ public class GunController : MonoBehaviourPun
         if (TurnSync.CurrentTurnPlayerId == PhotonNetwork.LocalPlayer.NickName && !_isHold)
         {
             _isHold = true;
-            Debug.Log($"[GunController] {photonView}");
+            Debug.Log($"[GunController] {photonView} / {nameof(GunController.SyncHold)}");
             photonView.RPC(nameof(GunController.SyncHold), RpcTarget.All, true);
             Debug.Log($"[GunController] {_isHold}");
             // OnHolded?.Invoke(_isHold);
