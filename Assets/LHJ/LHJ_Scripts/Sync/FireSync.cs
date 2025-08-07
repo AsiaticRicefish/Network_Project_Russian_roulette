@@ -32,7 +32,6 @@ public class FireSync : MonoBehaviourPun
             var current = GunManager.Instance.Magazine.ToArray();
             var bullets = new List<int> { (int)GunManager.Instance.LoadedBullet };
             bullets.AddRange(Array.ConvertAll(current, b => (int)b));
-            bullets.Sort((a, b) => b.CompareTo(a));
 
             photonView.RPC("ReloadSync", RpcTarget.All, bullets.ToArray(), bullets[0]);
         }
