@@ -200,22 +200,8 @@ public class GunManager : Singleton<GunManager>
     [PunRPC]
     public void RPC_SwitchNextBullet()
     {
-        int loopCnt = 0, maxLoop = 10;
-        BulletType switchBullet = _loadedBullet;
-        while (switchBullet == _loadedBullet && loopCnt < maxLoop)
-        {
-            switchBullet = (BulletType)new System.Random().Next(0, Enum.GetValues(typeof(BulletType)).Length);
-            loopCnt++;
-        }
-
-        if (loopCnt >= maxLoop)
-        {
-            Debug.Log("다이얼 사용 실패 → 다른 탄환으로 교체 불가");
-            return;
-        }
-
-        _loadedBullet = switchBullet;
-        Debug.Log($"다이얼 사용 성공 → 현재 탄환: {_loadedBullet}");
+        _loadedBullet = (_loadedBullet == BulletType.live) ? BulletType.blank : BulletType.live;
+        Debug.Log($"다이얼 사용 → 현재 탄환: {_loadedBullet}");
     }
 
     [PunRPC]
