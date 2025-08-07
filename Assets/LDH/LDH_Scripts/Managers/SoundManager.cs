@@ -297,6 +297,8 @@ namespace Managers
         }
         private IEnumerator CoPlayLiveBulletSequence()
         {
+            PlaySfxByKey("PickUpGun");
+            yield return new WaitForSeconds(1.35f);
             PlaySfxByKey("Fire");
             yield return new WaitForSeconds(0.5f);
             PlaySfxByKey("Reload");
@@ -315,6 +317,8 @@ namespace Managers
         }
         private IEnumerator CoPlayBlankBulletSequence()
         {
+            PlaySfxByKey("PickUpGun");
+            yield return new WaitForSeconds(1.35f);
             PlaySfxByKey("Blank");
             yield return new WaitForSeconds(0.5f);
             PlaySfxByKey("Reload");

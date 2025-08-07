@@ -630,6 +630,7 @@ MonoBehaviour:
   spawnPoints:
   - {fileID: 1184892834}
   - {fileID: 1254500167}
+  virtualCameras: []
 --- !u!4 &410417250
 Transform:
   m_ObjectHideFlags: 0

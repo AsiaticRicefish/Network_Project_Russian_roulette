@@ -25,6 +25,7 @@ public class TurnSync : MonoBehaviourPun
         // 마스터클라이언트만 턴 결정하고 클라이언트한테 전달
         if (PhotonNetwork.IsMasterClient)
         {
+            Debug.Log("[TurnSync] 마스터 클라이언트가 Turn sync 를 맞추기 위해 SyncTurn rpc 보냄");
             string turnId = InGameManager.Instance.CurrentTurn;
             photonView.RPC("SyncTurn", RpcTarget.All, turnId);
         }
@@ -33,6 +34,7 @@ public class TurnSync : MonoBehaviourPun
     // 턴 종료
     private void OnTurnEnd()
     {
+        Debug.Log("On Turn End 호출, current turn player id = \"\"");
         CurrentTurnPlayerId = "";
     }
 
@@ -40,8 +42,10 @@ public class TurnSync : MonoBehaviourPun
     [PunRPC]
     private void SyncTurn(string playerId)
     {
+        Debug.Log("[TurnSync] SyncTurn rpc 호출됨");
+
         CurrentTurnPlayerId = playerId;
-        Debug.Log($"현재 턴 플레이어: {playerId}");
+        Debug.Log($"[TurnSync] 현재 턴 플레이어: {playerId}");
     }
 
     // 클라이언트에서 호출되는 턴 종료 요청 RPC

@@ -25,3 +25,5 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: 0940cc5f0bdf84060b0431b14da0e445, type: 3}
   - key: CameraChange
     clip: {fileID: 8300000, guid: 576c922c48e49412a8e82f0f576a5b0c, type: 3}
+  - key: PickUpGun
+    clip: {fileID: 8300000, guid: a797f95e435ee4c21976b5b54a353eb1, type: 3}

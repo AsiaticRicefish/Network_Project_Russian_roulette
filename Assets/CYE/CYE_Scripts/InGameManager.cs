@@ -40,7 +40,7 @@ public class InGameManager : Singleton<InGameManager>
     #endregion
 
     #region >> Constants
-    private const int MAX_ROUND = 3;
+    private const int MAX_ROUND = 1;
     #endregion
 
     #region  >> Variables
@@ -258,13 +258,13 @@ public class InGameManager : Singleton<InGameManager>
             if (item.Value.CurrentHp > 0)
             {
                 // 해당 플레이어의 WinCount(승 수)를 증가시킨다.
-                _playerPointPair.Find(x => x.PlayerId == item.Value.PlayerId).IncreaseWinCount();
+                _playerPointPair.Find(x => x.PlayerId == item.Value.PlayerId)?.IncreaseWinCount();
             }
             // hp가 0이하일 경우,
             else
             {
                 // 해당 플레이어의 LoseCount(패 수)를 증가시킨다.
-                _playerPointPair.Find(x => x.PlayerId == item.Value.PlayerId).IncreaseLoseCount();
+                _playerPointPair.Find(x => x.PlayerId == item.Value.PlayerId)?.IncreaseLoseCount();
             }
         }
     }

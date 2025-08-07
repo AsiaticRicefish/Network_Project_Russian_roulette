@@ -95,7 +95,7 @@ public class PlayerHPUI : MonoBehaviour
                 player.OnHpChanged -= UpdateHpUIForAll;
             }
         }
-        PlayerManager.Instance.OnAddPlayer -= Bind;
+        //PlayerManager.Instance.OnAddPlayer -= Bind;
     }
 
     private void UpdateHpUIForAll(int _, bool __)
@@ -122,6 +122,7 @@ public class PlayerHPUI : MonoBehaviour
                 if (!player.IsAlive && !hasShownGameOver)
                 {
                     hasShownGameOver = true;
+                    
                     ShowGameOverUI();
                 }
             }
@@ -176,6 +177,8 @@ public class PlayerHPUI : MonoBehaviour
 
     private void ShowGameOverUI()
     {
+        
+        
         string winner = FindAlivePlayerName();
         if (GameOverSync.Instance != null)
         {

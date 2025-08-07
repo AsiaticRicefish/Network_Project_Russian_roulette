@@ -24,16 +24,16 @@ namespace LDH_Animation
             }
                
         }
-        
-        //쏘는 소리
-        public void PlayFireSfx()
-        {
-            Manager.Sound.PlayFire();
-        }
-
-        public void PlayBlank()
-        {
-            Manager.Sound.PlayBlank();
-        }
+        //
+        // //쏘는 소리
+        // public void PlayFireSfx()
+        // {
+        //     Manager.Sound.PlayFire();
+        // }
+        //
+        // public void PlayBlank()
+        // {
+        //     Manager.Sound.PlayBlank();
+        // }
     }
 }

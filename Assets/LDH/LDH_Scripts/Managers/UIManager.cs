@@ -14,7 +14,17 @@ namespace Managers
     public class UIManager : DesignPattern.Singleton<UIManager>
     {
         //---- Stack 관리 ----//
-        private int _order = 10;        // UI 정렬 순서 제어용
+        [SerializeField] private int _order = 10;        // UI 정렬 순서 제어
+
+        public int order
+        {
+            get => _order;
+            set
+            {
+                Debug.Log($"canvas order value 변경 - new value : {value}");
+                _order = value;
+            }
+        }                                                // 용
         private Stack<UI_Popup> _popupStack = new();    // 팝업 UI Stack
         
         //---- 전역 UI 관리 (Global UI) ----//
@@ -129,7 +139,7 @@ namespace Managers
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
             canvas.overrideSorting = true;
 
-            canvas.sortingOrder = sort ? _order++ : 0;
+            canvas.sortingOrder = sort ? order++ : 0;
         }
 
         #endregion
@@ -162,7 +172,10 @@ namespace Managers
         {
             Type type = GetUIType(uiEnum.ToString());
             if (!_globalUIDict.TryGetValue(type, out var ui)) return null;
-
+            
+            //이미 켜져 있으면 그대로 둔다.
+            if(ui.gameObject.activeSelf) return ui;
+            
             SetCanvas(ui.gameObject);
             
             // 팝업일 경우 Stack에 등록
@@ -181,6 +194,9 @@ namespace Managers
         {
             Type type = GetUIType(uiEnum.ToString());
             if (!_globalUIDict.TryGetValue(type, out var ui)) return;
+            
+            //이미 꺼져 있으면 그대로 둔다.
+            if(!ui.gameObject.activeSelf) return;
 
             // 팝업일 경우 Stack 검사 후 Pop
             if (ui is UI_Popup popup && _popupStack.Count > 0)
@@ -194,7 +210,7 @@ namespace Managers
             }
 
             ui.gameObject.SetActive(false);
-            _order--;
+            order--;
         }
 
         #endregion
@@ -242,7 +258,7 @@ namespace Managers
             popup = null;
             
             // 정렬 순서 감소
-            _order--;
+            order--;
         }
 
         /// <summary>

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Utils;
 
 public class UI_GunController : MonoBehaviour
 {
@@ -12,6 +13,9 @@ public class UI_GunController : MonoBehaviour
     [SerializeField] private FireSync fireSync;
     [SerializeField] private TextMeshProUGUI hitMessageText;
 
+    /// <summary>
+    /// PhotonNetwork.NickName
+    /// </summary>
     private string myId;
 
     private void Start()
@@ -43,24 +47,30 @@ public class UI_GunController : MonoBehaviour
 
     private void OnFireButtonClicked()
     {
+        //중복 클릭 방지를 위해 누르자마자 interactable 차단
+        fireButton.interactable = false;
+        
+        
         if (TurnSync.CurrentTurnPlayerId != myId)
         {
             Debug.LogWarning("[FireButtonController] 내 턴이 아님 → 발사 안 됨");
             return;
         }
-
-        fireSync.photonView.RPC("Fire", RpcTarget.All, myId, (int)GunManager.Instance.LoadedBullet);
+        fireSync.photonView.RPC("RequestFire", RpcTarget.MasterClient, myId);
     }
 
     // 맞은 사람과 탄 종류에 따라 메시지 출력
     private void HandlePlayerHit(string targetId, BulletType bullet)
     {
+        //target id 파싱
+        targetId = Util_LDH.GetUserNickname(targetId);
+        
         Debug.Log($"[HandlePlayerHit] 내 클라이언트에서 호출됨 → {targetId}, {bullet}");
         if (hitMessageText == null) return;
 
         string result = bullet == BulletType.live
-            ? $"<color=red>{targetId}</color> 이(가) <b>실탄</b>에 맞았습니다!"
-            : $"<color=green>{targetId}</color> 은(는) <b>공포탄</b>이었습니다.";
+        ? "<color=red>발사된 탄환은 <b>실탄</b>입니다.</color>"
+        : "<color=green>발사된 탄환은 <b>공포탄</b>입니다.</color>";
 
         hitMessageText.text = result;
 
