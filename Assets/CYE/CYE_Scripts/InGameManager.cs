@@ -304,7 +304,7 @@ public class InGameManager : Singleton<InGameManager>
     private void OnPlayerDiedHandler(GamePlayer deadPlayer)
     {
         Debug.Log($"[InGameManager] 사망 감지: {deadPlayer.Nickname}");
-        if (CheckRoundEnd()) EndRound();
+        //if (CheckRoundEnd()) EndRound();      //end round 2번 호출되어서 하나 주석 처리
     }
     public void ChangeKeepTurn(bool isKeepTurn)
     {

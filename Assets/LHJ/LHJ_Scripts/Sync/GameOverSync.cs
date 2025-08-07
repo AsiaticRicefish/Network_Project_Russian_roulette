@@ -18,6 +18,7 @@ public class GameOverSync : MonoBehaviourPunCallbacks
     [SerializeField] private BgmPlayer bgmPlayer;
     
     private bool hasShow = false;
+    private bool isGameOver = false;
 
     public static GameOverSync Instance;
 
@@ -31,8 +32,23 @@ public class GameOverSync : MonoBehaviourPunCallbacks
     private void Start()
     {
         gameOverPanelManager = gameOverPanel.GetComponent<ModalWindowManager>();
+        InGameManager.Instance.OnGameEnd += () =>
+        {
+            GameOver(FindWinnerName());
+        };
     }
 
+
+    public string FindWinnerName()
+    {
+        foreach (var player in PlayerManager.Instance.GetAllPlayers().Values)
+        {
+            if (player.IsAlive)
+                return player.Nickname;
+        }
+        return "상대방";
+    }
+    
     /// <summary>
     /// 외부에서 승자 이름을 전달해서 모든 클라이언트에 패널 띄움
     /// </summary>
@@ -111,7 +127,7 @@ public class GameOverSync : MonoBehaviourPunCallbacks
     {
         Debug.Log($"플레이어 {otherPlayer.NickName}가 나감");
 
-        if (!InGameManager.Instance.IsGameOver)
+        if (!hasShow)
         {
             //다른 플레이어가 나갔을 때, 게임 오버 상태가 아니고 게임이 진행 중이라면
             //로컬 플레이어도 나가게 처리한다.

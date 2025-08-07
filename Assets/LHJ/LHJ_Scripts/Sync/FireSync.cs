@@ -178,7 +178,7 @@ public class FireSync : MonoBehaviourPun
     {
         Debug.Log("마스터가 턴 소진을 체크하고,  턴을 넘기기위해 request end turn을 호출합니다.");
         // 탄을 모두 소진했을 경우 마스터만 자동 장전 후 동기화
-        if (PhotonNetwork.IsMasterClient && GunManager.Instance.LoadedBullet == default && GunManager.Instance.Magazine.Count == 0)
+        if (PhotonNetwork.IsMasterClient && !InGameManager.Instance.IsGameOver && GunManager.Instance.LoadedBullet == default && GunManager.Instance.Magazine.Count == 0)
         {
             GunManager.Instance.Reload();
 

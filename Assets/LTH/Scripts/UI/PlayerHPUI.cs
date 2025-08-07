@@ -29,8 +29,6 @@ public class PlayerHPUI : MonoBehaviour
     {
         myId = PhotonNetwork.NickName;
         
-        //인게임 로직에서 게임 오버가 됐을 때 게임 오버를 보여주기 위해 이벤트 구독으로 변경
-        InGameManager.Instance.OnGameEnd += ShowGameOverUI;
     }
 
     //----- 생략----- //
