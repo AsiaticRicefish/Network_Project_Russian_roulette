@@ -13,9 +13,10 @@ GameObject:
   - component: {fileID: 4177692682925492398}
   - component: {fileID: 2254114405264707779}
   - component: {fileID: 6025383849365274383}
+  - component: {fileID: 2967812849222310520}
   m_Layer: 0
   m_Name: _Gun
-  m_TagString: Untagged
+  m_TagString: Gun
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -69,6 +70,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05c6d0f1c24db1d459c7f6630d14813d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _isHold: 0
   _targetSelectUI: {fileID: 0}
 --- !u!65 &2254114405264707779
 BoxCollider:
@@ -89,8 +91,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.035, y: 0.19, z: 1.03}
-  m_Center: {x: 0, y: -0.04, z: 0.07}
+  m_Size: {x: 0.09510411, y: 0.19, z: 1.1039057}
+  m_Center: {x: 0.0009169355, y: -0.03999999, z: 0.2240516}
 --- !u!54 &6025383849365274383
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -118,6 +120,28 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &2967812849222310520
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7156347064089585388}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 3
+  OwnershipTransfer: 0
+  observableSearch: 2
+  ObservedComponents: []
+  sceneViewId: 0
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
 --- !u!1001 &1565710549865283125
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -139,7 +163,7 @@ PrefabInstance:
     - target: {fileID: 6640086488598509582, guid: 6581219875244c34aaae5e19d6789a68,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: 0.153
       objectReference: {fileID: 0}
     - target: {fileID: 6640086488598509582, guid: 6581219875244c34aaae5e19d6789a68,
         type: 3}

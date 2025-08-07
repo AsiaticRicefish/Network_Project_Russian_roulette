@@ -1194,7 +1194,7 @@ PrefabInstance:
     - target: {fileID: -5142669447431565515, guid: bd2d7a1e76a47ef4e87bad63cfc6beef,
         type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -4687188570341475101, guid: bd2d7a1e76a47ef4e87bad63cfc6beef,
         type: 3}
@@ -1204,7 +1204,7 @@ PrefabInstance:
     - target: {fileID: 3108254760081273986, guid: bd2d7a1e76a47ef4e87bad63cfc6beef,
         type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6656097000227532582, guid: bd2d7a1e76a47ef4e87bad63cfc6beef,
         type: 3}
@@ -1266,11 +1266,6 @@ PrefabInstance:
       propertyPath: m_Avatar
       value: 
       objectReference: {fileID: 9000000, guid: a4a3ba617ed9c5946bb76844ec1ef299, type: 3}
-    - target: {fileID: 6656097000234917094, guid: bd2d7a1e76a47ef4e87bad63cfc6beef,
-        type: 3}
-      propertyPath: m_Controller
-      value: 
-      objectReference: {fileID: 9100000, guid: 27097b412102e4342be6e8be1b09a406, type: 2}
     - target: {fileID: 8212014869060516789, guid: bd2d7a1e76a47ef4e87bad63cfc6beef,
         type: 3}
       propertyPath: sceneViewId

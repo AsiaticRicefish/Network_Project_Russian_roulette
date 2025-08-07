@@ -39,9 +39,10 @@ public class PlayerController : MonoBehaviourPun
 
     private void Start()
     {
+        _gun = GameObject.FindWithTag("Gun");       //Gun 오브젝트 찾기
         _oldGunPos = _gun.transform.position;
         _oldGunRotation = _gun.transform.rotation.eulerAngles;
-
+       
         if (!_pv.IsMine)
         {
             //자기 카메라가 아니면 다 비활성화 처리
@@ -49,6 +50,7 @@ public class PlayerController : MonoBehaviourPun
             GetComponentInChildren<Camera>().gameObject.SetActive(false);
             Destroy(_rb);
         }
+        
         //  
         //  string nickname = PhotonNetwork.NickName;
         //  string playerId = photonView.Owner.UserId;
@@ -63,16 +65,26 @@ public class PlayerController : MonoBehaviourPun
     }
 
 
-    private void Update()
-    {
-        if (!_pv.IsMine) return;
+    // private void Update()
+    // {
+    //     if (!_pv.IsMine) return;
+    //
+    //     if (Input.GetKeyDown(KeyCode.Space) && gunCorutine == null && IsGunAnim == false)
+    //     {
+    //         IsGunAnim = true;
+    //         GetGun(_gun.transform, _destination.transform);
+    //     }
+    //     //PlayerLook();
+    // }
 
-        if (Input.GetKeyDown(KeyCode.Space) && gunCorutine == null && IsGunAnim == false)
+
+    public void PlayFire()
+    {
+        if (gunCorutine == null && IsGunAnim == false)
         {
             IsGunAnim = true;
             GetGun(_gun.transform, _destination.transform);
         }
-        //PlayerLook();
     }
 
     private IEnumerator GunAnimation()
@@ -99,6 +111,7 @@ public class PlayerController : MonoBehaviourPun
     private void GetGun(Transform target, Transform destination)
     {
         //Manager.Camera.PlayImpulse(1.0f);
+        target.rotation = Quaternion.identity;
         Sequence seq = DOTween.Sequence();
         seq.Append(target.DOMove(destination.position, 1.5f));
         seq.Join(target.DORotate(new Vector3(-45, 90, 0), 0.8f));
@@ -163,5 +176,18 @@ public class PlayerController : MonoBehaviourPun
         Util_LDH.GetOrAddComponent<CinemachineIndependentImpulseListener>(cam.gameObject);
 
         yield return null;
+    }
+    
+    public void OnEndAnimation()
+    {
+        if (!PhotonNetwork.IsMasterClient)
+            return;
+        StartCoroutine(DelayAndTurnEnd());
+    }
+
+    private IEnumerator DelayAndTurnEnd()
+    {
+        yield return new WaitForSeconds(0.5f);
+        FireSync.RequestEndTurn();
     }
 }

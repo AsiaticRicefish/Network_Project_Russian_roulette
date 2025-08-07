@@ -17,12 +17,12 @@ public class CameraManager : Singleton<CameraManager>
 
     private void OnEnable()
     {
-        //SceneManager.sceneLoaded += OnSceneLoaded;       
+        SceneManager.sceneLoaded += OnSceneLoaded;       
     }
     
     private void OnDisable()
     {
-        //SceneManager.sceneLoaded -= OnSceneLoaded;
+        SceneManager.sceneLoaded -= OnSceneLoaded;
     }
     
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)

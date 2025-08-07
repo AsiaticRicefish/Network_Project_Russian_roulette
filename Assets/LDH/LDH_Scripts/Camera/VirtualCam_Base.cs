@@ -13,10 +13,10 @@ namespace GameCamera
 
         protected virtual void Awake() => Init();
 
-        private void Start()
-        {
-            Manager.Camera.PushCamera(cameraID);
-        }
+        // private void Start()
+        // {
+        //     Manager.Camera.PushCamera(cameraID);
+        // }
 
         /// <summary>
         /// override시 base.Init() 호출 필요

@@ -80,10 +80,15 @@ public class GamePlayer : MonoBehaviourPun, IComparer<GamePlayer>
 
     public bool IsCuffedThisTurn = false;
 
+    private PlayerController _playerController;
+    
+    
     private void Awake()
     {
         _animator = GetComponent<Animator>();
         _pv = GetComponent<PhotonView>();
+        _playerController = GetComponent<PlayerController>();
+        
         Initialize();
     }
 
@@ -169,7 +174,7 @@ public class GamePlayer : MonoBehaviourPun, IComparer<GamePlayer>
     {
         //if (!IsAlive) return;
 
-        _pv.RPC("RPC_DecreasePlayerCurrentHp", RpcTarget.MasterClient, PlayerId, damage);
+        _pv.RPC(nameof(RPC_DecreasePlayerCurrentHp), RpcTarget.MasterClient, PlayerId, damage);
     }
     #endregion
 
@@ -274,7 +279,7 @@ public class GamePlayer : MonoBehaviourPun, IComparer<GamePlayer>
 
         int newHp = Mathf.Max(target.CurrentHp - damage, 0);
         // 결과를 모든 클라에게 전파
-        photonView.RPC("RPC_ApplyHp", RpcTarget.All, requestId, newHp);
+        photonView.RPC(nameof(RPC_ApplyHp), RpcTarget.All, requestId, newHp);
     }
 
 
@@ -313,16 +318,22 @@ public class GamePlayer : MonoBehaviourPun, IComparer<GamePlayer>
         if (hp < oldHp && PhotonNetwork.IsMasterClient)
         {
             // 해당 플레이어에게만 애니메이션 재생 지시
-            player.photonView.RPC("RPC_PlayTrigger", RpcTarget.All, "Hit");
+            player.photonView.RPC(nameof(RPC_PlayTrigger), RpcTarget.All, "Hit");
         }
     }
 
     [PunRPC]
-    void RPC_PlayTrigger(string triggerName)
-    {
+    public void RPC_PlayTrigger(string triggerName)
+    { 
         Debug.Log("[GamePlayer] --- 트리거 호출");
         Debug.Log(triggerName);
         _animator.SetTrigger(triggerName);
+    }
+
+    [PunRPC]
+    public void RPC_PlayFire()
+    {
+       _playerController.PlayFire();
     }
 
     [PunRPC]
@@ -337,16 +348,5 @@ public class GamePlayer : MonoBehaviourPun, IComparer<GamePlayer>
     }
 
 
-    public void OnEndAnimation()
-    {
-        if (!PhotonNetwork.IsMasterClient)
-            return;
-        StartCoroutine(DelayAndTurnEnd());
-    }
 
-    private IEnumerator DelayAndTurnEnd()
-    {
-        yield return new WaitForSeconds(0.5f);
-        FireSync.RequestEndTurn();
-    }
 }

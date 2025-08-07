@@ -105,6 +105,11 @@ public class FireSync : MonoBehaviourPun
             shooter._pv.RPC("RPC_PlayTrigger", RpcTarget.All, "Shot");
             
             
+            // if (Input.GetKeyDown(KeyCode.Space) && gunCorutine == null && IsGunAnim == false)
+            // {
+            //     IsGunAnim = true;
+            //     GetGun(_gun.transform, _destination.transform);
+            // }
             
             //총 발사 효과음
             photonView.RPC(nameof(RPC_PlayShotSFX), RpcTarget.All, bullet==BulletType.live);
