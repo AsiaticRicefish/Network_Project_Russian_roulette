@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using GameUI;
+using Managers;
 using UnityEngine;
 using System;
 
@@ -274,11 +275,16 @@ public class ItemSync : MonoBehaviourPun
     [PunRPC]
     private void ClearSlot(string nickname, string itemId)
     {
+        
         var deskUI = DeskUIManager.Instance.GetDeskUI(nickname);
         
         if (deskUI == null) return;
 
+        //양쪽 모두에게 사운드 들리게 하기 위해 rpc에서 효과음 재생
+        Manager.Sound.PlaySfxByKey("ItemUse");
+        
         deskUI.ClearItemSlotById(itemId);
+        
     }
 
     public void BoxOpen()

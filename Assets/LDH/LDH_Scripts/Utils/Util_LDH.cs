@@ -249,6 +249,17 @@ namespace Utils
 
             PhotonNetwork.LocalPlayer.SetCustomProperties(clearProperties);
         }
+
+
+        public static void ReleaseInGameManager()
+        {
+            GunManager.Release();
+            PlayerManager.Release();
+            InGameManager.Release();
+            ItemBoxSpawnerManager.Release();
+            DeskUIManager.Release();
+            ItemSyncManager.Release();
+        }
         #endregion
         
         
@@ -258,8 +269,8 @@ namespace Utils
             Debug.Log("PushCamera 실행");
             Manager.Camera.PushCamera("BulletDisplay");
             Manager.Sound.PlaySfxByKey("CameraChange");
-            Debug.Log("1초 대기 시작");
-            yield return new WaitForSeconds(2f);
+            Debug.Log("3초 대기 시작(전환 시간 1초, 대기 시간 2초)");
+            yield return new WaitForSeconds(3f);
             Debug.Log("PopCamera 실행");
             Manager.Camera.PopCamera();
             Manager.Sound.PlaySfxByKey("CameraChange");
