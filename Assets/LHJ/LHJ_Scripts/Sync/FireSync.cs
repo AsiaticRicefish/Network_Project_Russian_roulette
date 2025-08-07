@@ -171,20 +171,27 @@ public class FireSync : MonoBehaviourPun
             List<int> bullets = new List<int> { (int)GunManager.Instance.LoadedBullet };
             bullets.AddRange(Array.ConvertAll(current, b => (int)b));
 
-            photonView.RPC("ReloadSync", RpcTarget.All, bullets.ToArray(), bullets[0]);
+            photonView.RPC(nameof(ReloadSync), RpcTarget.All, bullets.ToArray(), bullets[0]);
             ItemBoxSpawnerManager.Instance.ShowAllBoxes();
         }
 
-        if (PhotonNetwork.IsMasterClient)
-        {
-            TurnSync turnSync = FindObjectOfType<TurnSync>(); // 직접 찾아서 호출
-            if (turnSync != null)
-                turnSync.photonView.RPC("RequestEndTurn", RpcTarget.MasterClient);
-            else
-                Debug.LogError("TurnSync를 찾을 수 없습니다.");
-        }
+       
         //=================================================//
     }
+    
+    
+    //연출 후 턴 끝내고 동기화 맞춰주기 위해 함수 분리
+    //마스터인 경우에만 이걸 호출해주면 됨
+    public static void RequestEndTurn()
+    {
+        TurnSync turnSync = FindObjectOfType<TurnSync>(); // 직접 찾아서 호출
+        if (turnSync != null)
+            turnSync.photonView.RPC("RequestEndTurn", RpcTarget.MasterClient);
+        else
+            Debug.LogError("TurnSync를 찾을 수 없습니다.");
+    }
+    
+    
 
     [PunRPC]
     public void RequestFire(string shooterId)

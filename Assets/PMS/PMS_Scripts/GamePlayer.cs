@@ -335,4 +335,18 @@ public class GamePlayer : MonoBehaviourPun, IComparer<GamePlayer>
             ui.ShowBulletInfo(type);
         }
     }
+
+
+    public void OnEndAnimation()
+    {
+        if (!PhotonNetwork.IsMasterClient)
+            return;
+        StartCoroutine(DelayAndTurnEnd());
+    }
+
+    private IEnumerator DelayAndTurnEnd()
+    {
+        yield return new WaitForSeconds(0.5f);
+        FireSync.RequestEndTurn();
+    }
 }
