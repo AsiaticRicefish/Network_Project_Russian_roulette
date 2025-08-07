@@ -254,7 +254,7 @@ public class InGameManager : Singleton<InGameManager>
     private void TurnInit()
     {
         OnTurnChange?.Invoke();
-        _photonView.RPC(nameof(InGameManager.SyncIsKeepTurn), RpcTarget.All, false);
+        _photonView.RPC(nameof(SyncIsKeepTurn), RpcTarget.All, false);
     }
 
     private bool CheckRoundEnd()
@@ -309,7 +309,7 @@ public class InGameManager : Singleton<InGameManager>
     public void ChangeKeepTurn(bool isKeepTurn)
     {
         Debug.Log($"[InGameManager] 턴 유지 여부 동기화: {isKeepTurn}");
-        _photonView.RPC(nameof(InGameManager.SyncIsKeepTurn), RpcTarget.All, isKeepTurn);
+        _photonView.RPC(nameof(SyncIsKeepTurn), RpcTarget.All, isKeepTurn);
     }
     [PunRPC]
     public void SyncIsKeepTurn(bool isKeepTurn)

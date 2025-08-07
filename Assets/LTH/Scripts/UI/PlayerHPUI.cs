@@ -28,6 +28,9 @@ public class PlayerHPUI : MonoBehaviour
     private void Start()
     {
         myId = PhotonNetwork.NickName;
+        
+        //인게임 로직에서 게임 오버가 됐을 때 게임 오버를 보여주기 위해 이벤트 구독으로 변경
+        InGameManager.Instance.OnGameEnd += ShowGameOverUI;
     }
 
     //----- 생략----- //
@@ -122,8 +125,7 @@ public class PlayerHPUI : MonoBehaviour
                 if (!player.IsAlive && !hasShownGameOver)
                 {
                     hasShownGameOver = true;
-                    
-                    ShowGameOverUI();
+                   // ShowGameOverUI();         //인게임 로직에서 게임 오버가 됐을 때 게임 오버를 보여주기 위해 이벤트 구독으로 변경
                 }
             }
             else
@@ -141,7 +143,7 @@ public class PlayerHPUI : MonoBehaviour
                 if (pair.Key != myId && !pair.Value.IsAlive)
                 {
                     hasShownGameOver = true;
-                    ShowGameOverUI();
+                    // ShowGameOverUI();        //인게임 로직에서 게임 오버가 됐을 때 게임 오버를 보여주기 위해 이벤트 구독으로 변경
                     break;
                 }
             }
@@ -177,8 +179,6 @@ public class PlayerHPUI : MonoBehaviour
 
     private void ShowGameOverUI()
     {
-        
-        
         string winner = FindAlivePlayerName();
         if (GameOverSync.Instance != null)
         {

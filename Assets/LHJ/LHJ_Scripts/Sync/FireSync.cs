@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 using Utils;
 
 public class FireSync : MonoBehaviourPun
@@ -167,9 +168,15 @@ public class FireSync : MonoBehaviourPun
         }
         GunManager.Instance.SetLoadedBullet(next);
         Debug.Log($"장전된 탄: {GunManager.Instance.LoadedBullet}, 남은 탄 수: {GunManager.Instance.Magazine.Count}");
-
         
-        //===================== 마스터만 실행 ======================== //
+    }
+    
+    
+    //연출 후에 총 재장전될지 체크, 턴 넘기기 위해 함수 분리
+    //마스터인 경우에만 이걸 호출해주면 됨
+    public void RequestEndTurn()
+    {
+        Debug.Log("마스터가 턴 소진을 체크하고,  턴을 넘기기위해 request end turn을 호출합니다.");
         // 탄을 모두 소진했을 경우 마스터만 자동 장전 후 동기화
         if (PhotonNetwork.IsMasterClient && GunManager.Instance.LoadedBullet == default && GunManager.Instance.Magazine.Count == 0)
         {
@@ -183,15 +190,7 @@ public class FireSync : MonoBehaviourPun
             ItemBoxSpawnerManager.Instance.ShowAllBoxes();
         }
 
-       
-        //=================================================//
-    }
     
-    
-    //연출 후 턴 끝내고 동기화 맞춰주기 위해 함수 분리
-    //마스터인 경우에만 이걸 호출해주면 됨
-    public static void RequestEndTurn()
-    {
         TurnSync turnSync = FindObjectOfType<TurnSync>(); // 직접 찾아서 호출
         if (turnSync != null)
             turnSync.photonView.RPC("RequestEndTurn", RpcTarget.MasterClient);

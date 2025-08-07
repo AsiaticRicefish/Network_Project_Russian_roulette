@@ -21,8 +21,9 @@ public class PlayerController : MonoBehaviourPun
     private Vector3 _oldGunPos;
     private Vector3 _oldGunRotation;
 
-    private bool IsGunAnim = false;
-
+    private bool _isGunAnim = false;
+    
+    
     private float moveSpeed = 5.0f;
     private float verticalLookRotation;
 
@@ -30,6 +31,8 @@ public class PlayerController : MonoBehaviourPun
     private Rigidbody _rb;
 
     private IEnumerator gunCorutine;
+
+    private FireSync _fireSync;
 
     private void Awake()
     {
@@ -42,6 +45,8 @@ public class PlayerController : MonoBehaviourPun
         _gun = GameObject.FindWithTag("Gun");       //Gun 오브젝트 찾기
         _oldGunPos = _gun.transform.position;
         _oldGunRotation = _gun.transform.rotation.eulerAngles;
+
+        _fireSync = FindObjectOfType<FireSync>();
        
         if (!_pv.IsMine)
         {
@@ -80,9 +85,9 @@ public class PlayerController : MonoBehaviourPun
 
     public void PlayFire()
     {
-        if (gunCorutine == null && IsGunAnim == false)
+        if (gunCorutine == null && _isGunAnim == false)
         {
-            IsGunAnim = true;
+            _isGunAnim = true;
             GetGun(_gun.transform, _destination.transform);
         }
     }
@@ -105,7 +110,7 @@ public class PlayerController : MonoBehaviourPun
         _gun.transform.rotation = Quaternion.LookRotation(_oldGunRotation);//_oldGunRotation;
 
         gunCorutine = null;
-        IsGunAnim = false;
+        _isGunAnim = false;
     }
 
     private void GetGun(Transform target, Transform destination)
@@ -158,6 +163,9 @@ public class PlayerController : MonoBehaviourPun
         }
     }
 
+
+    #region Setting
+
     //가상 카메라 및 시네머신 브레인 설정, 초기화
     public IEnumerator InitCameraSetting()
     {
@@ -165,6 +173,7 @@ public class PlayerController : MonoBehaviourPun
         //카메라 매니저에 stack에 push
         CinemachineVirtualCamera vcam = GetComponentInChildren<CinemachineVirtualCamera>();
         var playerVCam = Util_LDH.GetOrAddComponent<VirtualCam_LocalPlayer>(vcam.gameObject);
+        Util_LDH.GetOrAddComponent<CinemachineImpulseSource>(vcam.gameObject);
         Manager.Camera.PushCamera(playerVCam.cameraID);
 
         Camera cam = GetComponentInChildren<Camera>();
@@ -177,7 +186,12 @@ public class PlayerController : MonoBehaviourPun
 
         yield return null;
     }
-    
+
+    #endregion
+
+
+    #region Sync
+
     public void OnEndAnimation()
     {
         if (!PhotonNetwork.IsMasterClient)
@@ -187,7 +201,11 @@ public class PlayerController : MonoBehaviourPun
 
     private IEnumerator DelayAndTurnEnd()
     {
+        Debug.Log("애니메이션 종료 후 0.5초 대기를 시작합니다.(마스터 매니저만 호출합니다.)");
         yield return new WaitForSeconds(0.5f);
-        FireSync.RequestEndTurn();
+        _fireSync?.RequestEndTurn();
     }
+
+    #endregion
+   
 }
