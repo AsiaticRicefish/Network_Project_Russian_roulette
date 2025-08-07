@@ -96,9 +96,9 @@ public class PlayerController : MonoBehaviourPun
         IsGunAnim = false;
     }
 
-    //StartCorutine
     private void GetGun(Transform target, Transform destination)
     {
+        //Manager.Camera.PlayImpulse(1.0f);
         Sequence seq = DOTween.Sequence();
         seq.Append(target.DOMove(destination.position, 1.5f));
         seq.Join(target.DORotate(new Vector3(-45, 90, 0), 0.8f));
@@ -108,6 +108,11 @@ public class PlayerController : MonoBehaviourPun
             gunCorutine = GunAnimation();
             StartCoroutine(GunAnimation());
         });
+    }
+
+    private void GunImpuse()
+    {
+        Manager.Camera.PlayImpulse(1.0f);
     }
 
     //시점 변경 테스트코드
