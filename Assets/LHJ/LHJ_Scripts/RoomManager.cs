@@ -62,6 +62,13 @@ public class RoomManager : MonoBehaviour
         // if (PhotonNetwork.IsMasterClient && AllPlayerReadyCheck()) 
         // -> 마스터 클라이언트에게만 Game Start 기능 부여 & 버튼 활성화에서 Ready Check를 진행하는 로직으로 변경함에 따라 주석 처리
         
+        //room status 변경
+        ExitGames.Client.Photon.Hashtable newProperties = new ExitGames.Client.Photon.Hashtable
+        {
+            { "roomStatus", Define_LDH.RoomStatus.Playing.ToString() }
+        };
+        PhotonNetwork.CurrentRoom.SetCustomProperties(newProperties);
+        
         if(_skipCutScene)
             PhotonNetwork.LoadLevel(gameSceneName);
         else

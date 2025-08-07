@@ -17,6 +17,7 @@ public class RoomList : MonoBehaviour
 {
     [Header("UI Components")]
     [SerializeField] private TextMeshProUGUI roomNameText;
+    [SerializeField] private TextMeshProUGUI roomStatusText;
     [SerializeField] private TextMeshProUGUI playerCountText;
     // [SerializeField] private TextMeshProUGUI statusText;
     [SerializeField] private Button roomListButton;
@@ -56,9 +57,11 @@ public class RoomList : MonoBehaviour
         _roomName = _info.Name;
         _userRoomName = info.CustomProperties["userRoomName"] as string;
         _roomCode = info.CustomProperties["roomCode"] as string;
+        info.CustomProperties.TryGetValue("roomStatus", out var value);
         
         //------ ui 초기화 -----//
         roomNameText.text = $"{_userRoomName}";
+        roomStatusText.text = value?.ToString().Trim();
         playerCountText.text = $"{info.PlayerCount} / {info.MaxPlayers}";
         // statusText.text = "Waiting"; //todo: status Text (상태값을 동적으로 표시하기 위해서 커스텀 프로퍼티 추가해야 함)
         
@@ -84,8 +87,19 @@ public class RoomList : MonoBehaviour
         {
             if (_info.PlayerCount >= _info.MaxPlayers)
             {
-                Manager.UI.ShowNotifyModal(NotifyMessage.MessageEntities[Define_LDH.NotifyMessageType.JoinRoomError]);
+                //max 플레이어인 경우
+                Manager.UI.ShowNotifyModal(NotifyMessage.MessageEntities[Define_LDH.NotifyMessageType.JoinRoomMaxPlayerError]);
                 return;
+            }
+            if (_info.CustomProperties.TryGetValue("roomStatus", out var statusValue) && (statusValue!= null))
+            {
+                if (Enum.TryParse(statusValue.ToString(), out Define_LDH.RoomStatus status) &&
+                    status == Define_LDH.RoomStatus.Playing)
+                {
+                    //게임이 진행 중인 경우
+                    Manager.UI.ShowNotifyModal(NotifyMessage.MessageEntities[Define_LDH.NotifyMessageType.JoinRoomStatusError]);
+                    return;
+                }
             }
             
             PhotonNetwork.JoinRoom(_roomName);

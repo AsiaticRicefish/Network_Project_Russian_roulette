@@ -53,10 +53,15 @@ namespace Utils
             RoomCodeError,
             RoomCodeEmpty,
             RoomCodeSuccess,
-            JoinRoomError,
+            JoinRoomMaxPlayerError,
+            JoinRoomStatusError,
             
-            
-            
+        }
+        
+        public enum RoomStatus
+        {
+            Waiting,
+            Playing
         }
     }
 }

@@ -66,7 +66,7 @@ MonoBehaviour:
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 0.30588236}
   m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_RaycastPadding: {x: -0.01, y: -0.01, z: -0.01, w: -0.01}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -208,14 +208,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e27dde6bdf6b4f04cafe9f65fdba4d1d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  slotTransform: {fileID: 8723189457005248799}
-  canvasGroup: {fileID: 6629579939108061149, guid: 3342e1cb6fa8e9442b3c86efbae95e26,
-    type: 3}
   useEffectPrefab: {fileID: 6799395908933409621, guid: d3e1db27f1ad50644ac27375703c0003,
     type: 3}
   itemAppearEffectPrefab: {fileID: 7664432295443010884, guid: 91cdc1f43b459c446b76e5dfb22f7902,
     type: 3}
-  appearMoveHeight: 0.3
-  appearDuration: 0.4
-  shakeDuration: 0.2
-  shakeStrength: 8

@@ -61,9 +61,6 @@ public class BulletDisplayer : MonoBehaviour
         List<BulletType> allBullets = new() { GunManager.Instance.LoadedBullet };
         allBullets.AddRange(GunManager.Instance.Magazine);
 
-        // 실탄 → 공포탄 순으로 정렬
-        // allBullets.Sort((a, b) => ((int)b).CompareTo((int)a));
-
         int[] serialized = allBullets.ConvertAll(b => (int)b).ToArray();
         pv.RPC(nameof(RPC_ReceiveBulletInfo), RpcTarget.All, serialized);
     }
@@ -84,23 +81,29 @@ public class BulletDisplayer : MonoBehaviour
     {
         ClearBullets();
 
-        float startX = -(syncedBullets.Count - 1) * spacing / 2f;
-        int liveCount = 0, blankCount = 0;
+        int liveCount = syncedBullets.Count(b => b == BulletType.live);
+        int blankCount = syncedBullets.Count(b => b == BulletType.blank);
 
-        for (int i = 0; i < syncedBullets.Count; i++)
+        float totalCount = liveCount + blankCount;
+        float startX = -(totalCount - 1) * spacing / 2f;
+        int index = 0;
+
+        // 실탄을 먼저 배치 
+
+        for (int i = 0; i < liveCount; i++, index++)
         {
-            BulletType type = syncedBullets[i];
-            GameObject prefab = (type == BulletType.live) ? liveBulletPrefab : blankBulletPrefab;
-            if (type == BulletType.live) liveCount++;
-            else if (type == BulletType.blank) blankCount++;
-
-            Vector3 position = anchorPoint.position + anchorPoint.right * (startX + i * spacing) + offset;
-            Quaternion rotation = anchorPoint.rotation;
-
-            GameObject bullet = Instantiate(prefab, position, rotation, anchorPoint);
+            Vector3 position = anchorPoint.position + anchorPoint.right * (startX + index * spacing) + offset;
+            GameObject bullet = Instantiate(liveBulletPrefab, position, anchorPoint.rotation, anchorPoint);
             spawnedBullets.Add(bullet);
         }
-        Debug.Log("[DisplayBullets] 표시할 탄 배열: " + string.Join(", ", syncedBullets.Select(b => b.ToString())));
+
+        // 공포탄 배치
+        for (int i = 0; i < blankCount; i++, index++)
+        {
+            Vector3 position = anchorPoint.position + anchorPoint.right * (startX + index * spacing) + offset;
+            GameObject bullet = Instantiate(blankBulletPrefab, position, anchorPoint.rotation, anchorPoint);
+            spawnedBullets.Add(bullet);
+        } 
 
         if (bulletInfoPanel != null && bulletCountText != null)
         {
