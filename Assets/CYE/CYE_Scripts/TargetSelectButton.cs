@@ -8,9 +8,10 @@ using UnityEngine.UI;
 public class TargetSelectButton : MonoBehaviourPun
 {
     public string _targetId;
+    private PhotonView _photonView;
     private void Awake()
     {
-
+        _photonView = GetComponentInParent<PhotonView>();
     }
 
     public void SetTargetId(string targetId, string targetNickname)
@@ -20,10 +21,10 @@ public class TargetSelectButton : MonoBehaviourPun
     }
     public void FireToTarget()
     {
-        // Managers.Manager.Gun.Fire(_targetId);
         Debug.Log($"[GunController] {_targetId}");
-        photonView.RPC("Fire", RpcTarget.All, _targetId, (int)GunManager.Instance.LoadedBullet);
         transform.parent.gameObject.SetActive(false);
-        photonView.RPC("SyncHold", RpcTarget.All, false);
+        photonView.RPC(nameof(GunController.SyncHold), RpcTarget.All, false);
+        // Managers.Manager.Gun.Fire(_targetId);
+        photonView.RPC(nameof(FireSync.RequestFire), RpcTarget.All, _targetId);
     }
 }
