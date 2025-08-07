@@ -331,9 +331,9 @@ public class GamePlayer : MonoBehaviourPun, IComparer<GamePlayer>
     }
 
     [PunRPC]
-    public void RPC_PlayFire()
+    public void RPC_PlayFire(int value)
     {
-       _playerController.PlayFire();
+       _playerController.PlayFire(value);
     }
 
     [PunRPC]

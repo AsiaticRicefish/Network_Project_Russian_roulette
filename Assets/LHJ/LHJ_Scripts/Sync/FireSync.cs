@@ -103,7 +103,7 @@ public class FireSync : MonoBehaviourPun
             }
             
             //shooter 애니메이션 실행 (RPC로 모든 클라이언트에서 실행되도록 함) - 마스터만 호출하기 때문에 rpc 중복 호출 x
-            shooter._pv.RPC("RPC_PlayFire", RpcTarget.All,null);           
+            shooter._pv.RPC("RPC_PlayFire", RpcTarget.All,bulletInt);           
             
             
             // if (Input.GetKeyDown(KeyCode.Space) && gunCorutine == null && IsGunAnim == false)
