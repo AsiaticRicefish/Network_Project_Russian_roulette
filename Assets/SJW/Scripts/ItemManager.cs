@@ -19,8 +19,6 @@ public class ItemManager : Singleton<ItemManager>
             return;
         }
         
-        //사운드 재생
-        Manager.Sound.PlaySfxByKey("ItemUse");
         
         ApplyEffect(item.itemType, user, target);
         SetItemUsed(item);
