@@ -141,7 +141,7 @@ public class GamePlayer : MonoBehaviourPun, IComparer<GamePlayer>
     //프로퍼티 사용해서 이벤트 호출하게 해야함 - UI를 위해서
     public void Initialize()
     {
-        MaxHp = 3;
+        MaxHp = 5;
         CurrentHp = MaxHp;
         IsAlive = true;
     }
