@@ -284,7 +284,7 @@ namespace Managers
         #endregion
 
 
-        #region SFX Utility (sfx 효과 묶어서 재생하는거 미리 만들어둔 영역 : 예를 들어 총 발사 후에 장전하고 탄피 떨어지는 소리까지 한방에 묶어서 타이밍 맞추서 만들어두고 이거 한번호출로 실해오디게_)
+        #region SFX Utility
 
         
         /// <summary>

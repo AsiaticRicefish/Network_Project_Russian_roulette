@@ -115,8 +115,8 @@ public class FireSync : MonoBehaviourPun
             //     GetGun(_gun.transform, _destination.transform);
             // }
 
-            //총 발사 효과음
-            photonView.RPC(nameof(RPC_PlayShotSFX), RpcTarget.All, bullet == BulletType.live);
+            // //총 발사 효과음 -> 애니메이션으로 이동
+            // photonView.RPC(nameof(RPC_PlayShotSFX), RpcTarget.All, bullet == BulletType.live);
 
             if (bullet == BulletType.live)
             {
@@ -308,16 +308,12 @@ public class FireSync : MonoBehaviourPun
     }
 
 
-
-
-    [PunRPC]
-    public void RPC_PlayShotSFX(bool isLiveBullet)
-    {
-        Debug.Log($"sfx : 실탄인지? {isLiveBullet}");
-        if (isLiveBullet)
-            Manager.Sound.PlayFire();
-        else
-            Manager.Sound.PlayBlank();
-    }
+    //
+    //
+    // [PunRPC]
+    // public void RPC_PlayPickUpGunSFX()
+    // {
+    //    Manager.Sound.PlaySfxByKey("PickUpGun");
+    // }
 
 }

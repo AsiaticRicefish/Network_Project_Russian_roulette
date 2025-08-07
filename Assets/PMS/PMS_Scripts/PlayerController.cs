@@ -7,6 +7,7 @@ using UnityEngine;
 using Photon.Pun;
 using Utils;
 using DG.Tweening;
+using Photon.Realtime;
 
 public class PlayerController : MonoBehaviourPun
 {
@@ -16,8 +17,8 @@ public class PlayerController : MonoBehaviourPun
 
     [SerializeField] private GameObject _gun;
     [SerializeField] private GameObject _gunPos;
+    [SerializeField] private GameObject _selfGunPos;
     [SerializeField] private GameObject _destination;
-    [SerializeField] private GameObject _selfDestination;
 
     private bool _isSelf = false;
 
@@ -45,7 +46,7 @@ public class PlayerController : MonoBehaviourPun
 
     private void Start()
     {
-        _gun = GameObject.FindWithTag("Gun");       //Gun 오브젝트 찾기
+        _gun = GameObject.FindWithTag("Gun"); //Gun 오브젝트 찾기
         _oldGunPos = _gun.transform.position;
         _oldGunRotation = _gun.transform.rotation.eulerAngles;
 
@@ -86,8 +87,6 @@ public class PlayerController : MonoBehaviourPun
     // }
 
 
-
-
     public void PlayFire(int bulletType, bool isSelf)
     {
         if (gunCorutine == null && _isGunAnim == false)
@@ -95,10 +94,9 @@ public class PlayerController : MonoBehaviourPun
             _isGunAnim = true;
             _isSelf = isSelf;
             _bulletType = bulletType;
-            GetGun(_gun.transform, (isSelf ? _selfDestination.transform : _destination.transform));
+            GetGun(_gun.transform, _destination.transform);
         }
     }
-
 
 
     private IEnumerator GunAnimation()
@@ -107,18 +105,21 @@ public class PlayerController : MonoBehaviourPun
 
         _animator.SetTrigger("Shot");
 
-        _gun.transform.parent = _gunPos.transform;
+        _gun.transform.parent = _isSelf ? _selfGunPos.transform : _gunPos.transform;
+        ;
         _gun.transform.position = transform.position;
 
         _gun.transform.localPosition = new Vector3(0, 0, 0);
         _gun.transform.localRotation = Quaternion.Euler(0, 0, 0);
 
-        yield return new WaitForSeconds(2.3f);// new WaitUntil(() => !_animator.GetCurrentAnimatorStateInfo(1).IsName("GunPlay"));
+        yield return
+            new WaitForSeconds(
+                2.3f); // new WaitUntil(() => !_animator.GetCurrentAnimatorStateInfo(1).IsName("GunPlay"));
 
         _gun.transform.parent = null;
 
         _gun.transform.position = _oldGunPos;
-        _gun.transform.rotation = Quaternion.LookRotation(_oldGunRotation);//_oldGunRotation;
+        _gun.transform.rotation = Quaternion.LookRotation(_oldGunRotation); //_oldGunRotation;
 
         gunCorutine = null;
         _isGunAnim = false;
@@ -156,7 +157,6 @@ public class PlayerController : MonoBehaviourPun
         {
             GunImpulse();
             Debug.Log("Live탄");
-
         }
         else if (_bulletType == 1)
         {
@@ -216,8 +216,8 @@ public class PlayerController : MonoBehaviourPun
 
         Util_LDH.GetOrAddComponent<CinemachineBrain>(cam.gameObject);
         var impluseListener = Util_LDH.GetOrAddComponent<CinemachineIndependentImpulseListener>(cam.gameObject);
-        impluseListener.m_ChannelMask = ~0;     //모든 채널 활성화
-        impluseListener.m_Gain = 1f;            //gain 1로 설정
+        impluseListener.m_ChannelMask = ~0; //모든 채널 활성화
+        impluseListener.m_Gain = 1f; //gain 1로 설정
 
 
         yield return null;
@@ -230,6 +230,7 @@ public class PlayerController : MonoBehaviourPun
 
     public void OnEndAnimation()
     {
+        Debug.Log("asdfasfasfasfdf");
         if (!PhotonNetwork.IsMasterClient)
             return;
         StartCoroutine(DelayAndTurnEnd());
@@ -244,4 +245,43 @@ public class PlayerController : MonoBehaviourPun
 
     #endregion
 
+    #region Souund
+
+    // public void PlayShotSFX()
+    // {
+    //     if (_bulletType == (int)BulletType.live)
+    //         Manager.Sound.PlayFire();
+    //     else
+    //         Manager.Sound.PlayBlank();
+    // }
+
+    public void PlayPickUpGunSFX()
+    {
+        Manager.Sound.PlaySfxByKey("PickUpGun");
+    }
+
+    public void PlayReloadSFX()
+    {
+        Manager.Sound.PlaySfxByKey("Reload");
+    }
+
+    public void PlayDropBulletSFX()
+    {
+        Manager.Sound.PlaySfxByKey("DropBullet");
+    }
+
+    public void PlayShotSFX()
+    {
+        if(_bulletType == (int)BulletType.live)
+            Manager.Sound.PlaySfxByKey("Fire");
+        else
+            Manager.Sound.PlaySfxByKey("Blank");
+    }
+
+    // public void PlayBlankSFX()
+    // {
+    //     Manager.Sound.PlaySfxByKey("Blank");
+    // }
+
+    #endregion
 }
