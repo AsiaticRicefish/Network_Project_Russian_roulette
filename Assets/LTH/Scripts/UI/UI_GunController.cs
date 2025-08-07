@@ -18,6 +18,8 @@ public class UI_GunController : MonoBehaviour
     /// </summary>
     private string myId;
 
+    private bool isFiring = false; // 발사 중인지 여부
+
     private void Start()
     {
         myId = PhotonNetwork.NickName;
@@ -41,22 +43,30 @@ public class UI_GunController : MonoBehaviour
 
     private void Update()
     {
-        // 내 턴일 때만 버튼 활성화
-        fireButton.interactable = (TurnSync.CurrentTurnPlayerId == myId);
+        // 발사 중이 아닐 때만 버튼 활성화
+        fireButton.interactable = !isFiring && TurnSync.CurrentTurnPlayerId == myId;
     }
 
     private void OnFireButtonClicked()
     {
-        //중복 클릭 방지를 위해 누르자마자 interactable 차단
-        fireButton.interactable = false;
-        
-        
+        if (isFiring)
+        {
+            Debug.LogWarning("[FireButtonController] 이미 발사 처리 중 → 무시");
+            return;
+        }
+
         if (TurnSync.CurrentTurnPlayerId != myId)
         {
             Debug.LogWarning("[FireButtonController] 내 턴이 아님 → 발사 안 됨");
             return;
         }
-        fireSync.photonView.RPC("RequestFire", RpcTarget.MasterClient, myId);
+
+        isFiring = true;
+
+        //중복 클릭 방지를 위해 누르자마자 interactable 차단
+        fireButton.interactable = false;
+        
+        fireSync.photonView.RPC("RequestFire", RpcTarget.MasterClient, myId, fireSync.GetNextTargetId(myId));
     }
 
     // 맞은 사람과 탄 종류에 따라 메시지 출력
@@ -66,6 +76,10 @@ public class UI_GunController : MonoBehaviour
         targetId = Util_LDH.GetUserNickname(targetId);
         
         Debug.Log($"[HandlePlayerHit] 내 클라이언트에서 호출됨 → {targetId}, {bullet}");
+
+        // 발사 완료 처리
+        isFiring = false;
+
         if (hitMessageText == null) return;
 
         string result = bullet == BulletType.live
