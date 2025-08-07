@@ -225,14 +225,4 @@ public class GunManager : Singleton<GunManager>
         Debug.Log($"[동기화] isEnhanced = {value}");
     }
 
-
-    [PunRPC]
-    public void RPC_PlayShotSFX(bool isLiveBullet)
-    {
-        if(isLiveBullet)
-            Manager.Sound.PlayFire();
-        else
-            Manager.Sound.PlayBlank();
-    }
-
 }

@@ -34,6 +34,7 @@ public class TurnSync : MonoBehaviourPun
     // 턴 종료
     private void OnTurnEnd()
     {
+        Debug.Log("On Turn End 호출, current turn player id = \"\"");
         CurrentTurnPlayerId = "";
     }
 

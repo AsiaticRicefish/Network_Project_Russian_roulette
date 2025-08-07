@@ -396,6 +396,19 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     // /// </summary>
     public override void OnJoinedRoom()
     {
+        Debug.Log($"[NetworkManager] {PhotonNetwork.PlayerList.Length} 명 있음");
+
+        if (PhotonNetwork.LocalPlayer.CustomProperties.TryGetValue("Ready", out object isready))
+        {
+            Debug.Log($"방 들어오자마자 isready 커스텀 프로퍼티 존재 하면 -> {(bool)isready}");
+         
+        }
+        else
+        {
+            Debug.Log($"방 들어오자마자 isready 커스텀 프로퍼티 존재 하지 않음");
+        }
+     
+        
         
         lobbyPanel.SetActive(false);
         roomPanel.SetActive(true);
