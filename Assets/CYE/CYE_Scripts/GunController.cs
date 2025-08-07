@@ -20,6 +20,10 @@ public class GunController : MonoBehaviourPun
     {
         _animator = GetComponent<Animator>();
         _photonview = GetComponent<PhotonView>();
+        
+        var targetUI = FindObjectOfType<TargetSelectUI>(false);
+        targetUI.SetGunController(this);
+        _targetSelectUI = targetUI.gameObject;
     }
     void OnMouseDown()
     {
@@ -39,5 +43,13 @@ public class GunController : MonoBehaviourPun
     {
         _isHold = isHold;
         Debug.Log($"[GunController] {_isHold}");
+    }
+
+    [PunRPC]
+    public void SetTargetSelectUI(GameObject targetUI)
+    {
+        if(!PhotonNetwork.IsMasterClient) return;
+        Debug.Log("[Gun Controller] targetSelectUI 동적으로 할당");
+        _targetSelectUI = targetUI;
     }
 }

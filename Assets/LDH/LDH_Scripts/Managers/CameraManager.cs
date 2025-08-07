@@ -183,7 +183,7 @@ public class CameraManager : Singleton<CameraManager>
     /// 현재 스택 최상단 카메라의 ImpulseSource에 흔들림 효과를 줌
     /// </summary>
     /// <param name="force">세기 (기본값 1f)</param>
-    public void PlayImpulse(float force = 1f)
+    public void PlayImpulse(float force = 1f, CinemachineImpulseDefinition.ImpulseShapes impulseShapes = CinemachineImpulseDefinition.ImpulseShapes.Bump)
     {
         Debug.Log("[CameraManager] PlayImpulse() 호출됨");
 
@@ -207,6 +207,9 @@ public class CameraManager : Singleton<CameraManager>
             Debug.LogWarning($"[CameraManager] PlayImpulse() → {camId}에 ImpulseSource 없음");
             return;
         }
+        
+        Debug.Log("[CameraManager] Impulse Shape 적용");
+        impulse.m_ImpulseDefinition.m_ImpulseShape = impulseShapes;
 
         impulse.GenerateImpulseWithForce(force);
         Debug.Log($"[CameraManager] PlayImpulse() → {camId}에 force {force}로 Impulse 발생");

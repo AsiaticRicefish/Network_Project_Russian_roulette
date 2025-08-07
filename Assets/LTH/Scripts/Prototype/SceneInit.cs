@@ -15,12 +15,20 @@ using Hashtable = ExitGames.Client.Photon.Hashtable;
 
 public class SceneInit : MonoBehaviourPunCallbacks
 {
+    [Header("Prefab Name")]
     [SerializeField] private string playerPrefabName;
-
+    [SerializeField] private string gunPrefabName;
+    
+    [Header("Position")]
     [SerializeField] private Transform[] spawnPoints;
     [SerializeField] private CinemachineVirtualCamera[] virtualCameras;
+    [SerializeField] private Transform gunSpawnPoint;
 
+    [Header("UI")] [SerializeField]
+    private GameObject _targetUI;
 
+    
+    
     private void Awake()
     {
         SceneManager.sceneLoaded += OnEnterScene;
@@ -61,7 +69,14 @@ public class SceneInit : MonoBehaviourPunCallbacks
         {
             // Manager.Camera.PushCamera("Player");
             if (PhotonNetwork.IsMasterClient)
+            {
+                // //총을 생성하기
+                // var gun = PhotonNetwork.Instantiate(gunPrefabName, gunSpawnPoint.position, Quaternion.identity).GetComponent<GunController>();
+                //
+                // gun.photonView.RPC("SetTargetSelectUI", RpcTarget.All, _targetUI);
                 InGameManager.Instance.StartGame();
+            }
+               
         }
 
         // // 마스터만 게임 시작 진행
@@ -143,9 +158,18 @@ public class SceneInit : MonoBehaviourPunCallbacks
         }
     }
 
+    private void SpawnGun()
+    {
+        //총을 생성하기
+        var gun = PhotonNetwork.Instantiate(gunPrefabName, gunSpawnPoint.position, Quaternion.identity).GetComponent<GunController>();
+    }
+    
 
     private void OnEnterScene(Scene scene, LoadSceneMode mode)
     {
+        if(PhotonNetwork.IsMasterClient)
+            SpawnGun();
+        
         //자기 자신의 isInGameScene 프로퍼티 초기화
         Hashtable playerProperty = new Hashtable { { "IsInGameScene", true } };
 

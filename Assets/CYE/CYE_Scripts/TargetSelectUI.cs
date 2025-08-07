@@ -15,6 +15,12 @@ public class TargetSelectUI : MonoBehaviour
         InitializeNameTag();
     }
 
+    public void SetGunController(GunController gunController)
+    {
+        _gunController = gunController;
+        gameObject.SetActive(false);
+    }
+
     public void InitializeNameTag()
     {
         foreach (Photon.Realtime.Player p in PhotonNetwork.PlayerList)

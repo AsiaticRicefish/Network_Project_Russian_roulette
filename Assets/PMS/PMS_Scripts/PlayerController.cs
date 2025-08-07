@@ -130,7 +130,7 @@ public class PlayerController : MonoBehaviourPun
 
     private void GunImpuse()
     {
-        Manager.Camera.PlayImpulse(1.0f);
+        Manager.Camera.PlayImpulse(1.0f, CinemachineImpulseDefinition.ImpulseShapes.Rumble);
     }
 
     //시점 변경 테스트코드
@@ -173,17 +173,23 @@ public class PlayerController : MonoBehaviourPun
         //카메라 매니저에 stack에 push
         CinemachineVirtualCamera vcam = GetComponentInChildren<CinemachineVirtualCamera>();
         var playerVCam = Util_LDH.GetOrAddComponent<VirtualCam_LocalPlayer>(vcam.gameObject);
-        Util_LDH.GetOrAddComponent<CinemachineImpulseSource>(vcam.gameObject);
+        var impluseSource = Util_LDH.GetOrAddComponent<CinemachineImpulseSource>(vcam.gameObject);
+        impluseSource.m_ImpulseDefinition.m_ImpulseType = CinemachineImpulseDefinition.ImpulseTypes.Uniform;
         Manager.Camera.PushCamera(playerVCam.cameraID);
 
+        
+        //------ 메인 카메라 설정 ----- //
         Camera cam = GetComponentInChildren<Camera>();
         // 내 플레이어의 캠을 카메라 매니저의 매인캠으로 등록, CinemachineBrain 추가, ImpulseListener 추가
         Manager.Camera.SetMainCamera(cam);
         Manager.Camera.ApplyBlenderSettingToBrain(cam, "InGameCinemahineBlenderSetting");
 
         Util_LDH.GetOrAddComponent<CinemachineBrain>(cam.gameObject);
-        Util_LDH.GetOrAddComponent<CinemachineIndependentImpulseListener>(cam.gameObject);
-
+        var impluseListener = Util_LDH.GetOrAddComponent<CinemachineIndependentImpulseListener>(cam.gameObject);
+        impluseListener.m_ChannelMask = ~0;     //모든 채널 활성화
+        impluseListener.m_Gain = 1f;            //gain 1로 설정
+        
+        
         yield return null;
     }
 
