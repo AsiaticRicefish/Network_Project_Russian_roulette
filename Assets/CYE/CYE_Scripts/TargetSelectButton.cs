@@ -30,6 +30,6 @@ public class TargetSelectButton : MonoBehaviourPun
         transform.parent.gameObject.SetActive(false);
         // Managers.Manager.Gun.Fire(_targetId);
         _fireSync.photonView.RPC(nameof(FireSync.RequestFire), RpcTarget.All, PhotonNetwork.LocalPlayer.NickName, _targetId);
-        _gunController.photonView.RPC(nameof(GunController.SyncHold), RpcTarget.All, false);
+        //_gunController.photonView.RPC(nameof(GunController.SyncHold), RpcTarget.All, false);
     }
 }

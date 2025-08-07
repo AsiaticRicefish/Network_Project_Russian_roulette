@@ -4,6 +4,7 @@ using UnityEngine;
 using Managers;
 using Photon.Pun;
 using System;
+using UnityEngine.EventSystems;
 
 public class GunController : MonoBehaviourPun
 {
@@ -35,6 +36,8 @@ public class GunController : MonoBehaviourPun
     }
     void OnMouseDown()
     {
+        if (EventSystem.current.IsPointerOverGameObject()) return;
+        
         if (TurnSync.CurrentTurnPlayerId == PhotonNetwork.LocalPlayer.NickName && !_isHold)
         {
             _isHold = true;
