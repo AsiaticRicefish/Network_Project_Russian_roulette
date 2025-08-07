@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 using LTH;
+using Managers;
 
 public class ItemManager : Singleton<ItemManager>
 {
@@ -17,7 +18,10 @@ public class ItemManager : Singleton<ItemManager>
             Debug.LogWarning("아이템이 null이거나 이미 사용됨");
             return;
         }
-
+        
+        //사운드 재생
+        Manager.Sound.PlaySfxByKey("ItemUse");
+        
         ApplyEffect(item.itemType, user, target);
         SetItemUsed(item);
     }

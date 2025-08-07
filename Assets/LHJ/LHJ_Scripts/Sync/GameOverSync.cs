@@ -1,6 +1,7 @@
 using Managers;
 using Michsky.UI.ModernUIPack;
 using Photon.Pun;
+using Sound;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -13,6 +14,8 @@ public class GameOverSync : MonoBehaviourPunCallbacks
     [SerializeField] private GameObject gameOverPanel;
     [SerializeField] private TextMeshProUGUI winnerText;
     [SerializeField] private TextMeshProUGUI countdownText;
+    [SerializeField] private BgmPlayer bgmPlayer;
+    
     private bool hasShow = false;
 
     public static GameOverSync Instance;
@@ -46,6 +49,9 @@ public class GameOverSync : MonoBehaviourPunCallbacks
         if (hasShow) return;
 
         hasShow = true;
+        
+        //bgm 변경
+        bgmPlayer.PlayBgm(1);
 
         //닉네임 파싱
         winnerNickname = Util_LDH.GetUserNickname(winnerNickname);
@@ -91,12 +97,7 @@ public class GameOverSync : MonoBehaviourPunCallbacks
         //}
         
         //인게임 매니저 release
-        GunManager.Release();
-        PlayerManager.Release();
-        InGameManager.Release();
-        ItemBoxSpawnerManager.Release();
-        DeskUIManager.Release();
-        ItemSyncManager.Release();
+        Util_LDH.ReleaseInGameManager();
 
         //플레이어 커스텀 프로퍼티 초기화
         Util_LDH.ClearAllPlayerProperty();

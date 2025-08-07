@@ -21,6 +21,8 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: 0869b5c3b8d5c4fc2a0210313c0b73a3, type: 3}
   - key: ItemSpawn
     clip: {fileID: 8300000, guid: 7d3afc5a326a04b30b91780142a20e48, type: 3}
+  - key: ItemUse
+    clip: {fileID: 8300000, guid: 64ad0985c82ed441dae217cc27f4126c, type: 3}
   - key: DropBullet
     clip: {fileID: 8300000, guid: 0940cc5f0bdf84060b0431b14da0e445, type: 3}
   - key: CameraChange
