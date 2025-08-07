@@ -4833,6 +4833,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 5432584749535455019}
   - {fileID: 1773880646279122547}
   m_Father: {fileID: 6656097000227686832}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -18837,6 +18838,9 @@ MonoBehaviour:
   - Type: 9
     SynchronizeType: 0
     Name: Hit
+  - Type: 4
+    SynchronizeType: 0
+    Name: IsSelf
   m_SynchronizeLayers:
   - SynchronizeType: 0
     LayerIndex: 0
@@ -19317,3 +19321,34 @@ Transform:
   m_Children: []
   m_Father: {fileID: 6656097000227686530}
   m_LocalEulerAnglesHint: {x: 5.4421, y: 124.15224, z: 103.82885}
+--- !u!1 &8973972221875154893
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5432584749535455019}
+  m_Layer: 20
+  m_Name: GunPos_self
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5432584749535455019
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8973972221875154893}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.9605197, y: 0.00403011, z: 0.13530862, w: 0.24305844}
+  m_LocalPosition: {x: -0.51530707, y: -0.7093919, z: 0.75891584}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6656097000227686530}
+  m_LocalEulerAnglesHint: {x: 64.143, y: 62.957, z: 317.073}

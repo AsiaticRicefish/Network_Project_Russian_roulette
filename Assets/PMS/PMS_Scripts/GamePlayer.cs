@@ -331,11 +331,13 @@ public class GamePlayer : MonoBehaviourPun, IComparer<GamePlayer>
     }
 
     [PunRPC]
-    public void RPC_PlayFire()
+    public void RPC_PlayFire(bool isSelf)
     {
-       _playerController.PlayFire();
+       _playerController.PlayFire(isSelf);
     }
 
+    
+    
     [PunRPC]
     public void RPC_ShowBulletInfo(int bulletTypeInt)
     {

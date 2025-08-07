@@ -93,6 +93,9 @@ public class FireSync : MonoBehaviourPun
                 Debug.LogError("타겟 ID를 찾을 수 없습니다.");
                 return;
             }
+            // 닉네임 기반으로 먼저 찾고 → PlayerId로 변환
+            GamePlayer targetByNick = PlayerManager.Instance.FindPlayerByNickname(targetNick);
+            
             //string targetId = (playerId == "player1") ? "player2" : "player1";
             Debug.Log($"{playerId}이(가) {bullet} 탄을 발사했습니다.");
             GamePlayer shooter = PlayerManager.Instance.FindPlayerByNickname(playerId);
@@ -103,7 +106,7 @@ public class FireSync : MonoBehaviourPun
             }
             
             //shooter 애니메이션 실행 (RPC로 모든 클라이언트에서 실행되도록 함) - 마스터만 호출하기 때문에 rpc 중복 호출 x
-            shooter._pv.RPC("RPC_PlayFire", RpcTarget.All,null);           
+            shooter._pv.RPC("RPC_PlayFire", RpcTarget.All, shooter == targetByNick);           
             
             
             // if (Input.GetKeyDown(KeyCode.Space) && gunCorutine == null && IsGunAnim == false)
@@ -119,8 +122,7 @@ public class FireSync : MonoBehaviourPun
             {
                 Debug.Log($"{targetNick}이 데미지를 입었습니다.");
 
-                // 닉네임 기반으로 먼저 찾고 → PlayerId로 변환
-                GamePlayer targetByNick = PlayerManager.Instance.FindPlayerByNickname(targetNick);
+             
                 if (targetByNick != null)
                 {
                     string targetPlayerId = targetByNick.PlayerId;

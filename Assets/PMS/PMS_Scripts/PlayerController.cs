@@ -17,7 +17,10 @@ public class PlayerController : MonoBehaviourPun
     [SerializeField] private GameObject _gun;
     [SerializeField] private GameObject _gunPos;
     [SerializeField] private GameObject _destination;
+    [SerializeField] private GameObject _selfDestination;
 
+    private bool _isSelf = false;
+    
     private Vector3 _oldGunPos;
     private Vector3 _oldGunRotation;
 
@@ -83,17 +86,22 @@ public class PlayerController : MonoBehaviourPun
     // }
 
 
-    public void PlayFire()
+    public void PlayFire(bool isSelf)
     {
         if (gunCorutine == null && _isGunAnim == false)
         {
             _isGunAnim = true;
-            GetGun(_gun.transform, _destination.transform);
+            _isSelf = isSelf;
+            GetGun(_gun.transform, (isSelf? _selfDestination.transform: _destination.transform));
         }
     }
+    
+
 
     private IEnumerator GunAnimation()
     {
+        _animator.SetBool("IsSelf", _isSelf);
+        
         _animator.SetTrigger("Shot");
 
         _gun.transform.parent = _gunPos.transform;
