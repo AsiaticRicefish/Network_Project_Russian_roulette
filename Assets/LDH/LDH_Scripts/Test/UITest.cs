@@ -8,26 +8,17 @@ namespace Test
 {
     public class UITest : MonoBehaviour
     {
-        private UI_Base settingUI;
+        [SerializeField] private Transform ui;
 
+        private Camera _camera;
         private void Start()
         {
-            settingUI = Manager.UI.GetGlobalUI(Define_LDH.GlobalUI.UI_Setting);
+            _camera = Camera.main;
         }
 
-        private void Update()
+        private void LateUpdate()
         {
-            if(Input.GetKeyDown(KeyCode.Escape))
-            {
-                if (!settingUI.gameObject.activeSelf)
-                {
-                    Manager.UI.ShowGlobalUI(Define_LDH.GlobalUI.UI_Setting);
-                }
-                else
-                {
-                    Manager.UI.CloseGlobalUI(Define_LDH.GlobalUI.UI_Setting);
-                }
-            }
+            ui.transform.forward = _camera.transform.forward;
         }
     }
 }
