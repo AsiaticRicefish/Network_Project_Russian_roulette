@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 2254114405264707779}
   - component: {fileID: 6025383849365274383}
   - component: {fileID: 2967812849222310520}
-  m_Layer: 0
+  m_Layer: 21
   m_Name: _Gun
   m_TagString: Gun
   m_Icon: {fileID: 0}
@@ -87,7 +87,7 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -112,10 +112,10 @@ Rigidbody:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 1048576
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 0
@@ -150,6 +150,16 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 8609809143704403627}
     m_Modifications:
+    - target: {fileID: 1360200821607672262, guid: 6581219875244c34aaae5e19d6789a68,
+        type: 3}
+      propertyPath: m_Layer
+      value: 21
+      objectReference: {fileID: 0}
+    - target: {fileID: 5523957764449386275, guid: 6581219875244c34aaae5e19d6789a68,
+        type: 3}
+      propertyPath: m_Layer
+      value: 21
+      objectReference: {fileID: 0}
     - target: {fileID: 6640086488598509582, guid: 6581219875244c34aaae5e19d6789a68,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -200,10 +210,35 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6641596131887601344, guid: 6581219875244c34aaae5e19d6789a68,
+        type: 3}
+      propertyPath: m_Layer
+      value: 21
+      objectReference: {fileID: 0}
+    - target: {fileID: 6641607786173221982, guid: 6581219875244c34aaae5e19d6789a68,
+        type: 3}
+      propertyPath: m_Layer
+      value: 21
+      objectReference: {fileID: 0}
+    - target: {fileID: 6642224703108006950, guid: 6581219875244c34aaae5e19d6789a68,
+        type: 3}
+      propertyPath: m_Layer
+      value: 21
+      objectReference: {fileID: 0}
     - target: {fileID: 6642354650944126856, guid: 6581219875244c34aaae5e19d6789a68,
         type: 3}
       propertyPath: m_Name
       value: Body
+      objectReference: {fileID: 0}
+    - target: {fileID: 6642354650944126856, guid: 6581219875244c34aaae5e19d6789a68,
+        type: 3}
+      propertyPath: m_Layer
+      value: 21
+      objectReference: {fileID: 0}
+    - target: {fileID: 6642435039754617364, guid: 6581219875244c34aaae5e19d6789a68,
+        type: 3}
+      propertyPath: m_Layer
+      value: 21
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 2358376256884658353, guid: 6581219875244c34aaae5e19d6789a68, type: 3}

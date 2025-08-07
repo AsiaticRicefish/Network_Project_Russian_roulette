@@ -20,18 +20,26 @@ public class GunController : MonoBehaviourPun
     {
         _animator = GetComponent<Animator>();
         _photonview = GetComponent<PhotonView>();
-        
+
         var targetUI = FindObjectOfType<TargetSelectUI>(false);
         targetUI.SetGunController(this);
         _targetSelectUI = targetUI.gameObject;
+    }
+
+    private void Start()
+    {
+        if (PhotonNetwork.IsMasterClient)
+        {
+            InGameManager.Instance.OnTurnEnd += HoldReset;
+        }
     }
     void OnMouseDown()
     {
         if (TurnSync.CurrentTurnPlayerId == PhotonNetwork.LocalPlayer.NickName && !_isHold)
         {
             _isHold = true;
-            Debug.Log($"[GunController] {photonView} / {nameof(GunController.SyncHold)}");
-            photonView.RPC(nameof(GunController.SyncHold), RpcTarget.All, true);
+            Debug.Log($"[GunController] {photonView} / {nameof(SyncHold)}");
+            photonView.RPC(nameof(SyncHold), RpcTarget.All, true);
             Debug.Log($"[GunController] {_isHold}");
             // OnHolded?.Invoke(_isHold);
 
@@ -48,8 +56,13 @@ public class GunController : MonoBehaviourPun
     [PunRPC]
     public void SetTargetSelectUI(GameObject targetUI)
     {
-        if(!PhotonNetwork.IsMasterClient) return;
+        if (!PhotonNetwork.IsMasterClient) return;
         Debug.Log("[Gun Controller] targetSelectUI 동적으로 할당");
         _targetSelectUI = targetUI;
+    }
+
+    public void HoldReset()
+    {
+        photonView.RPC("SyncHold", RpcTarget.All, false);
     }
 }
