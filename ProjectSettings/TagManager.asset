@@ -6,6 +6,7 @@ TagManager:
   tags:
   - ItemBoxSpawnPoint
   - Item
+  - Gun
   layers:
   - Default
   - TransparentFX

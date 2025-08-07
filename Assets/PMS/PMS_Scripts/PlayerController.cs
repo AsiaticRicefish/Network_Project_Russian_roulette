@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 using Utils;
+using DG.Tweening;
 
 public class PlayerController : MonoBehaviourPun
 {
@@ -13,11 +14,22 @@ public class PlayerController : MonoBehaviourPun
     [SerializeField] private GameObject _cameraHolder;
     [SerializeField] private float _mouseSensitivity;
 
+    [SerializeField] private GameObject _gun;
+    [SerializeField] private GameObject _gunPos;
+    [SerializeField] private GameObject _destination;
+
+    private Vector3 _oldGunPos;
+    private Vector3 _oldGunRotation;
+
+    private bool IsGunAnim = false;
+
     private float moveSpeed = 5.0f;
     private float verticalLookRotation;
 
     private PhotonView _pv;
     private Rigidbody _rb;
+
+    private IEnumerator gunCorutine;
 
     private void Awake()
     {
@@ -27,6 +39,9 @@ public class PlayerController : MonoBehaviourPun
 
     private void Start()
     {
+        _oldGunPos = _gun.transform.position;
+        _oldGunRotation = _gun.transform.rotation.eulerAngles;
+
         if (!_pv.IsMine)
         {
             //자기 카메라가 아니면 다 비활성화 처리
@@ -52,11 +67,52 @@ public class PlayerController : MonoBehaviourPun
     {
         if (!_pv.IsMine) return;
 
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Space) && gunCorutine == null && IsGunAnim == false)
         {
-            _animator.SetTrigger("Shot");
+            IsGunAnim = true;
+            GetGun(_gun.transform, _destination.transform);
         }
         //PlayerLook();
+    }
+
+    private IEnumerator GunAnimation()
+    {
+        _animator.SetTrigger("Shot");
+
+        _gun.transform.parent = _gunPos.transform;
+        _gun.transform.position = transform.position;
+
+        _gun.transform.localPosition = new Vector3(0, 0, 0);
+        _gun.transform.localRotation = Quaternion.Euler(0, 0, 0);
+
+        yield return new WaitForSeconds(2.3f);// new WaitUntil(() => !_animator.GetCurrentAnimatorStateInfo(1).IsName("GunPlay"));
+
+        _gun.transform.parent = null;
+
+        _gun.transform.position = _oldGunPos;
+        _gun.transform.rotation = Quaternion.LookRotation(_oldGunRotation);//_oldGunRotation;
+
+        gunCorutine = null;
+        IsGunAnim = false;
+    }
+
+    private void GetGun(Transform target, Transform destination)
+    {
+        //Manager.Camera.PlayImpulse(1.0f);
+        Sequence seq = DOTween.Sequence();
+        seq.Append(target.DOMove(destination.position, 1.5f));
+        seq.Join(target.DORotate(new Vector3(-45, 90, 0), 0.8f));
+        seq.OnComplete(() =>
+        {
+            Debug.Log("시퀀스 완료!");
+            gunCorutine = GunAnimation();
+            StartCoroutine(GunAnimation());
+        });
+    }
+
+    private void GunImpuse()
+    {
+        Manager.Camera.PlayImpulse(1.0f);
     }
 
     //시점 변경 테스트코드
