@@ -14,24 +14,26 @@ public enum BulletType
 
 public class GunManager : Singleton<GunManager>
 {
-    private PhotonView _pv;
+    // private PhotonView _pv;
+    public GunController gunController;
 
     private void Awake()
     {
         SingletonInit();
-        _pv = gameObject.AddComponent<PhotonView>(); // 동적으로 PhotonView 추가
-
-        if (_pv.ViewID == 0)
-        {
-            bool success = PhotonNetwork.AllocateViewID(_pv); // ViewID 수동 할당
-            Debug.Log($"[GunManager] ViewID 할당됨: {_pv.ViewID}, 성공여부: {success}");
-        }
+        // _pv = gameObject.AddComponent<PhotonView>(); // 동적으로 PhotonView 추가
+        // _pv = GetComponent<PhotonView>();
+        // if (_pv.ViewID == 0)
+        // {
+        //     bool success = PhotonNetwork.AllocateViewID(_pv); // ViewID 수동 할당
+        //     Debug.Log($"[GunManager] ViewID 할당됨: {_pv.ViewID}, 성공여부: {success}");
+        // }
 
         _isEnhanced = false;
 
         Manager.Game.OnTurnStart += () =>
         {
-            GunManager.Instance.PV.RPC("RPC_SetEnhanced", RpcTarget.All, false);
+            gunController.photonView.RPC("RPC_SetEnhanced", RpcTarget.All, false);
+            //RPC_SetEnhanced(false);
             Reload();
         };
 
@@ -40,7 +42,7 @@ public class GunManager : Singleton<GunManager>
 
 
     // 다른 곳에서 RPC 호출 가능하게
-    public PhotonView PV => _pv;
+    // public PhotonView PV => _pv;
 
     #region >> Constants
     private const int BULLET_MIN_COUNT = 1; // 최소 총일 갯수 2개(공포탄 1개, 실탄 1개)
@@ -196,19 +198,7 @@ public class GunManager : Singleton<GunManager>
     {
         _loadedBullet = bullet;
     }
+    
 
-    [PunRPC]
-    public void RPC_SwitchNextBullet()
-    {
-        _loadedBullet = (_loadedBullet == BulletType.live) ? BulletType.blank : BulletType.live;
-        Debug.Log($"다이얼 사용 → 현재 탄환: {_loadedBullet}");
-    }
-
-    [PunRPC]
-    public void RPC_SetEnhanced(bool value)
-    {
-        _isEnhanced = value;
-        Debug.Log($"[동기화] isEnhanced = {value}");
-    }
-
+    
 }
