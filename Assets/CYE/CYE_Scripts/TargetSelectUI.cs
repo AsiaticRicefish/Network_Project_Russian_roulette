@@ -40,6 +40,14 @@ public class TargetSelectUI : MonoBehaviour
         InitializeNameTag();
     }
 
+    private void OnDisable()
+    {
+        foreach (GameObject buttonObj in _targetButtonArray)
+        {
+            buttonObj.GetComponentInChildren<TMP_Text>().color = originColor;
+        }
+    }
+
     public void SetGunController(GunController gunController)
     {
         _gunController = gunController;
@@ -63,6 +71,6 @@ public class TargetSelectUI : MonoBehaviour
 
     private void ChangeTextColor(GameObject buttonObj, Color color)
     {
-        buttonObj.GetComponent<TMP_Text>().color = color;
+        buttonObj.GetComponentInChildren<TMP_Text>().color = color;
     }
 }
