@@ -89,6 +89,7 @@ MonoBehaviour:
   - RPC_PlayFire
   - SetTargetSelectUI
   - SyncNoHold
+  - RPC_LoadedBulletSync
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1
