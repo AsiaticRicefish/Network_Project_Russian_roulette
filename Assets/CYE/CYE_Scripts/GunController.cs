@@ -9,7 +9,7 @@ public class GunController : MonoBehaviourPun
 {
     private Animator _animator;
 
-    private bool _isHold = false;
+    public bool _isHold = false;
     // public event Action<bool> OnHolded;
 
     private PhotonView _photonview;
@@ -26,8 +26,8 @@ public class GunController : MonoBehaviourPun
         if (TurnSync.CurrentTurnPlayerId == PhotonNetwork.LocalPlayer.NickName && !_isHold)
         {
             _isHold = true;
-            Debug.Log($"[GunController] {_photonview}");
-            _photonview.RPC("SyncHold", RpcTarget.All, _isHold);
+            Debug.Log($"[GunController] {photonView} / {nameof(GunController.SyncHold)}");
+            photonView.RPC(nameof(GunController.SyncHold), RpcTarget.All, true);
             Debug.Log($"[GunController] {_isHold}");
             // OnHolded?.Invoke(_isHold);
 
@@ -37,7 +37,7 @@ public class GunController : MonoBehaviourPun
     [PunRPC]
     public void SyncHold(bool isHold)
     {
-        Debug.Log($"[GunController] {_isHold}");
         _isHold = isHold;
+        Debug.Log($"[GunController] {_isHold}");
     }
 }

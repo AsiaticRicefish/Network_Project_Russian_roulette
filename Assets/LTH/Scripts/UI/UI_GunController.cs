@@ -66,7 +66,7 @@ public class UI_GunController : MonoBehaviour
         //중복 클릭 방지를 위해 누르자마자 interactable 차단
         fireButton.interactable = false;
         
-        fireSync.photonView.RPC("RequestFire", RpcTarget.MasterClient, myId);
+        fireSync.photonView.RPC("RequestFire", RpcTarget.MasterClient, myId, fireSync.GetNextTargetId(myId));
     }
 
     // 맞은 사람과 탄 종류에 따라 메시지 출력
