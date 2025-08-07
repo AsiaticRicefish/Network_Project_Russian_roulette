@@ -117,7 +117,10 @@ public class ItemSlot : MonoBehaviourPun
         Vector3 offset = anchorPoint.forward * -0.05f;
         Vector3 spawnPos = anchorPoint.position + offset;
 
-        currentItem = Instantiate(Resources.Load<GameObject>(path), spawnPos, anchorPoint.rotation);
+        Quaternion extraRotation = Quaternion.Euler(-90f, 0f, 0f);
+        Quaternion finalRotation = anchorPoint.rotation * extraRotation;
+
+        currentItem = Instantiate(Resources.Load<GameObject>(path), spawnPos, finalRotation);
         currentItem.transform.SetParent(anchorPoint, true);
 
         slotEffectController?.PlayItemAppearEffect(anchorPoint.position);
