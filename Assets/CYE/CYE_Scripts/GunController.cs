@@ -21,13 +21,21 @@ public class GunController : MonoBehaviourPun
         _animator = GetComponent<Animator>();
         _photonview = GetComponent<PhotonView>();
     }
+
+    private void Start()
+    {
+        if (PhotonNetwork.IsMasterClient)
+        {
+            InGameManager.Instance.OnTurnEnd += HoldReset;
+        }
+    }
     void OnMouseDown()
     {
         if (TurnSync.CurrentTurnPlayerId == PhotonNetwork.LocalPlayer.NickName && !_isHold)
         {
             _isHold = true;
-            Debug.Log($"[GunController] {photonView} / {nameof(GunController.SyncHold)}");
-            photonView.RPC(nameof(GunController.SyncHold), RpcTarget.All, true);
+            Debug.Log($"[GunController] {photonView} / {nameof(SyncHold)}");
+            photonView.RPC(nameof(SyncHold), RpcTarget.All, true);
             Debug.Log($"[GunController] {_isHold}");
             // OnHolded?.Invoke(_isHold);
 
@@ -39,5 +47,10 @@ public class GunController : MonoBehaviourPun
     {
         _isHold = isHold;
         Debug.Log($"[GunController] {_isHold}");
+    }
+
+    public void HoldReset()
+    {
+        photonView.RPC("SyncHold", RpcTarget.All, false);
     }
 }

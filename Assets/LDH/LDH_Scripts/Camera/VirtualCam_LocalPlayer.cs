@@ -13,7 +13,7 @@ namespace GameCamera
             cameraID = "Player";
             base.Awake();
 
-            // Manager.Camera.PushCamera(cameraID);
+            Manager.Camera.PushCamera(cameraID);
         }
 
         // private IEnumerator Start()
