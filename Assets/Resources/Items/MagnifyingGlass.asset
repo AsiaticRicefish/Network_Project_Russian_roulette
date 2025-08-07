@@ -16,7 +16,5 @@ MonoBehaviour:
   itemType: 2
   displayName: MagnifyingGlass
   description: Check Loaded Bullet Type
-  icon: {fileID: 0}
-  isUsed: 0
-  itemPrefab: {fileID: 9138742753409025537, guid: c3574ba66e0e26c4d8504f7c86b6397a,
+  itemPrefab: {fileID: 5283432143312026210, guid: 6f0b4ee75d921cd4fa856776dca069f4,
     type: 3}

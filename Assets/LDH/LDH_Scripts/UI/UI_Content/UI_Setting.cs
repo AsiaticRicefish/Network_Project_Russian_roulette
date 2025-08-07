@@ -72,6 +72,8 @@ namespace GameUI
         {
             if (PhotonNetwork.IsConnected && PhotonNetwork.InRoom)
             {
+                if(InGameManager.Instance!=null && !InGameManager.Instance.IsGameOver)
+                
                 //방 나가기
                 PhotonNetwork.LeaveRoom(false);
                 Close();

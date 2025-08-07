@@ -52,9 +52,13 @@ public class InGameManager : Singleton<InGameManager>
     private int _totalRound;
     public int TotalRound { get { return _totalRound; } private set { _totalRound = value; } }
     private List<PlayerPointPair> _playerPointPair = new();
-    
+
     private bool _isGameOver = false;    // 게임 오버 여부
     public bool IsGameOver => _isGameOver;
+
+    public bool IsKeepTurn = false; // 다음 턴 유지 여부
+
+    public PhotonView _photonView;
     #endregion
 
     #region  >> Events
@@ -79,6 +83,14 @@ public class InGameManager : Singleton<InGameManager>
     {
         SingletonInit();
         _totalRound = MAX_ROUND;
+
+        _photonView = gameObject.AddComponent<PhotonView>(); // 동적으로 PhotonView 추가
+
+        if (_photonView.ViewID == 0)
+        {
+            bool success = PhotonNetwork.AllocateViewID(_photonView); // ViewID 수동 할당
+            Debug.Log($"[GunManager] ViewID 할당됨: {_photonView.ViewID}, 성공여부: {success}");
+        }
     }
     #endregion
 
@@ -101,14 +113,14 @@ public class InGameManager : Singleton<InGameManager>
         // 라운드 시작
         StartRound();
     }
-    
+
     /// <summary>
     /// 게임 종료시 호출되는 함수
     /// </summary>
     public void EndGame()
     {
         Debug.Log("EndGame");
-        
+
         //게임 오버 플래그 설정
         _isGameOver = true;
 
@@ -191,7 +203,9 @@ public class InGameManager : Singleton<InGameManager>
         }
 
         // 현재 턴을 다음으로 넘긴다.
-        _currentTurn = _currentTurn.Next ?? _turnOrder.First;
+        // _currentTurn = _currentTurn.Next ?? _turnOrder.First;
+        Debug.Log($"[InGameManager] 현재 턴 유저: {CurrentTurn} / 턴 유지 여부: {IsKeepTurn}");
+        _currentTurn = IsKeepTurn ? _currentTurn : (_currentTurn.Next ?? _turnOrder.First);
         // 턴 시작
         StartTurn();
     }
@@ -214,7 +228,7 @@ public class InGameManager : Singleton<InGameManager>
     {
         // 게임 오버 플래그 초기화
         _isGameOver = false;
-        
+
         // 현재 라운드를 초기화한다.
         _currentRound = 0;
 
@@ -240,6 +254,7 @@ public class InGameManager : Singleton<InGameManager>
     private void TurnInit()
     {
         OnTurnChange?.Invoke();
+        _photonView.RPC(nameof(InGameManager.SyncIsKeepTurn), RpcTarget.All, false);
     }
 
     private bool CheckRoundEnd()
@@ -290,6 +305,16 @@ public class InGameManager : Singleton<InGameManager>
     {
         Debug.Log($"[InGameManager] 사망 감지: {deadPlayer.Nickname}");
         if (CheckRoundEnd()) EndRound();
+    }
+    public void ChangeKeepTurn(bool isKeepTurn)
+    {
+        Debug.Log($"[InGameManager] 턴 유지 여부 동기화: {isKeepTurn}");
+        _photonView.RPC(nameof(InGameManager.SyncIsKeepTurn), RpcTarget.All, isKeepTurn);
+    }
+    [PunRPC]
+    public void SyncIsKeepTurn(bool isKeepTurn)
+    {
+        this.IsKeepTurn = isKeepTurn;
     }
     #endregion
 }
