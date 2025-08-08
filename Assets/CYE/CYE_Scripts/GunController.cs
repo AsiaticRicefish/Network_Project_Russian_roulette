@@ -21,14 +21,10 @@ public class GunController : MonoBehaviourPun
     {
         _animator = GetComponent<Animator>();
         _photonview = GetComponent<PhotonView>();
-
-        var targetUI = FindObjectOfType<TargetSelectUI>(false);
-        targetUI.SetGunController(this);
-        _targetSelectUI = targetUI.gameObject;
-        
         
         //싱글톤에 등록하기
         GunManager.Instance.gunController = this;
+        
     }
 
     private void Start()
@@ -37,6 +33,10 @@ public class GunController : MonoBehaviourPun
         {
             InGameManager.Instance.OnTurnEnd += HoldReset;
         }
+
+        var targetUI = FindObjectOfType<TargetSelectUI>(true);
+        targetUI.SetGunController(this);
+        _targetSelectUI = targetUI.gameObject;
     }
     void OnMouseDown()
     {
@@ -53,14 +53,15 @@ public class GunController : MonoBehaviourPun
             _targetSelectUI.SetActive(true);
         }
     }
+    
+    
     [PunRPC]
     public void SyncHold(bool isHold)
     {
         _isHold = isHold;
         Debug.Log($"[GunController] {_isHold}");
     }
-
-    [PunRPC]
+    
     public void SetTargetSelectUI(GameObject targetUI)
     {
         if (!PhotonNetwork.IsMasterClient) return;
