@@ -19,6 +19,7 @@ public class TargetSelectUI : MonoBehaviour
 
     private void Start()
     {
+        
         foreach (GameObject button in _targetButtonArray)
         {
             UI_Base.BindUIEvent(button, (_) =>
