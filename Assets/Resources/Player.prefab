@@ -18781,6 +18781,7 @@ MonoBehaviour:
     loseCount: 0
   _spawnPointindex: -1
   IsCuffedThisTurn: 1
+  _playerController: {fileID: 0}
 --- !u!114 &8322331512635834442
 MonoBehaviour:
   m_ObjectHideFlags: 0
