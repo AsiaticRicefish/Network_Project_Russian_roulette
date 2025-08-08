@@ -320,7 +320,9 @@ public class GamePlayer : MonoBehaviourPun, IComparer<GamePlayer>
         //     // 해당 플레이어에게만 애니메이션 재생 지시
         //     player.photonView.RPC(nameof(RPC_PlayTrigger), RpcTarget.All, "Hit");
         // }
-        RPC_PlayTrigger("Hit");
+        // if(hp<oldHp)
+        //     RPC_PlayTrigger("Hit");
+        
     }
 
     [PunRPC]
