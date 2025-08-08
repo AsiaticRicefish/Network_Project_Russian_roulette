@@ -37,6 +37,7 @@ public class GunController : MonoBehaviourPun
         var targetUI = FindObjectOfType<TargetSelectUI>(true);
         targetUI.SetGunController(this);
         _targetSelectUI = targetUI.gameObject;
+        targetUI.gameObject.SetActive(false);
     }
     void OnMouseDown()
     {
