@@ -192,33 +192,28 @@ public class CameraManager : Singleton<CameraManager>
             Debug.LogWarning("[CameraManager] PlayImpulse() → 카메라 스택이 비어 있음");
             return;
         }
-
-        Debug.Log("[CameraManager] 1");
+        
         var camId = _cameraStack.Peek();
 
-        Debug.Log("[CameraManager] 2");
+   
         var cam = GetCamera(camId);
-
-        Debug.Log("[CameraManager] 3");
+        
         if (cam == null)
         {
             Debug.LogWarning($"[CameraManager] PlayImpulse() → {camId} 카메라 없음");
             return;
         }
-        Debug.Log("[CameraManager] 4");
+
         var impulse = cam.GetComponent<CinemachineImpulseSource>();
 
-        Debug.Log("[CameraManager] 5");
         if (impulse == null)
         {
             Debug.LogWarning($"[CameraManager] PlayImpulse() → {camId}에 ImpulseSource 없음");
             return;
         }
-        
-        Debug.Log("[CameraManager] Impulse Shape 적용");
-        impulse.m_ImpulseDefinition.m_ImpulseShape = impulseShapes;
 
-        Debug.Log("[CameraManager] Impluse Shape 적용");
+        impulse.m_ImpulseDefinition.m_ImpulseShape = impulseShapes;
+        
         impulse.m_ImpulseDefinition.m_ImpulseShape = impulseShapes;
 
         impulse.GenerateImpulseWithForce(force);

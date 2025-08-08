@@ -80,7 +80,7 @@ public class GamePlayer : MonoBehaviourPun, IComparer<GamePlayer>
 
     public bool IsCuffedThisTurn = false;
 
-    private PlayerController _playerController;
+    public PlayerController _playerController;
 
 
     private void Awake()
@@ -315,18 +315,20 @@ public class GamePlayer : MonoBehaviourPun, IComparer<GamePlayer>
         player.CurrentHp = hp; //setter 이벤트 호출
 
         // HP가 감소했고, 내가 마스터 클라이언트인 경우에만 애니메이션 RPC 전송
-        if (hp < oldHp && PhotonNetwork.IsMasterClient)
-        {
-            // 해당 플레이어에게만 애니메이션 재생 지시
-            player.photonView.RPC(nameof(RPC_PlayTrigger), RpcTarget.All, "Hit");
-        }
+        // if (hp < oldHp && PhotonNetwork.IsMasterClient)
+        // {
+        //     // 해당 플레이어에게만 애니메이션 재생 지시
+        //     player.photonView.RPC(nameof(RPC_PlayTrigger), RpcTarget.All, "Hit");
+        // }
+        // if(hp<oldHp)
+        //     RPC_PlayTrigger("Hit");
+        
     }
 
     [PunRPC]
     public void RPC_PlayTrigger(string triggerName)
     {
-        Debug.Log("[GamePlayer] --- 트리거 호출");
-        Debug.Log(triggerName);
+        Debug.Log($"[GamePlayer] --- 트리거 호출 : {triggerName}");
         _animator.SetTrigger(triggerName);
     }
 

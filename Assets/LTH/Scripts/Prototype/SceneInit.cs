@@ -59,6 +59,13 @@ public class SceneInit : MonoBehaviourPunCallbacks
     private IEnumerator InitFlow()
     {
         Debug.Log("[SceneInit] 모든 플레이어가 씬에 들어와 InitFlow() 실행");
+        
+        //마스터는 gun을 먼저 만든다
+        Debug.Log("[SceneInit] 마스터는 gun을 만듭니다.");
+
+        if(PhotonNetwork.IsMasterClient)
+            SpawnGun();
+        
         // 플레이어 스폰
         yield return SpawnPlayerWithDelay();
     }
@@ -67,9 +74,15 @@ public class SceneInit : MonoBehaviourPunCallbacks
     {
         if (Manager.PlayerManager.GetAllPlayers().Count == 2)
         {
+            //총 등록
+            foreach(var player in Manager.PlayerManager.GetAllPlayers())
+            {
+                player.Value._playerController.GetGun();
+            }
             // Manager.Camera.PushCamera("Player");
             if (PhotonNetwork.IsMasterClient)
             {
+                
                 // //총을 생성하기
                 // var gun = PhotonNetwork.Instantiate(gunPrefabName, gunSpawnPoint.position, Quaternion.identity).GetComponent<GunController>();
                 //
@@ -167,9 +180,6 @@ public class SceneInit : MonoBehaviourPunCallbacks
 
     private void OnEnterScene(Scene scene, LoadSceneMode mode)
     {
-        if(PhotonNetwork.IsMasterClient)
-            SpawnGun();
-        
         //자기 자신의 isInGameScene 프로퍼티 초기화
         Hashtable playerProperty = new Hashtable { { "IsInGameScene", true } };
 

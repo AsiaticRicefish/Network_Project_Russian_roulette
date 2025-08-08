@@ -21,6 +21,7 @@ public class PlayerController : MonoBehaviourPun
     [SerializeField] private GameObject _destination;
 
     private bool _isSelf = false;
+    private bool _isCalled = false;
 
     private Vector3 _oldGunPos;
     private Vector3 _oldGunRotation;
@@ -46,10 +47,6 @@ public class PlayerController : MonoBehaviourPun
 
     private void Start()
     {
-        _gun = GameObject.FindWithTag("Gun"); //Gun 오브젝트 찾기
-        _oldGunPos = _gun.transform.position;
-        _oldGunRotation = _gun.transform.rotation.eulerAngles;
-
         _fireSync = FindObjectOfType<FireSync>();
 
         if (!_pv.IsMine)
@@ -87,6 +84,17 @@ public class PlayerController : MonoBehaviourPun
     // }
 
 
+    public void GetGun()
+    {
+        // _gun = GameObject.FindWithTag("Gun"); //Gun 오브젝트 찾기
+
+        Debug.Log($"[PlayerContorller] GetGun 적용");
+        _gun = GunManager.Instance.gunController.gameObject;
+        _oldGunPos = _gun.transform.position;
+        _oldGunRotation = _gun.transform.rotation.eulerAngles;
+    }
+
+
     public void PlayFire(int bulletType, bool isSelf)
     {
         if (gunCorutine == null && _isGunAnim == false)
@@ -96,6 +104,40 @@ public class PlayerController : MonoBehaviourPun
             _bulletType = bulletType;
             GetGun(_gun.transform, _destination.transform);
         }
+    }
+
+    public void TriggerTargetAnimation()
+    {
+        GamePlayer target = null;
+        if (_isSelf)
+        {
+            target = GetComponent<GamePlayer>();
+        }
+        else
+        {
+            foreach (var gamePlayer in PlayerManager.Instance.GetAllPlayers().Values)
+            {
+                if (gamePlayer._pv != _pv)
+                {
+                    target = gamePlayer;
+                    break;
+                }
+            }
+        }
+        
+        if (_bulletType == (int)BulletType.live)
+        {
+            Debug.Log($"{PhotonNetwork.LocalPlayer.NickName}이 발사해서 애니메이션을 진행하다가 {target?.Nickname}의 hit을 재생시킵니다.");
+
+            target?.RPC_PlayTrigger("Hit");
+            
+        }
+        
+        if (_isSelf)
+        {
+            OnEndAnimation();
+        }
+
     }
 
 
@@ -230,6 +272,7 @@ public class PlayerController : MonoBehaviourPun
 
     public void OnEndAnimation()
     {
+        Debug.Log("Onend animation 호출. 마스터면 턴 끝내기 처리 ");
         if (!PhotonNetwork.IsMasterClient)
             return;
         StartCoroutine(DelayAndTurnEnd());
@@ -237,8 +280,8 @@ public class PlayerController : MonoBehaviourPun
 
     private IEnumerator DelayAndTurnEnd()
     {
-        Debug.Log("애니메이션 종료 후 0.5초 대기를 시작합니다.(마스터 매니저만 호출합니다.)");
-        yield return new WaitForSeconds(0.5f);
+        Debug.Log("애니메이션 종료 후 0.3초 대기를 시작합니다.(마스터 매니저만 호출합니다.)");
+        yield return new WaitForSeconds(0.3f);
         _fireSync?.RequestEndTurn();
     }
 
@@ -271,7 +314,7 @@ public class PlayerController : MonoBehaviourPun
 
     public void PlayShotSFX()
     {
-        if(_bulletType == (int)BulletType.live)
+        if (_bulletType == (int)BulletType.live)
             Manager.Sound.PlaySfxByKey("Fire");
         else
             Manager.Sound.PlaySfxByKey("Blank");
