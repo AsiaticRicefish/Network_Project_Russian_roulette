@@ -42,14 +42,14 @@ public class PlayerController : MonoBehaviourPun
     {
         _rb = GetComponent<Rigidbody>();
         _pv = GetComponent<PhotonView>();
+        
+        //이벤트 구독
+        InGameManager.Instance.OnGameStart += GetGun;
     }
 
     private void Start()
     {
-        _gun = GameObject.FindWithTag("Gun"); //Gun 오브젝트 찾기
-        _oldGunPos = _gun.transform.position;
-        _oldGunRotation = _gun.transform.rotation.eulerAngles;
-
+        
         _fireSync = FindObjectOfType<FireSync>();
 
         if (!_pv.IsMine)
@@ -86,6 +86,16 @@ public class PlayerController : MonoBehaviourPun
     //     //PlayerLook();
     // }
 
+
+    public void GetGun()
+    {
+        // _gun = GameObject.FindWithTag("Gun"); //Gun 오브젝트 찾기
+
+        _gun = GunManager.Instance.gunController.gameObject;
+        _oldGunPos = _gun.transform.position;
+        _oldGunRotation = _gun.transform.rotation.eulerAngles;
+    }
+    
 
     public void PlayFire(int bulletType, bool isSelf)
     {

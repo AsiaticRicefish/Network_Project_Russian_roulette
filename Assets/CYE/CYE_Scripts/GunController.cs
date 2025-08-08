@@ -34,11 +34,16 @@ public class GunController : MonoBehaviourPun
             InGameManager.Instance.OnTurnEnd += HoldReset;
         }
 
+        
+        //타겟 ui 참조 설정
         var targetUI = FindObjectOfType<TargetSelectUI>(true);
         targetUI.SetGunController(this);
         _targetSelectUI = targetUI.gameObject;
         targetUI.gameObject.SetActive(false);
+        
     }
+    
+    
     void OnMouseDown()
     {
         if (EventSystem.current.IsPointerOverGameObject()) return;
