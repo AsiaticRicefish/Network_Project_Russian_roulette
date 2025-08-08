@@ -22,6 +22,8 @@ namespace Utils
     {
         public static readonly Dictionary<NotifyMessageType, MessageEntity> MessageEntities = new Dictionary<NotifyMessageType, MessageEntity>
         {
+            [NotifyMessageType.EnterLobby] = new ("Enter Lobby", "Welcome!", NotifyType.Check),
+            
             [NotifyMessageType.SignupSuccess] = new ("Sign Up Successful", "Your account has been created. Welcome!", NotifyType.Check),
             [NotifyMessageType.SignupError] = new ("Sign Up Failed", "Something went wrong. Please try again.", NotifyType.Error),
             
