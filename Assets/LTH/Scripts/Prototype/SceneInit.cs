@@ -74,6 +74,7 @@ public class SceneInit : MonoBehaviourPunCallbacks
     {
         if (Manager.PlayerManager.GetAllPlayers().Count == 2)
         {
+            
             // Manager.Camera.PushCamera("Player");
             if (PhotonNetwork.IsMasterClient)
             {
