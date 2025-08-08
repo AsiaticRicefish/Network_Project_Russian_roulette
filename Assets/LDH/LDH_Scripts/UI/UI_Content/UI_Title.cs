@@ -29,13 +29,17 @@ namespace GameUI
 
         [Header("Buttons")] 
         [SerializeField] private GameObject _signupButton;
-        [SerializeField] private GameObject _loginButton;
+        // [SerializeField] private GameObject _loginButton;
+        [SerializeField] private GameObject _startButton;
+        
         [SerializeField] private GameObject _settingButton;
         
 
         [Header("Panel Animation Config")]
         [SerializeField] private float _showTitlePanelDelay = 0.3f;
         private WaitForSeconds _titlePanelWait;
+
+        private bool isEnterLobby = false;
         
         private void Awake()
         {
@@ -77,7 +81,9 @@ namespace GameUI
             UI_Base.BindUIEvent(_signupButton, ShowSignupPanel, Define_LDH.UIEvent.Click);
 
             // log in button
-            UI_Base.BindUIEvent(_loginButton, ShowLoginPanel, Define_LDH.UIEvent.Click);
+            // UI_Base.BindUIEvent(_loginButton, ShowLoginPanel, Define_LDH.UIEvent.Click);
+            
+            UI_Base.BindUIEvent(_startButton, EnterLobby);
             
             // setting button
             UI_Base.BindUIEvent(_settingButton, ShowSettingPanel);
@@ -187,5 +193,16 @@ namespace GameUI
         
 
         #endregion
+
+
+        private void EnterLobby(PointerEventData data)
+        {
+            if(isEnterLobby) return;
+
+            isEnterLobby = true;
+            Manager.UI.ShowNotifyModal(NotifyMessage.MessageEntities[Define_LDH.NotifyMessageType.EnterLobby]);
+            Debug.Log($"[{GetType().Name}] 로비 씬으로 이동합니다.");
+            StartCoroutine(Util_LDH.LoadSceneWithDelay("Lobby", 1f));
+        }
     }
 }

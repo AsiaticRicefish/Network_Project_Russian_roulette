@@ -40,6 +40,7 @@ namespace Utils
         
         public enum NotifyMessageType
         {
+            EnterLobby,
             SignupSuccess,
             SignupError,
             EmailCheckSuccess,
