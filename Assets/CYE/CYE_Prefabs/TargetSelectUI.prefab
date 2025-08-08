@@ -151,7 +151,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &4912553547351428360
 RectTransform:
   m_ObjectHideFlags: 0
@@ -185,12 +185,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 11cf718dba01ed44385cc44dbc0a53d8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _targetSpawnPoint:
-  - {fileID: 0}
-  - {fileID: 0}
   _targetButtonArray:
   - {fileID: 7367888901692560347}
   - {fileID: 3298496497866794282}
+  _fireSync: {fileID: 0}
+  _gunController: {fileID: 0}
 --- !u!1 &3298496497866794282
 GameObject:
   m_ObjectHideFlags: 0
@@ -228,7 +227,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 50}
   m_SizeDelta: {x: 300, y: 150}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!222 &3635863548583152883
@@ -510,7 +509,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: -50}
   m_SizeDelta: {x: 300, y: 150}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!222 &3952530099011324772

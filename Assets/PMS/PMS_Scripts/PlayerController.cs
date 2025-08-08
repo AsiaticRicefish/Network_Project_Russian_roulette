@@ -230,7 +230,6 @@ public class PlayerController : MonoBehaviourPun
 
     public void OnEndAnimation()
     {
-        Debug.Log("asdfasfasfasfdf");
         if (!PhotonNetwork.IsMasterClient)
             return;
         StartCoroutine(DelayAndTurnEnd());
