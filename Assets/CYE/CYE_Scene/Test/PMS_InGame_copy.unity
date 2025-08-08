@@ -18288,12 +18288,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerPrefabName: Player
+  gunPrefabName: 
   spawnPoints:
   - {fileID: 723768325}
   - {fileID: 1299948553}
   virtualCameras:
   - {fileID: 589999416}
   - {fileID: 997190986}
+  gunSpawnPoint: {fileID: 0}
+  _targetUI: {fileID: 0}
 --- !u!4 &470778918
 Transform:
   m_ObjectHideFlags: 0
@@ -81618,7 +81621,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 15.122925, y: 421.7484}
+  m_AnchoredPosition: {x: 15.123047, y: 421.7484}
   m_SizeDelta: {x: -994.0072, y: -858.1968}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2045363573
