@@ -80,7 +80,7 @@ public class GamePlayer : MonoBehaviourPun, IComparer<GamePlayer>
 
     public bool IsCuffedThisTurn = false;
 
-    private PlayerController _playerController;
+    public PlayerController _playerController;
 
 
     private void Awake()

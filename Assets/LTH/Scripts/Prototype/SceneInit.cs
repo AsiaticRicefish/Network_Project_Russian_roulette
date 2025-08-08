@@ -74,10 +74,15 @@ public class SceneInit : MonoBehaviourPunCallbacks
     {
         if (Manager.PlayerManager.GetAllPlayers().Count == 2)
         {
-            
+            //총 등록
+            foreach(var player in Manager.PlayerManager.GetAllPlayers())
+            {
+                player.Value._playerController.GetGun();
+            }
             // Manager.Camera.PushCamera("Player");
             if (PhotonNetwork.IsMasterClient)
             {
+                
                 // //총을 생성하기
                 // var gun = PhotonNetwork.Instantiate(gunPrefabName, gunSpawnPoint.position, Quaternion.identity).GetComponent<GunController>();
                 //

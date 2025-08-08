@@ -41,10 +41,7 @@ public class PlayerController : MonoBehaviourPun
     private void Awake()
     {
         _rb = GetComponent<Rigidbody>();
-        _pv = GetComponent<PhotonView>();
-        
-        //이벤트 구독
-        InGameManager.Instance.OnGameStart += GetGun;
+        _pv = GetComponent<PhotonView>();     
     }
 
     private void Start()
@@ -91,6 +88,7 @@ public class PlayerController : MonoBehaviourPun
     {
         // _gun = GameObject.FindWithTag("Gun"); //Gun 오브젝트 찾기
 
+        Debug.Log($"[PlayerContorller] GetGun 적용");
         _gun = GunManager.Instance.gunController.gameObject;
         _oldGunPos = _gun.transform.position;
         _oldGunRotation = _gun.transform.rotation.eulerAngles;
