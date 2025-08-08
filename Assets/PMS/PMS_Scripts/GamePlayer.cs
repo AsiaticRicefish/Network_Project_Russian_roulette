@@ -80,10 +80,15 @@ public class GamePlayer : MonoBehaviourPun, IComparer<GamePlayer>
 
     public bool IsCuffedThisTurn = false;
 
+    private PlayerController _playerController;
+
+
     private void Awake()
     {
         _animator = GetComponent<Animator>();
         _pv = GetComponent<PhotonView>();
+        _playerController = GetComponent<PlayerController>();
+
         Initialize();
     }
 
@@ -157,7 +162,7 @@ public class GamePlayer : MonoBehaviourPun, IComparer<GamePlayer>
     }
 
     #region 플레이어 hp 관련 메서드
-   
+
     public void IncreaseHp(int amount)
     {
         //if (!IsAlive) return;
@@ -169,7 +174,7 @@ public class GamePlayer : MonoBehaviourPun, IComparer<GamePlayer>
     {
         //if (!IsAlive) return;
 
-        _pv.RPC("RPC_DecreasePlayerCurrentHp", RpcTarget.MasterClient, PlayerId, damage);
+        _pv.RPC(nameof(RPC_DecreasePlayerCurrentHp), RpcTarget.MasterClient, PlayerId, damage);
     }
     #endregion
 
@@ -208,20 +213,20 @@ public class GamePlayer : MonoBehaviourPun, IComparer<GamePlayer>
     {
         // 수신된 데이터를 사용하여 플레이어 업데이트
         _data = new PlayerData(receivedNickname, receivedPlayerId, receivedWinCount, receivedLoseCount);
-        _spawnPointindex = receiveSpawnPointIndex; 
+        _spawnPointindex = receiveSpawnPointIndex;
         Debug.Log($"RPC로 수신된 플레이어 닉네임: {_data.nickname}, 플레이어 ID: {_data.playerId}, 승리: {_data.winCount}, 패배: {_data.loseCount}");
 
         PlayerManager.Instance.RegisterPlayer(this);
 
         // TODO - 모든 플레이어가 List의 순서를 보장해줘야한다.
-        PlayerManager.Instance._playerList.Add(this);      
+        PlayerManager.Instance._playerList.Add(this);
     }
 
     // 내 PlayerData를 다른 클라이언트에게 보내는 함수
     public void SendMyPlayerDataRPC()
     {
         // RpcTarget.AllViaServer는 모든 클라이언트에게 RPC를 전송  전송자 -> 서버 -> 클라이언트 RpcTarget.AllViaServer
-        _pv.RPC("ReceivePlayerData", RpcTarget.All, _data.nickname,_data.playerId,_data.winCount,_data.loseCount,_spawnPointindex);
+        _pv.RPC("ReceivePlayerData", RpcTarget.All, _data.nickname, _data.playerId, _data.winCount, _data.loseCount, _spawnPointindex);
     }
 
     //테스트 코드 임시 스폰 pos에 따른 Compare구현 - 각자의 List Sort하기 위해서
@@ -274,7 +279,7 @@ public class GamePlayer : MonoBehaviourPun, IComparer<GamePlayer>
 
         int newHp = Mathf.Max(target.CurrentHp - damage, 0);
         // 결과를 모든 클라에게 전파
-        photonView.RPC("RPC_ApplyHp", RpcTarget.All, requestId, newHp);
+        photonView.RPC(nameof(RPC_ApplyHp), RpcTarget.All, requestId, newHp);
     }
 
 
@@ -313,17 +318,25 @@ public class GamePlayer : MonoBehaviourPun, IComparer<GamePlayer>
         if (hp < oldHp && PhotonNetwork.IsMasterClient)
         {
             // 해당 플레이어에게만 애니메이션 재생 지시
-            player.photonView.RPC("RPC_PlayTrigger", RpcTarget.All, "Hit");
+            player.photonView.RPC(nameof(RPC_PlayTrigger), RpcTarget.All, "Hit");
         }
     }
 
     [PunRPC]
-    void RPC_PlayTrigger(string triggerName)
+    public void RPC_PlayTrigger(string triggerName)
     {
         Debug.Log("[GamePlayer] --- 트리거 호출");
         Debug.Log(triggerName);
         _animator.SetTrigger(triggerName);
     }
+
+    [PunRPC]
+    public void RPC_PlayFire(int value, bool isSelf)
+    {
+        _playerController.PlayFire(value, isSelf);
+    }
+
+
 
     [PunRPC]
     public void RPC_ShowBulletInfo(int bulletTypeInt)
@@ -335,4 +348,7 @@ public class GamePlayer : MonoBehaviourPun, IComparer<GamePlayer>
             ui.ShowBulletInfo(type);
         }
     }
+
+
+
 }

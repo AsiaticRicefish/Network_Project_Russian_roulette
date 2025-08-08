@@ -23,6 +23,7 @@ public class PlayerManager : Singleton<PlayerManager>
     [SerializeField] public List<PlayerData> _playerDataList;
 
     public Dictionary<string, GamePlayer> GetAllPlayers() => _players;
+    
 
     public Action OnAddPlayer;
 
@@ -154,6 +155,25 @@ public class PlayerManager : Singleton<PlayerManager>
 
         Debug.LogWarning($"[PlayerManager] 닉네임 {nickname} 을 가진 플레이어를 찾지 못했습니다.");
         return null;
+    }
+
+
+    /// <summary>
+    /// 현재 로컬 플레이어를 제외한 모든 GamePlayer 리스트를 반환
+    /// </summary>
+    public List<GamePlayer> GetOtherPlayers()
+    {
+        string myId = PhotonNetwork.LocalPlayer.UserId;
+        List<GamePlayer> others = new List<GamePlayer>();
+        foreach (var player in _players.Values)
+        {
+            if (player.PlayerId!= myId)
+            {
+                others.Add(player);
+            }
+        }
+
+        return others;
     }
 
     //Dictionary에 추가되어 있는 유저들 확인(디버깅용)

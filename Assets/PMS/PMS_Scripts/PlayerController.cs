@@ -7,6 +7,7 @@ using UnityEngine;
 using Photon.Pun;
 using Utils;
 using DG.Tweening;
+using Photon.Realtime;
 
 public class PlayerController : MonoBehaviourPun
 {
@@ -16,12 +17,16 @@ public class PlayerController : MonoBehaviourPun
 
     [SerializeField] private GameObject _gun;
     [SerializeField] private GameObject _gunPos;
+    [SerializeField] private GameObject _selfGunPos;
     [SerializeField] private GameObject _destination;
+
+    private bool _isSelf = false;
 
     private Vector3 _oldGunPos;
     private Vector3 _oldGunRotation;
 
-    private bool IsGunAnim = false;
+    private bool _isGunAnim = false;
+    private int _bulletType = 0;
 
     private float moveSpeed = 5.0f;
     private float verticalLookRotation;
@@ -31,6 +36,8 @@ public class PlayerController : MonoBehaviourPun
 
     private IEnumerator gunCorutine;
 
+    private FireSync _fireSync;
+
     private void Awake()
     {
         _rb = GetComponent<Rigidbody>();
@@ -39,8 +46,11 @@ public class PlayerController : MonoBehaviourPun
 
     private void Start()
     {
+        _gun = GameObject.FindWithTag("Gun"); //Gun 오브젝트 찾기
         _oldGunPos = _gun.transform.position;
         _oldGunRotation = _gun.transform.rotation.eulerAngles;
+
+        _fireSync = FindObjectOfType<FireSync>();
 
         if (!_pv.IsMine)
         {
@@ -49,6 +59,7 @@ public class PlayerController : MonoBehaviourPun
             GetComponentInChildren<Camera>().gameObject.SetActive(false);
             Destroy(_rb);
         }
+
         //  
         //  string nickname = PhotonNetwork.NickName;
         //  string playerId = photonView.Owner.UserId;
@@ -63,42 +74,61 @@ public class PlayerController : MonoBehaviourPun
     }
 
 
-    private void Update()
-    {
-        if (!_pv.IsMine) return;
+    // private void Update()
+    // {
+    //     if (!_pv.IsMine) return;
+    //
+    //     if (Input.GetKeyDown(KeyCode.Space) && gunCorutine == null && IsGunAnim == false)
+    //     {
+    //         IsGunAnim = true;
+    //         GetGun(_gun.transform, _destination.transform);
+    //     }
+    //     //PlayerLook();
+    // }
 
-        if (Input.GetKeyDown(KeyCode.Space) && gunCorutine == null && IsGunAnim == false)
+
+    public void PlayFire(int bulletType, bool isSelf)
+    {
+        if (gunCorutine == null && _isGunAnim == false)
         {
-            IsGunAnim = true;
+            _isGunAnim = true;
+            _isSelf = isSelf;
+            _bulletType = bulletType;
             GetGun(_gun.transform, _destination.transform);
         }
-        //PlayerLook();
     }
+
 
     private IEnumerator GunAnimation()
     {
+        _animator.SetBool("IsSelf", _isSelf);
+
         _animator.SetTrigger("Shot");
 
-        _gun.transform.parent = _gunPos.transform;
+        _gun.transform.parent = _isSelf ? _selfGunPos.transform : _gunPos.transform;
+        ;
         _gun.transform.position = transform.position;
 
         _gun.transform.localPosition = new Vector3(0, 0, 0);
         _gun.transform.localRotation = Quaternion.Euler(0, 0, 0);
 
-        yield return new WaitForSeconds(2.3f);// new WaitUntil(() => !_animator.GetCurrentAnimatorStateInfo(1).IsName("GunPlay"));
+        yield return
+            new WaitForSeconds(
+                2.3f); // new WaitUntil(() => !_animator.GetCurrentAnimatorStateInfo(1).IsName("GunPlay"));
 
         _gun.transform.parent = null;
 
         _gun.transform.position = _oldGunPos;
-        _gun.transform.rotation = Quaternion.LookRotation(_oldGunRotation);//_oldGunRotation;
+        _gun.transform.rotation = Quaternion.LookRotation(_oldGunRotation); //_oldGunRotation;
 
         gunCorutine = null;
-        IsGunAnim = false;
+        _isGunAnim = false;
     }
 
     private void GetGun(Transform target, Transform destination)
     {
         //Manager.Camera.PlayImpulse(1.0f);
+        target.rotation = Quaternion.identity;
         Sequence seq = DOTween.Sequence();
         seq.Append(target.DOMove(destination.position, 1.5f));
         seq.Join(target.DORotate(new Vector3(-45, 90, 0), 0.8f));
@@ -110,9 +140,28 @@ public class PlayerController : MonoBehaviourPun
         });
     }
 
-    private void GunImpuse()
+    private void GunImpulse()
     {
-        Manager.Camera.PlayImpulse(1.0f);
+        if (photonView.IsMine)
+        {
+            Manager.Camera.PlayImpulse(1.0f, CinemachineImpulseDefinition.ImpulseShapes.Rumble);
+        }
+    }
+
+    private void OnGunImpuse()
+    {
+        if (!photonView.IsMine) return;
+
+        Debug.Log($"[PlayerController] 탄값 {_bulletType}");
+        if (_bulletType == 2)
+        {
+            GunImpulse();
+            Debug.Log("Live탄");
+        }
+        else if (_bulletType == 1)
+        {
+            Debug.Log("Blank탄");
+        }
     }
 
     //시점 변경 테스트코드
@@ -145,6 +194,9 @@ public class PlayerController : MonoBehaviourPun
         }
     }
 
+
+    #region Setting
+
     //가상 카메라 및 시네머신 브레인 설정, 초기화
     public IEnumerator InitCameraSetting()
     {
@@ -152,16 +204,84 @@ public class PlayerController : MonoBehaviourPun
         //카메라 매니저에 stack에 push
         CinemachineVirtualCamera vcam = GetComponentInChildren<CinemachineVirtualCamera>();
         var playerVCam = Util_LDH.GetOrAddComponent<VirtualCam_LocalPlayer>(vcam.gameObject);
-        Manager.Camera.PushCamera(playerVCam.cameraID);
 
+        var impluseSource = Util_LDH.GetOrAddComponent<CinemachineImpulseSource>(vcam.gameObject);
+        impluseSource.m_ImpulseDefinition.m_ImpulseType = CinemachineImpulseDefinition.ImpulseTypes.Uniform;
+
+        //Manager.Camera.PushCamera(playerVCam.cameraID);
         Camera cam = GetComponentInChildren<Camera>();
         // 내 플레이어의 캠을 카메라 매니저의 매인캠으로 등록, CinemachineBrain 추가, ImpulseListener 추가
         Manager.Camera.SetMainCamera(cam);
         Manager.Camera.ApplyBlenderSettingToBrain(cam, "InGameCinemahineBlenderSetting");
 
         Util_LDH.GetOrAddComponent<CinemachineBrain>(cam.gameObject);
-        Util_LDH.GetOrAddComponent<CinemachineIndependentImpulseListener>(cam.gameObject);
+        var impluseListener = Util_LDH.GetOrAddComponent<CinemachineIndependentImpulseListener>(cam.gameObject);
+        impluseListener.m_ChannelMask = ~0; //모든 채널 활성화
+        impluseListener.m_Gain = 1f; //gain 1로 설정
+
 
         yield return null;
     }
+
+    #endregion
+
+
+    #region Sync
+
+    public void OnEndAnimation()
+    {
+        Debug.Log("asdfasfasfasfdf");
+        if (!PhotonNetwork.IsMasterClient)
+            return;
+        StartCoroutine(DelayAndTurnEnd());
+    }
+
+    private IEnumerator DelayAndTurnEnd()
+    {
+        Debug.Log("애니메이션 종료 후 0.5초 대기를 시작합니다.(마스터 매니저만 호출합니다.)");
+        yield return new WaitForSeconds(0.5f);
+        _fireSync?.RequestEndTurn();
+    }
+
+    #endregion
+
+    #region Souund
+
+    // public void PlayShotSFX()
+    // {
+    //     if (_bulletType == (int)BulletType.live)
+    //         Manager.Sound.PlayFire();
+    //     else
+    //         Manager.Sound.PlayBlank();
+    // }
+
+    public void PlayPickUpGunSFX()
+    {
+        Manager.Sound.PlaySfxByKey("PickUpGun");
+    }
+
+    public void PlayReloadSFX()
+    {
+        Manager.Sound.PlaySfxByKey("Reload");
+    }
+
+    public void PlayDropBulletSFX()
+    {
+        Manager.Sound.PlaySfxByKey("DropBullet");
+    }
+
+    public void PlayShotSFX()
+    {
+        if(_bulletType == (int)BulletType.live)
+            Manager.Sound.PlaySfxByKey("Fire");
+        else
+            Manager.Sound.PlaySfxByKey("Blank");
+    }
+
+    // public void PlayBlankSFX()
+    // {
+    //     Manager.Sound.PlaySfxByKey("Blank");
+    // }
+
+    #endregion
 }

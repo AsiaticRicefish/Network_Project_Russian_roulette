@@ -48,7 +48,7 @@ public class ItemManager : Singleton<ItemManager>
                 //    break;
                 //}
 
-                GunManager.Instance.PV.RPC("RPC_SetEnhanced", RpcTarget.All, true);
+                GunManager.Instance.gunController.photonView.RPC("RPC_SetEnhanced", RpcTarget.All, true);
                 Debug.Log("톱 사용 → 이번턴 총기 데미지 2배");
                 break;
 
@@ -58,8 +58,9 @@ public class ItemManager : Singleton<ItemManager>
                 break;
 
             case ItemType.Dial:
-                GunManager.Instance.PV.RPC("RPC_SwitchNextBullet", RpcTarget.All);
+                GunManager.Instance.gunController.photonView.RPC("RPC_SwitchNextBullet", RpcTarget.All);
                 Debug.Log("다이얼 사용 → 현재 탄 타입 변환");
+                
                 break;
 
             case ItemType.Cellphone:

@@ -254,7 +254,7 @@ public class InGameManager : Singleton<InGameManager>
     private void TurnInit()
     {
         OnTurnChange?.Invoke();
-        _photonView.RPC(nameof(InGameManager.SyncIsKeepTurn), RpcTarget.All, false);
+        _photonView.RPC(nameof(SyncIsKeepTurn), RpcTarget.All, false);
     }
 
     private bool CheckRoundEnd()
@@ -304,12 +304,12 @@ public class InGameManager : Singleton<InGameManager>
     private void OnPlayerDiedHandler(GamePlayer deadPlayer)
     {
         Debug.Log($"[InGameManager] 사망 감지: {deadPlayer.Nickname}");
-        if (CheckRoundEnd()) EndRound();
+        //if (CheckRoundEnd()) EndRound();      //end round 2번 호출되어서 하나 주석 처리
     }
     public void ChangeKeepTurn(bool isKeepTurn)
     {
         Debug.Log($"[InGameManager] 턴 유지 여부 동기화: {isKeepTurn}");
-        _photonView.RPC(nameof(InGameManager.SyncIsKeepTurn), RpcTarget.All, isKeepTurn);
+        _photonView.RPC(nameof(SyncIsKeepTurn), RpcTarget.All, isKeepTurn);
     }
     [PunRPC]
     public void SyncIsKeepTurn(bool isKeepTurn)

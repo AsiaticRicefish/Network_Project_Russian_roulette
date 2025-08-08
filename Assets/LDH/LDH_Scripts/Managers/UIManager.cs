@@ -21,7 +21,7 @@ namespace Managers
             get => _order;
             set
             {
-                Debug.Log($"canvas order value 변경 - new value : {value}");
+                //Debug.Log($"canvas order value 변경 - new value : {value}");
                 _order = value;
             }
         }                                                // 용
